@@ -1,0 +1,8 @@
+{
+    "@@locale": "en",
+    "appTitle": "Archethic dApp Template",
+    "connectWallet": "Connect Wallet",
+    "disconnectWallet": "Disconnect",
+    "welcomeMessage": "Welcome to Archethic dApp Template",
+    "connectedMessage": "You are connected to the Archethic wallet!"
+}
