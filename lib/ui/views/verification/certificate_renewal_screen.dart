@@ -334,7 +334,15 @@ class _CertificateRenewalScreenState
 
       // Navigate to the verification process screen
       if (mounted) {
-        await context.pushNamed('verificationProcess');
+        await context.pushNamed(
+          'verificationProcess',
+          pathParameters: {'processIdentifier': 'renewal'},
+          queryParameters: ref
+                  .read(verificationNotifierProvider)
+                  .verificationProcess
+                  ?.toJson() ??
+              {},
+        );
       }
     } catch (e) {
       // Show error

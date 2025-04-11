@@ -91,35 +91,71 @@ class MainApp extends ConsumerWidget {
             path: '/welcome',
             builder: (context, state) => const WelcomeScreen(),
           ),
-          GoRoute(
-            path: '/main',
-            builder: (context, state) => const MainScreen(),
+          ShellRoute(
+            builder: (context, state, child) {
+              return MainScreen(child: child);
+            },
             routes: [
               GoRoute(
-                path: 'identity',
+                path: '/main',
+                builder: (context, state) => const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.account_balance_wallet,
+                        size: 80,
+                        color: Colors.blue,
+                      ),
+                      SizedBox(height: 24),
+                      Text(
+                        'DID Wallet',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'Votre portefeuille d\'identité numérique',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              GoRoute(
+                path: '/main/identity',
                 builder: (context, state) => const IdentityScreen(),
                 routes: [
                   GoRoute(
                     path: 'createIdentity',
+                    name: 'createIdentity',
                     builder: (context, state) => const CreateIdentityScreen(),
                   ),
                   GoRoute(
-                    path: 'identityDetails',
-                    builder: (context, state) => IdentityDetailsScreen(),
+                    path: 'identityDetails/:address',
+                    name: 'identityDetails',
+                    builder: (context, state) => IdentityDetailsScreen(
+                      address: state.pathParameters['address'],
+                    ),
                   ),
                 ],
               ),
               GoRoute(
-                path: 'verification',
+                path: '/main/verification',
+                name: 'verification',
                 builder: (context, state) => const VerificationScreen(),
                 routes: [
                   GoRoute(
                     path: 'start',
+                    name: 'verificationStart',
                     builder: (context, state) =>
                         const VerificationStartScreen(),
                   ),
                   GoRoute(
                     path: 'process/:processIdentifier',
+                    name: 'verificationProcess',
                     builder: (context, state) => VerificationProcessScreen(
                       verificationProcess: VerificationProcess.fromJson(
                         state.uri.queryParameters,
@@ -180,7 +216,8 @@ class MainApp extends ConsumerWidget {
                 ],
               ),
               GoRoute(
-                path: 'documents',
+                path: '/main/documents',
+                name: 'documents',
                 builder: (context, state) => const DocumentListScreen(),
                 routes: [
                   GoRoute(
@@ -198,7 +235,8 @@ class MainApp extends ConsumerWidget {
                 ],
               ),
               GoRoute(
-                path: 'credentials',
+                path: '/main/credentials',
+                name: 'credentials',
                 builder: (context, state) => const CredentialListScreen(),
                 routes: [
                   GoRoute(

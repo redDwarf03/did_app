@@ -72,7 +72,7 @@ class VerificationSuccessScreen extends ConsumerWidget {
 
               // Actions
               ElevatedButton.icon(
-                onPressed: () => context.go('/'), // Go to home page
+                onPressed: () => context.go('/main'), // Go to home page
                 icon: const Icon(Icons.home),
                 label: const Text('Return to Home'),
                 style: ElevatedButton.styleFrom(
@@ -85,7 +85,7 @@ class VerificationSuccessScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: () =>
-                    context.go('/identity'), // Go to identity screen
+                    context.go('/main/identity'), // Go to identity screen
                 icon: const Icon(Icons.person),
                 label: const Text('View My Identity'),
                 style: ElevatedButton.styleFrom(

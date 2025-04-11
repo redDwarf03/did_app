@@ -420,7 +420,15 @@ class _VerificationStartScreenState
 
       // Navigate to verification process screen
       if (mounted) {
-        await context.pushNamed('verificationProcess');
+        await context.pushNamed(
+          'verificationProcess',
+          pathParameters: {'processIdentifier': 'latest'},
+          queryParameters: ref
+                  .read(verificationNotifierProvider)
+                  .verificationProcess
+                  ?.toJson() ??
+              {},
+        );
       }
     } catch (e) {
       // Show error message

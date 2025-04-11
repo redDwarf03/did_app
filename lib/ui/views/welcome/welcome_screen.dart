@@ -65,7 +65,7 @@ class WelcomeScreen extends ConsumerWidget {
                 icon: const Icon(Icons.badge),
                 label: const Text('Manage Digital Identity'),
                 onPressed: () {
-                  context.go('/identity');
+                  context.go('/main/identity');
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
