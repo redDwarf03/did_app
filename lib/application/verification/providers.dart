@@ -83,7 +83,7 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
 
   /// Load verification process for an identity
   Future<void> loadVerification(String identityAddress) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(verificationRepositoryProvider);
@@ -91,10 +91,10 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
           await repository.getVerificationProcess(identityAddress);
 
       // If there's a verification process, find the current step
-      int currentStepIndex = 0;
+      var currentStepIndex = 0;
       if (verification != null && verification.steps.isNotEmpty) {
         // Find the first incomplete step
-        for (int i = 0; i < verification.steps.length; i++) {
+        for (var i = 0; i < verification.steps.length; i++) {
           final step = verification.steps[i];
           if (step.status != VerificationStepStatus.completed) {
             currentStepIndex = i;
@@ -111,14 +111,14 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to load verification: ${e.toString()}',
+        errorMessage: 'Failed to load verification: $e',
       );
     }
   }
 
   /// Start a new verification process
   Future<void> startVerification(String identityAddress) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(verificationRepositoryProvider);
@@ -142,21 +142,21 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to start verification: ${e.toString()}',
+        errorMessage: 'Failed to start verification: $e',
       );
     }
   }
 
   /// Start a new verification with a specific level
   Future<void> startVerificationWithLevel(dynamic verificationLevel) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(verificationRepositoryProvider);
       // TODO: Get identity address from session or wallet connection
       // This is currently hardcoded but should come from the authenticated user's session
-      final identityAddress =
-          "current_user_address"; // In a real app, get from session
+      const identityAddress =
+          'current_user_address'; // In a real app, get from session
 
       // Check if there's already a verification
       final hasActive = await repository.hasActiveVerification(identityAddress);
@@ -177,19 +177,19 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to start verification: ${e.toString()}',
+        errorMessage: 'Failed to start verification: $e',
       );
     }
   }
 
   /// Start a renewal process
   Future<void> startRenewal({String? previousCertificateId}) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(verificationRepositoryProvider);
-      final identityAddress =
-          "current_user_address"; // In a real app, get from session
+      const identityAddress =
+          'current_user_address'; // In a real app, get from session
 
       // Check if there's already a verification
       final hasActive = await repository.hasActiveVerification(identityAddress);
@@ -210,7 +210,7 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to start renewal: ${e.toString()}',
+        errorMessage: 'Failed to start renewal: $e',
       );
     }
   }
@@ -224,7 +224,7 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
       return;
     }
 
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(verificationRepositoryProvider);
@@ -239,7 +239,7 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
       );
 
       // Move to the next incomplete step if available
-      int nextStepIndex = state.currentStepIndex;
+      var nextStepIndex = state.currentStepIndex;
       if (updatedVerification.steps.length > state.currentStepIndex + 1) {
         nextStepIndex = state.currentStepIndex + 1;
       }
@@ -252,7 +252,7 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to submit verification step: ${e.toString()}',
+        errorMessage: 'Failed to submit verification step: $e',
       );
     }
   }
@@ -274,7 +274,7 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
       return;
     }
 
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(verificationRepositoryProvider);
@@ -284,7 +284,7 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to cancel verification: ${e.toString()}',
+        errorMessage: 'Failed to cancel verification: $e',
       );
     }
   }
@@ -301,7 +301,8 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
 
   /// Get verification certificate for an identity
   Future<VerificationCertificate?> getVerificationCertificate(
-      String identityAddress) async {
+    String identityAddress,
+  ) async {
     try {
       final repository = ref.read(verificationRepositoryProvider);
       return await repository.getVerificationCertificate(identityAddress);

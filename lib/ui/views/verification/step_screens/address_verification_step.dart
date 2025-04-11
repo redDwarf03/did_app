@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:did_app/domain/verification/verification_process.dart';
+import 'package:flutter/material.dart';
 
 /// Address verification step component for verification process
 class AddressVerificationStep extends StatefulWidget {
@@ -30,9 +30,9 @@ class _AddressVerificationStepState extends State<AddressVerificationStep> {
           ),
         ),
         const SizedBox(height: 16),
-        Text(
+        const Text(
           'Please upload proof of your address (utility bill, bank statement, etc.)',
-          style: const TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 16),
         ),
         const SizedBox(height: 24),
         Center(

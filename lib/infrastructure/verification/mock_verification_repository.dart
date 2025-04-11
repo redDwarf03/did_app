@@ -5,6 +5,15 @@ import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:did_app/domain/verification/verification_repository.dart';
 
 /// Mock implementation of the Verification Repository for development and testing
+///
+/// TODO: Replace this mock implementation with a real verification service
+/// This class simulates a verification process with artificial delays and in-memory storage.
+/// A real implementation should:
+/// - Integrate with a real KYC/AML provider
+/// - Securely store verification data on the blockchain
+/// - Implement proper document validation
+/// - Follow eIDAS 2.0 compliance requirements
+/// - Implement secure certificate generation with real digital signatures
 class MockVerificationRepository implements VerificationRepository {
   // In-memory storage for mock verification processes
   final Map<String, VerificationProcess> _verifications = {};
@@ -56,7 +65,7 @@ class MockVerificationRepository implements VerificationRepository {
         order: 3,
         description: 'Upload your ID document',
         instructions:
-            'Please upload a high-quality photo of your ID document (passport, driver\'s license, or national ID card). Both front and back sides are required.',
+            "Please upload a high-quality photo of your ID document (passport, driver's license, or national ID card). Both front and back sides are required.",
         updatedAt: now,
       ),
 
@@ -105,7 +114,8 @@ class MockVerificationRepository implements VerificationRepository {
 
   @override
   Future<VerificationProcess?> getVerificationProcess(
-      String identityAddress) async {
+    String identityAddress,
+  ) async {
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 500));
 
@@ -132,7 +142,8 @@ class MockVerificationRepository implements VerificationRepository {
     final hasActive = await hasActiveVerification(identityAddress);
     if (hasActive) {
       throw Exception(
-          'There is already an active verification process for this identity');
+        'There is already an active verification process for this identity',
+      );
     }
 
     // Create a new verification process
@@ -188,7 +199,7 @@ class MockVerificationRepository implements VerificationRepository {
     );
 
     // Update the verification process status if needed
-    VerificationStatus updatedStatus = verification.status;
+    var updatedStatus = verification.status;
     if (updatedStatus == VerificationStatus.notStarted) {
       updatedStatus = VerificationStatus.inProgress;
     }
@@ -215,14 +226,24 @@ class MockVerificationRepository implements VerificationRepository {
     _verifications[verificationId] = updatedVerification;
 
     // For the mock implementation, we'll auto-approve steps after a delay
-    _autoApproveStepAfterDelay(verificationId, stepId);
+    await _autoApproveStepAfterDelay(verificationId, stepId);
 
     return updatedVerification;
   }
 
   /// Auto-approve a verification step after a delay (mock testing only)
   Future<void> _autoApproveStepAfterDelay(
-      String verificationId, String stepId) async {
+    String verificationId,
+    String stepId,
+  ) async {
+    // TODO: Remove this mock auto-approval in production implementation
+    // This method exists only for testing and demonstration purposes.
+    // A real implementation would:
+    // - Have verification steps reviewed by authorized personnel or automated systems
+    // - Implement proper validation of submitted documents
+    // - Follow regulatory compliance requirements for KYC/AML procedures
+    // - Provide detailed feedback for rejected verification steps
+
     // Random delay between 5-10 seconds for testing
     final delay = Duration(milliseconds: 5000 + _random.nextInt(5000));
     await Future.delayed(delay);
@@ -251,9 +272,9 @@ class MockVerificationRepository implements VerificationRepository {
       (step) => step.status == VerificationStepStatus.completed,
     );
 
-    VerificationStatus updatedStatus = verification.status;
-    DateTime? completedAt = verification.completedAt;
-    VerificationCertificate? certificate = verification.certificate;
+    var updatedStatus = verification.status;
+    var completedAt = verification.completedAt;
+    var certificate = verification.certificate;
 
     // If all steps are completed, mark verification as completed
     if (allStepsCompleted) {
@@ -321,7 +342,8 @@ class MockVerificationRepository implements VerificationRepository {
 
   @override
   Future<VerificationCertificate?> getVerificationCertificate(
-      String identityAddress) async {
+    String identityAddress,
+  ) async {
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 500));
 

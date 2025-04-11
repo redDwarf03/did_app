@@ -57,17 +57,29 @@ class CertificateDetailsScreen extends ConsumerWidget {
                   children: [
                     _buildDetailRow('Certificate ID', certificate.id, true),
                     const Divider(),
-                    _buildDetailRow('Issued Date',
-                        _formatDate(certificate.issuedAt), false),
-                    const Divider(),
-                    _buildDetailRow('Expiry Date',
-                        _formatDate(certificate.expiresAt), false),
+                    _buildDetailRow(
+                      'Issued Date',
+                      _formatDate(certificate.issuedAt),
+                      false,
+                    ),
                     const Divider(),
                     _buildDetailRow(
-                        'Issuing Authority', certificate.issuer, false),
+                      'Expiry Date',
+                      _formatDate(certificate.expiresAt),
+                      false,
+                    ),
                     const Divider(),
-                    _buildDetailRow('eIDAS Level',
-                        _getEidasLevelText(certificate.eidasLevel), false),
+                    _buildDetailRow(
+                      'Issuing Authority',
+                      certificate.issuer,
+                      false,
+                    ),
+                    const Divider(),
+                    _buildDetailRow(
+                      'eIDAS Level',
+                      _getEidasLevelText(certificate.eidasLevel),
+                      false,
+                    ),
                   ],
                 ),
               ),
@@ -145,7 +157,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
+                            color: Colors.green.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -196,9 +208,11 @@ class CertificateDetailsScreen extends ConsumerWidget {
                 child: ElevatedButton.icon(
                   onPressed: () => _renewCertificate(context),
                   icon: const Icon(Icons.refresh),
-                  label: Text(isExpired
-                      ? 'Renew Expired Certificate'
-                      : 'Renew Certificate'),
+                  label: Text(
+                    isExpired
+                        ? 'Renew Expired Certificate'
+                        : 'Renew Certificate',
+                  ),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
@@ -244,10 +258,10 @@ class CertificateDetailsScreen extends ConsumerWidget {
 
     return Card(
       elevation: 3,
-      color: statusColor.withOpacity(0.1),
+      color: statusColor.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: statusColor.withOpacity(0.3)),
+        side: BorderSide(color: statusColor.withValues(alpha: 0.3)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -360,7 +374,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       builder: (context) => Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -33,5 +33,6 @@ abstract class VerificationRepository {
 
   /// Get a certificate for a completed verification
   Future<VerificationCertificate?> getVerificationCertificate(
-      String identityAddress);
+    String identityAddress,
+  );
 }

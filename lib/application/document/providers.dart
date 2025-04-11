@@ -5,7 +5,7 @@ import 'package:did_app/domain/document/document_repository.dart';
 import 'package:did_app/infrastructure/document/mock_document_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Provider pour le repository de documents
+/// Provider for the document repository
 final documentRepositoryProvider = Provider<DocumentRepository>((ref) {
   // TODO: Replace mock implementation with real document storage on blockchain
   // This should implement secure storage of documents, with end-to-end encryption
@@ -13,7 +13,7 @@ final documentRepositoryProvider = Provider<DocumentRepository>((ref) {
   return MockDocumentRepository();
 });
 
-/// État de la gestion des documents
+/// State for document management
 class DocumentState {
   const DocumentState({
     this.documents = const [],
@@ -26,31 +26,31 @@ class DocumentState {
     this.sharedWithMe = const [],
   });
 
-  /// Liste des documents de l'utilisateur
+  /// List of user's documents
   final List<Document> documents;
 
-  /// Document actuellement sélectionné
+  /// Currently selected document
   final Document? selectedDocument;
 
-  /// Indicateur de chargement
+  /// Loading indicator
   final bool isLoading;
 
-  /// Message d'erreur éventuel
+  /// Error message if any
   final String? errorMessage;
 
-  /// Liste des versions pour le document sélectionné
+  /// List of versions for the selected document
   final List<DocumentVersion> documentVersions;
 
-  /// Version sélectionnée
+  /// Selected version
   final DocumentVersion? selectedVersion;
 
-  /// Liste des partages pour le document sélectionné
+  /// List of shares for the selected document
   final List<DocumentShare> documentShares;
 
-  /// Liste des documents partagés avec l'utilisateur
+  /// List of documents shared with the user
   final List<DocumentShare> sharedWithMe;
 
-  /// Méthode utilitaire pour copier l'instance avec des modifications
+  /// Utility method to copy the instance with modifications
   DocumentState copyWith({
     List<Document>? documents,
     Document? selectedDocument,
@@ -74,21 +74,21 @@ class DocumentState {
   }
 }
 
-/// Provider pour la gestion des documents
+/// Provider for document management
 final documentNotifierProvider =
     StateNotifierProvider<DocumentNotifier, DocumentState>((ref) {
   return DocumentNotifier(ref);
 });
 
-/// Notifier pour la gestion des documents
+/// Notifier for document management
 class DocumentNotifier extends StateNotifier<DocumentState> {
   DocumentNotifier(this.ref) : super(const DocumentState());
 
   final Ref ref;
 
-  /// Charger les documents d'un utilisateur
+  /// Load user's documents
   Future<void> loadDocuments(String identityAddress) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(documentRepositoryProvider);
@@ -101,22 +101,21 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage:
-            'Erreur lors du chargement des documents: ${e.toString()}',
+        errorMessage: 'Error loading documents: $e',
       );
     }
   }
 
-  /// Charger un document spécifique
+  /// Load a specific document
   Future<void> loadDocument(String documentId) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(documentRepositoryProvider);
       final document = await repository.getDocument(documentId);
 
       if (document != null) {
-        // Charger également les versions et les partages
+        // Also load versions and shares
         final versions = await repository.getDocumentVersions(documentId);
         final shares = await repository.getDocumentShares(documentId);
 
@@ -129,18 +128,18 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Document non trouvé',
+          errorMessage: 'Document not found',
         );
       }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors du chargement du document: ${e.toString()}',
+        errorMessage: 'Error loading document: $e',
       );
     }
   }
 
-  /// Ajouter un nouveau document
+  /// Add a new document
   Future<Document?> addDocument({
     required String identityAddress,
     required Uint8List fileBytes,
@@ -155,7 +154,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     bool isShareable = false,
     EidasLevel eidasLevel = EidasLevel.low,
   }) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(documentRepositoryProvider);
@@ -174,7 +173,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
         eidasLevel: eidasLevel,
       );
 
-      // Mettre à jour la liste des documents
+      // Update document list
       final updatedDocuments = [...state.documents, document];
       state = state.copyWith(
         documents: updatedDocuments,
@@ -186,13 +185,13 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors de l\'ajout du document: ${e.toString()}',
+        errorMessage: 'Error adding document: $e',
       );
       return null;
     }
   }
 
-  /// Mettre à jour un document
+  /// Update a document
   Future<Document?> updateDocument({
     required String documentId,
     required Uint8List fileBytes,
@@ -206,7 +205,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     EidasLevel? eidasLevel,
     String? changeNote,
   }) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(documentRepositoryProvider);
@@ -224,13 +223,13 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
         changeNote: changeNote,
       );
 
-      // Mettre à jour la liste des documents
+      // Update document list
       final index = state.documents.indexWhere((doc) => doc.id == documentId);
       if (index != -1) {
         final updatedDocuments = [...state.documents];
         updatedDocuments[index] = updatedDocument;
 
-        // Charger les versions mises à jour
+        // Load updated versions
         final versions = await repository.getDocumentVersions(documentId);
 
         state = state.copyWith(
@@ -250,29 +249,27 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage:
-            'Erreur lors de la mise à jour du document: ${e.toString()}',
+        errorMessage: 'Error updating document: $e',
       );
       return null;
     }
   }
 
-  /// Supprimer un document
+  /// Delete a document
   Future<bool> deleteDocument(String documentId) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(documentRepositoryProvider);
       final success = await repository.deleteDocument(documentId);
 
       if (success) {
-        // Supprimer le document de la liste
+        // Remove document from list
         final updatedDocuments =
             state.documents.where((doc) => doc.id != documentId).toList();
 
         state = state.copyWith(
           documents: updatedDocuments,
-          selectedDocument: null,
           documentVersions: [],
           documentShares: [],
           isLoading: false,
@@ -280,7 +277,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Échec de la suppression du document',
+          errorMessage: 'Failed to delete document',
         );
       }
 
@@ -288,16 +285,15 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage:
-            'Erreur lors de la suppression du document: ${e.toString()}',
+        errorMessage: 'Error deleting document: $e',
       );
       return false;
     }
   }
 
-  /// Charger le contenu d'un document
+  /// Load document content
   Future<Uint8List?> getDocumentContent(String documentId) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(documentRepositoryProvider);
@@ -308,16 +304,18 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors du chargement du contenu: ${e.toString()}',
+        errorMessage: 'Error loading content: $e',
       );
       return null;
     }
   }
 
-  /// Charger le contenu d'une version spécifique
+  /// Load content of a specific version
   Future<Uint8List?> getVersionContent(
-      String documentId, String versionId) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    String documentId,
+    String versionId,
+  ) async {
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(documentRepositoryProvider);
@@ -329,14 +327,13 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage:
-            'Erreur lors du chargement de la version: ${e.toString()}',
+        errorMessage: 'Error loading version: $e',
       );
       return null;
     }
   }
 
-  /// Partager un document
+  /// Share a document
   Future<DocumentShare?> shareDocument({
     required String documentId,
     required String recipientDescription,
@@ -346,7 +343,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     String? accessCode,
     int? maxAccessCount,
   }) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(documentRepositoryProvider);
@@ -360,7 +357,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
         maxAccessCount: maxAccessCount,
       );
 
-      // Mettre à jour la liste des partages
+      // Update shares list
       final updatedShares = [...state.documentShares, share];
       state = state.copyWith(
         documentShares: updatedShares,
@@ -371,22 +368,22 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors du partage du document: ${e.toString()}',
+        errorMessage: 'Error sharing document: $e',
       );
       return null;
     }
   }
 
-  /// Révoquer un partage
+  /// Revoke a share
   Future<bool> revokeShare(String shareId) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(documentRepositoryProvider);
       final success = await repository.revokeDocumentShare(shareId);
 
       if (success) {
-        // Supprimer le partage de la liste
+        // Remove share from list
         final updatedShares =
             state.documentShares.where((share) => share.id != shareId).toList();
 
@@ -397,7 +394,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Échec de la révocation du partage',
+          errorMessage: 'Failed to revoke share',
         );
       }
 
@@ -405,16 +402,15 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage:
-            'Erreur lors de la révocation du partage: ${e.toString()}',
+        errorMessage: 'Error revoking share: $e',
       );
       return false;
     }
   }
 
-  /// Charger les documents partagés avec l'utilisateur
+  /// Load documents shared with the user
   Future<void> loadSharedWithMe(String identityAddress) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(documentRepositoryProvider);
@@ -427,16 +423,16 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage:
-            'Erreur lors du chargement des documents partagés: ${e.toString()}',
+        errorMessage: 'Error loading shared documents: $e',
       );
     }
   }
 
-  /// Vérifier l'authenticité d'un document
+  /// Verify document authenticity
   Future<DocumentVerificationStatus?> verifyDocumentAuthenticity(
-      String documentId) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    String documentId,
+  ) async {
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(documentRepositoryProvider);
@@ -447,19 +443,18 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage:
-            'Erreur lors de la vérification du document: ${e.toString()}',
+        errorMessage: 'Error verifying document: $e',
       );
       return null;
     }
   }
 
-  /// Signer un document
+  /// Sign a document
   Future<Document?> signDocument({
     required String documentId,
     required String signerIdentityAddress,
   }) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(documentRepositoryProvider);
@@ -468,7 +463,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
         signerIdentityAddress: signerIdentityAddress,
       );
 
-      // Mettre à jour le document dans la liste et comme document sélectionné
+      // Update document in the list and as selected document
       final index = state.documents.indexWhere((doc) => doc.id == documentId);
       if (index != -1) {
         final updatedDocuments = [...state.documents];
@@ -490,17 +485,18 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage:
-            'Erreur lors de la signature du document: ${e.toString()}',
+        errorMessage: 'Error signing document: $e',
       );
       return null;
     }
   }
 
-  /// Accéder à un document partagé
+  /// Access a shared document
   Future<Document?> accessSharedDocument(
-      String shareUrl, String? accessCode) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    String shareUrl,
+    String? accessCode,
+  ) async {
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(documentRepositoryProvider);
@@ -515,7 +511,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Document partagé non disponible',
+          errorMessage: 'Shared document not available',
         );
       }
 
@@ -523,8 +519,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage:
-            'Erreur lors de l\'accès au document partagé: ${e.toString()}',
+        errorMessage: 'Error accessing shared document: $e',
       );
       return null;
     }

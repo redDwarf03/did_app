@@ -77,9 +77,9 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'We need to verify your phone number to proceed with the identity verification process.',
-            style: const TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 24),
           if (!_phoneSubmitted) ...[
@@ -100,7 +100,8 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
                       )
                     : const Icon(Icons.send),
                 label: Text(
-                    _isSubmitting ? 'Sending...' : 'Send verification code'),
+                  _isSubmitting ? 'Sending...' : 'Send verification code',
+                ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
@@ -123,9 +124,9 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.sms),
-                label: Text(_isResending
-                    ? 'Sending code...'
-                    : 'Send verification code'),
+                label: Text(
+                  _isResending ? 'Sending code...' : 'Send verification code',
+                ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
@@ -260,7 +261,7 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
 
   /// Build the phone number input field
   Widget _buildPhoneInput() {
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(8),
@@ -274,12 +275,10 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
         selectorConfig: const SelectorConfig(
           selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
         ),
-        ignoreBlank: false,
         autoValidateMode: AutovalidateMode.onUserInteraction,
         selectorTextStyle: const TextStyle(color: Colors.black),
         initialValue: _phoneNumber,
         textFieldController: _phoneController,
-        formatInput: true,
         keyboardType: const TextInputType.numberWithOptions(
           signed: true,
           decimal: true,
@@ -303,9 +302,9 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.1),
+        color: Colors.blue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.blue.withOpacity(0.3)),
+        border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [

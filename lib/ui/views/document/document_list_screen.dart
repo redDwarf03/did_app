@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-/// Écran affichant la liste des documents de l'utilisateur
+/// Screen displaying the user's document list
 class DocumentListScreen extends ConsumerStatefulWidget {
   const DocumentListScreen({super.key});
 
@@ -18,7 +18,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
   @override
   void initState() {
     super.initState();
-    // Charger les documents au démarrage
+    // Load documents on startup
     _loadDocuments();
   }
 
@@ -39,7 +39,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
     if (identityState.identity == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Mes Documents'),
+          title: const Text('My Documents'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.of(context).pop(),
@@ -56,7 +56,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Identité requise',
+                'Identity Required',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -64,7 +64,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Vous devez créer une identité numérique pour accéder à vos documents',
+                'You must create a digital identity to access your documents',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey),
                 softWrap: true,
@@ -73,7 +73,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () => context.pushNamed('createIdentity'),
-                child: const Text('Créer une identité'),
+                child: const Text('Create an Identity'),
               ),
             ],
           ),
@@ -83,32 +83,32 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mes Documents'),
+        title: const Text('My Documents'),
         actions: [
-          // Bouton pour rafraîchir la liste
+          // Button to refresh the list
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: documentState.isLoading ? null : _loadDocuments,
-            tooltip: 'Actualiser',
+            tooltip: 'Refresh',
           ),
-          // Bouton pour afficher les documents partagés avec moi
+          // Button to display documents shared with me
           IconButton(
             icon: const Icon(Icons.download_for_offline),
             onPressed: documentState.isLoading
                 ? null
                 : () => _showSharedWithMe(context),
-            tooltip: 'Documents partagés avec moi',
+            tooltip: 'Documents shared with me',
           ),
         ],
       ),
-      // Afficher un indicateur de chargement si nécessaire
+      // Display loading indicator if needed
       body: documentState.isLoading
           ? const Center(child: CircularProgressIndicator())
           : _buildDocumentList(context, documentState),
-      // Bouton d'ajout de document
+      // Document add button
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDocumentDialog(context),
-        tooltip: 'Ajouter un document',
+        tooltip: 'Add document',
         child: const Icon(Icons.add),
       ),
     );
@@ -127,7 +127,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'Aucun document',
+              'No document',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -135,7 +135,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Ajoutez des documents pour les stocker et les partager de façon sécurisée',
+              'Add documents to store and share securely',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey),
             ),
@@ -143,7 +143,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
             ElevatedButton.icon(
               onPressed: () => _showAddDocumentDialog(context),
               icon: const Icon(Icons.add),
-              label: const Text('Ajouter un document'),
+              label: const Text('Add document'),
             ),
           ],
         ),
@@ -161,14 +161,14 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
   }
 
   Widget _buildDocumentCard(BuildContext context, Document document) {
-    // Formater les dates
+    // Formatter dates
     final dateFormat = DateFormat('dd/MM/yyyy');
     final issuedAt = dateFormat.format(document.issuedAt);
     final expiresAt = document.expiresAt != null
         ? dateFormat.format(document.expiresAt!)
         : 'Non applicable';
 
-    // Couleur selon le statut de vérification
+    // Color based on verification status
     final statusColor = _getStatusColor(document.verificationStatus);
 
     return Card(
@@ -181,7 +181,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Titre et type de document
+              // Title and document type
               Row(
                 children: [
                   Icon(
@@ -204,7 +204,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
+                      color: statusColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -230,38 +230,44 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
                   ),
                 ),
 
-              // Émetteur
+              // Issuer
               Row(
                 children: [
                   const Icon(Icons.business, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
                   Text(
-                    'Émetteur: ${document.issuer}',
+                    'Issuer: ${document.issuer}',
                     style: const TextStyle(fontSize: 14),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
 
-              // Dates d'émission et d'expiration
+              // Issued and expiration dates
               Row(
                 children: [
-                  const Icon(Icons.calendar_today,
-                      size: 16, color: Colors.grey),
+                  const Icon(
+                    Icons.calendar_today,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
                   const SizedBox(width: 4),
                   Text(
-                    'Émis le: $issuedAt',
+                    'Issued: $issuedAt',
                     style: const TextStyle(fontSize: 14),
                   ),
                   const SizedBox(width: 16),
                   if (document.expiresAt != null)
                     Row(
                       children: [
-                        const Icon(Icons.event_busy,
-                            size: 16, color: Colors.grey),
+                        const Icon(
+                          Icons.event_busy,
+                          size: 16,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(width: 4),
                         Text(
-                          'Expire le: $expiresAt',
+                          'Expire: $expiresAt',
                           style: const TextStyle(fontSize: 14),
                         ),
                       ],
@@ -275,63 +281,65 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
                 Wrap(
                   spacing: 8,
                   children: document.tags!
-                      .map((tag) => Chip(
-                            label: Text(tag),
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            labelStyle: const TextStyle(fontSize: 12),
-                            padding: EdgeInsets.zero,
-                          ))
+                      .map(
+                        (tag) => Chip(
+                          label: Text(tag),
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          labelStyle: const TextStyle(fontSize: 12),
+                          padding: EdgeInsets.zero,
+                        ),
+                      )
                       .toList(),
                 ),
 
               const SizedBox(height: 8),
 
-              // Boutons d'action
+              // Action buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // Bouton de téléchargement
+                  // Download button
                   IconButton(
                     icon: const Icon(Icons.download),
-                    tooltip: 'Télécharger',
+                    tooltip: 'Download',
                     onPressed: () => _downloadDocument(context, document),
                   ),
-                  // Bouton de partage (si le document est partageable)
+                  // Share button (if document is shareable)
                   if (document.isShareable)
                     IconButton(
                       icon: const Icon(Icons.share),
-                      tooltip: 'Partager',
+                      tooltip: 'Share',
                       onPressed: () => _showShareDialog(context, document),
                     ),
-                  // Bouton de vérification
+                  // Verify button
                   IconButton(
                     icon: const Icon(Icons.verified_user),
-                    tooltip: 'Vérifier l\'authenticité',
+                    tooltip: 'Verify authenticity',
                     onPressed: () => _verifyDocument(context, document),
                   ),
-                  // Bouton de menu contextuel
+                  // Context menu button
                   PopupMenuButton<String>(
                     onSelected: (value) =>
                         _handleMenuAction(context, value, document),
                     itemBuilder: (context) => [
                       const PopupMenuItem<String>(
                         value: 'edit',
-                        child: Text('Modifier'),
+                        child: Text('Edit'),
                       ),
                       const PopupMenuItem<String>(
                         value: 'versions',
-                        child: Text('Voir les versions'),
+                        child: Text('View versions'),
                       ),
                       if (document.verificationStatus !=
                           DocumentVerificationStatus.verified)
                         const PopupMenuItem<String>(
                           value: 'sign',
-                          child: Text('Signer'),
+                          child: Text('Sign'),
                         ),
                       const PopupMenuItem<String>(
                         value: 'delete',
-                        child: Text('Supprimer'),
+                        child: Text('Delete'),
                       ),
                     ],
                   ),
@@ -344,94 +352,98 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
     );
   }
 
-  // Afficher le dialogue d'ajout de document
+  // Show document add dialog
   Future<void> _showAddDocumentDialog(BuildContext context) async {
-    // Dans une implémentation complète, cela ouvrirait un formulaire de sélection de fichier
-    // et de saisie des métadonnées du document
-    showDialog(
+    // In a complete implementation, this would open a file selection dialog
+    // and input document metadata
+    await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ajouter un document'),
-        content:
-            const Text('Cette fonctionnalité sera implémentée prochainement.'),
+        title: const Text('Add document'),
+        content: const Text('This feature will be implemented soon.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Fermer'),
+            child: const Text('Close'),
           ),
         ],
       ),
     );
   }
 
-  // Ouvrir les détails d'un document
+  // Open document details
   void _openDocumentDetails(BuildContext context, Document document) {
-    // Pour une implémentation complète, cela naviguerait vers l'écran de détails du document
+    // For a complete implementation, this would navigate to the document details screen
     // context.push('/documents/${document.id}');
 
-    // Pour le moment, afficher un dialogue simple
+    // For now, show a simple dialog
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(document.title),
         content: const Text(
-            'L\'écran de détails du document sera implémenté prochainement.'),
+          'The document details screen will be implemented soon.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Fermer'),
+            child: const Text('Close'),
           ),
         ],
       ),
     );
   }
 
-  // Télécharger un document
+  // Download document
   Future<void> _downloadDocument(
-      BuildContext context, Document document) async {
-    // Pour une implémentation complète, cela téléchargerait le document
+    BuildContext context,
+    Document document,
+  ) async {
+    // For a complete implementation, this would download the document
     // final content = await ref.read(documentNotifierProvider.notifier).getDocumentContent(document.id);
 
-    // Pour le moment, afficher un dialogue simple
-    showDialog(
+    // For now, show a simple dialog
+    await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Télécharger le document'),
+        title: const Text('Download document'),
         content: const Text(
-            'Le téléchargement du document sera implémenté prochainement.'),
+          'The document download feature will be implemented soon.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Fermer'),
+            child: const Text('Close'),
           ),
         ],
       ),
     );
   }
 
-  // Afficher le dialogue de partage de document
+  // Show document share dialog
   Future<void> _showShareDialog(BuildContext context, Document document) async {
-    // Pour une implémentation complète, cela ouvrirait un formulaire de partage
-    showDialog(
+    // For a complete implementation, this would open a share dialog
+    await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Partager le document'),
-        content:
-            const Text('Le partage de document sera implémenté prochainement.'),
+        title: const Text('Share document'),
+        content: const Text(
+          'The document sharing feature will be implemented soon.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Fermer'),
+            child: const Text('Close'),
           ),
         ],
       ),
     );
   }
 
-  // Vérifier l'authenticité d'un document
+  // Verify document authenticity
   Future<void> _verifyDocument(BuildContext context, Document document) async {
-    // Afficher un indicateur de chargement
-    showDialog(
+    // Show loading indicator
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const AlertDialog(
@@ -439,60 +451,60 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
           children: [
             CircularProgressIndicator(),
             SizedBox(width: 16),
-            Text('Vérification en cours...'),
+            Text('Verification in progress...'),
           ],
         ),
       ),
     );
 
     try {
-      // Vérifier l'authenticité
+      // Verify authenticity
       final status = await ref
           .read(documentNotifierProvider.notifier)
           .verifyDocumentAuthenticity(document.id);
 
-      // Fermer le dialogue de chargement
+      // Close loading dialog
       if (context.mounted) {
         Navigator.of(context).pop();
       }
 
-      // Afficher le résultat
+      // Show result
       if (context.mounted) {
-        showDialog(
+        await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Résultat de la vérification'),
+            title: const Text('Verification result'),
             content: Text(
               status != null
-                  ? 'Statut: ${_getVerificationStatusText(status)}'
-                  : 'La vérification a échoué. Veuillez réessayer.',
+                  ? 'Status: ${_getVerificationStatusText(status)}'
+                  : 'Verification failed. Please try again.',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Fermer'),
+                child: const Text('Close'),
               ),
             ],
           ),
         );
       }
     } catch (e) {
-      // Fermer le dialogue de chargement
+      // Close loading dialog
       if (context.mounted) {
         Navigator.of(context).pop();
       }
 
-      // Afficher l'erreur
+      // Show error
       if (context.mounted) {
-        showDialog(
+        await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Erreur'),
-            content: Text('Une erreur est survenue: ${e.toString()}'),
+            title: const Text('Error'),
+            content: Text('An error occurred: $e'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Fermer'),
+                child: const Text('Close'),
               ),
             ],
           ),
@@ -501,32 +513,33 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
     }
   }
 
-  // Afficher les documents partagés avec l'utilisateur
+  // Show documents shared with user
   Future<void> _showSharedWithMe(BuildContext context) async {
     final identity = ref.read(identityNotifierProvider).identity;
     if (identity == null) return;
 
     try {
-      // Charger les documents partagés
+      // Load shared documents
       await ref
           .read(documentNotifierProvider.notifier)
           .loadSharedWithMe(identity.identityAddress);
 
-      // Naviguer vers l'écran des documents partagés
+      // Navigate to shared documents screen
       // context.push('/documents/shared-with-me');
 
-      // Pour le moment, afficher un dialogue simple
+      // For now, show a simple dialog
       if (context.mounted) {
-        showDialog(
+        await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Documents partagés avec moi'),
+            title: const Text('Documents shared with me'),
             content: const Text(
-                'L\'écran des documents partagés sera implémenté prochainement.'),
+              'The shared documents screen will be implemented soon.',
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Fermer'),
+                child: const Text('Close'),
               ),
             ],
           ),
@@ -534,15 +547,15 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
       }
     } catch (e) {
       if (context.mounted) {
-        showDialog(
+        await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Erreur'),
-            content: Text('Une erreur est survenue: ${e.toString()}'),
+            title: const Text('Error'),
+            content: Text('An error occurred: $e'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Fermer'),
+                child: const Text('Close'),
               ),
             ],
           ),
@@ -551,7 +564,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
     }
   }
 
-  // Gérer les actions du menu contextuel
+  // Handle context menu actions
   Future<void> _handleMenuAction(
     BuildContext context,
     String action,
@@ -565,7 +578,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
         _showVersions(context, document);
         break;
       case 'sign':
-        _signDocument(context, document);
+        await _signDocument(context, document);
         break;
       case 'delete':
         _confirmDeleteDocument(context, document);
@@ -573,51 +586,53 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
     }
   }
 
-  // Modifier un document
+  // Edit document
   void _editDocument(BuildContext context, Document document) {
-    // Pour une implémentation complète, cela ouvrirait un formulaire d'édition
+    // For a complete implementation, this would open an edit dialog
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Modifier le document'),
+        title: const Text('Edit document'),
         content: const Text(
-            'La modification de document sera implémentée prochainement.'),
+          'The document editing feature will be implemented soon.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Fermer'),
+            child: const Text('Close'),
           ),
         ],
       ),
     );
   }
 
-  // Afficher l'historique des versions
+  // Show document versions history
   void _showVersions(BuildContext context, Document document) {
-    // Pour une implémentation complète, cela afficherait l'historique des versions
+    // For a complete implementation, this would display document versions history
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Historique des versions'),
+        title: const Text('Document versions history'),
         content: const Text(
-            'L\'historique des versions sera implémenté prochainement.'),
+          'The document versions history feature will be implemented soon.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Fermer'),
+            child: const Text('Close'),
           ),
         ],
       ),
     );
   }
 
-  // Signer un document
+  // Sign document
   Future<void> _signDocument(BuildContext context, Document document) async {
     final identity = ref.read(identityNotifierProvider).identity;
     if (identity == null) return;
 
-    // Afficher un indicateur de chargement
-    showDialog(
+    // Show loading indicator
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const AlertDialog(
@@ -625,62 +640,62 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
           children: [
             CircularProgressIndicator(),
             SizedBox(width: 16),
-            Text('Signature en cours...'),
+            Text('Signing in progress...'),
           ],
         ),
       ),
     );
 
     try {
-      // Signer le document
+      // Sign document
       final signedDocument =
           await ref.read(documentNotifierProvider.notifier).signDocument(
                 documentId: document.id,
                 signerIdentityAddress: identity.identityAddress,
               );
 
-      // Fermer le dialogue de chargement
+      // Close loading dialog
       if (context.mounted) {
         Navigator.of(context).pop();
       }
 
-      // Afficher le résultat
+      // Show result
       if (context.mounted) {
-        showDialog(
+        await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Document signé'),
+            title: const Text('Document signed'),
             content: Text(
               signedDocument != null
-                  ? 'Le document a été signé avec succès.'
-                  : 'La signature a échoué. Veuillez réessayer.',
+                  ? 'The document was signed successfully.'
+                  : 'Signing failed. Please try again.',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Fermer'),
+                child: const Text('Close'),
               ),
             ],
           ),
         );
       }
     } catch (e) {
-      // Fermer le dialogue de chargement
+      // Close loading dialog
       if (context.mounted) {
         Navigator.of(context).pop();
       }
 
-      // Afficher l'erreur
+      // Show error
       if (context.mounted) {
-        showDialog(
+        await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Erreur'),
-            content: Text('Une erreur est survenue: ${e.toString()}'),
+            title: const Text('Error'),
+            content: Text('An error occurred: $e'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Fermer'),
+                child: const Text('Close'),
               ),
             ],
           ),
@@ -689,18 +704,17 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
     }
   }
 
-  // Confirmer la suppression d'un document
+  // Confirm document deletion
   void _confirmDeleteDocument(BuildContext context, Document document) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirmer la suppression'),
-        content:
-            Text('Êtes-vous sûr de vouloir supprimer "${document.title}" ?'),
+        title: const Text('Confirm deletion'),
+        content: Text('Are you sure you want to delete "${document.title}" ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Annuler'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -708,17 +722,17 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
               _deleteDocument(context, document);
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Supprimer'),
+            child: const Text('Delete'),
           ),
         ],
       ),
     );
   }
 
-  // Supprimer un document
+  // Delete document
   Future<void> _deleteDocument(BuildContext context, Document document) async {
-    // Afficher un indicateur de chargement
-    showDialog(
+    // Show loading indicator
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const AlertDialog(
@@ -726,47 +740,47 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
           children: [
             CircularProgressIndicator(),
             SizedBox(width: 16),
-            Text('Suppression en cours...'),
+            Text('Deletion in progress...'),
           ],
         ),
       ),
     );
 
     try {
-      // Supprimer le document
+      // Delete document
       final success = await ref
           .read(documentNotifierProvider.notifier)
           .deleteDocument(document.id);
 
-      // Fermer le dialogue de chargement
+      // Close loading dialog
       if (context.mounted) {
         Navigator.of(context).pop();
       }
 
-      // Afficher le résultat
+      // Show result
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               success
-                  ? 'Document supprimé avec succès'
-                  : 'Échec de la suppression du document',
+                  ? 'Document deleted successfully'
+                  : 'Document deletion failed',
             ),
             behavior: SnackBarBehavior.floating,
           ),
         );
       }
     } catch (e) {
-      // Fermer le dialogue de chargement
+      // Close loading dialog
       if (context.mounted) {
         Navigator.of(context).pop();
       }
 
-      // Afficher l'erreur
+      // Show error
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Une erreur est survenue: ${e.toString()}'),
+            content: Text('An error occurred: $e'),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.red,
           ),
@@ -775,7 +789,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
     }
   }
 
-  // Utilitaires
+  // Utilities
   IconData _getDocumentTypeIcon(DocumentType type) {
     switch (type) {
       case DocumentType.nationalId:
@@ -819,15 +833,15 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
   String _getVerificationStatusText(DocumentVerificationStatus status) {
     switch (status) {
       case DocumentVerificationStatus.unverified:
-        return 'Non vérifié';
+        return 'Unverified';
       case DocumentVerificationStatus.pending:
-        return 'En attente';
+        return 'Pending';
       case DocumentVerificationStatus.verified:
-        return 'Vérifié';
+        return 'Verified';
       case DocumentVerificationStatus.rejected:
-        return 'Rejeté';
+        return 'Rejected';
       case DocumentVerificationStatus.expired:
-        return 'Expiré';
+        return 'Expired';
     }
   }
 }

@@ -9,8 +9,10 @@ class IdentityDetailsScreen extends ConsumerWidget {
     super.key,
     this.identity,
     this.address,
-  }) : assert(identity != null || address != null,
-            'Either identity or address must be provided');
+  }) : assert(
+          identity != null || address != null,
+          'Either identity or address must be provided',
+        );
 
   final DigitalIdentity? identity;
   final String? address;
@@ -61,7 +63,9 @@ class IdentityDetailsScreen extends ConsumerWidget {
 
   /// Header with identity name and verification badge
   Widget _buildIdentityHeader(
-      BuildContext context, DigitalIdentity currentIdentity) {
+    BuildContext context,
+    DigitalIdentity currentIdentity,
+  ) {
     return Center(
       child: Column(
         children: [
@@ -109,7 +113,9 @@ class IdentityDetailsScreen extends ConsumerWidget {
 
   /// Card showing verification status with actions
   Widget _buildStatusCard(
-      BuildContext context, DigitalIdentity currentIdentity) {
+    BuildContext context,
+    DigitalIdentity currentIdentity,
+  ) {
     return Card(
       elevation: 2,
       child: Padding(
@@ -154,7 +160,9 @@ class IdentityDetailsScreen extends ConsumerWidget {
 
   /// Section showing personal information
   Widget _buildPersonalInfoSection(
-      BuildContext context, DigitalIdentity currentIdentity) {
+    BuildContext context,
+    DigitalIdentity currentIdentity,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -200,7 +208,9 @@ class IdentityDetailsScreen extends ConsumerWidget {
 
   /// Section showing address information if available
   Widget _buildAddressSection(
-      BuildContext context, DigitalIdentity currentIdentity) {
+    BuildContext context,
+    DigitalIdentity currentIdentity,
+  ) {
     final address = currentIdentity.personalInfo.address!;
 
     return Column(
@@ -246,7 +256,9 @@ class IdentityDetailsScreen extends ConsumerWidget {
 
   /// Card showing blockchain information
   Widget _buildBlockchainInfoCard(
-      BuildContext context, DigitalIdentity currentIdentity) {
+    BuildContext context,
+    DigitalIdentity currentIdentity,
+  ) {
     return Card(
       margin: EdgeInsets.zero,
       elevation: 2,
@@ -286,8 +298,12 @@ class IdentityDetailsScreen extends ConsumerWidget {
   }
 
   /// Helper to build consistent info rows
-  Widget _buildInfoRow(IconData icon, String label, String value,
-      {bool truncate = false}) {
+  Widget _buildInfoRow(
+    IconData icon,
+    String label,
+    String value, {
+    bool truncate = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(

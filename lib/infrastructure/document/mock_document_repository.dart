@@ -6,7 +6,17 @@ import 'package:did_app/domain/document/document.dart';
 import 'package:did_app/domain/document/document_repository.dart';
 import 'package:uuid/uuid.dart';
 
-/// Implémentation mock du repository de documents pour le développement et les tests
+/// Mock implementation of the document repository for development and testing
+///
+/// TODO: Replace this mock implementation with a real blockchain-based document repository
+/// This class simulates document management with in-memory storage and artificial delays.
+/// A real implementation should:
+/// - Store documents securely on the Archethic blockchain with proper encryption
+/// - Implement real end-to-end encryption for document contents
+/// - Use secure key management for document access control
+/// - Implement proper versioning with blockchain transaction history
+/// - Support secure document sharing with proper permission management
+/// - Implement verification of document authenticity using blockchain signatures
 class MockDocumentRepository implements DocumentRepository {
   final Map<String, Document> _documents = {};
   final Map<String, Uint8List> _documentContents = {};
@@ -14,10 +24,10 @@ class MockDocumentRepository implements DocumentRepository {
   final Map<String, Uint8List> _versionContents = {};
   final Map<String, DocumentShare> _documentShares = {};
 
-  // Map des documents par identité
+  // Map of documents by identity
   final Map<String, List<String>> _documentsByIdentity = {};
 
-  // Map des partages reçus par identité
+  // Map of shares received by identity
   final Map<String, List<String>> _sharesReceivedByIdentity = {};
 
   final _uuid = const Uuid();
@@ -25,7 +35,7 @@ class MockDocumentRepository implements DocumentRepository {
 
   @override
   Future<bool> hasDocuments(String identityAddress) async {
-    // Simuler un délai réseau
+    // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 300));
     return _documentsByIdentity.containsKey(identityAddress) &&
         _documentsByIdentity[identityAddress]!.isNotEmpty;
@@ -33,7 +43,7 @@ class MockDocumentRepository implements DocumentRepository {
 
   @override
   Future<List<Document>> getDocuments(String identityAddress) async {
-    // Simuler un délai réseau
+    // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 500));
 
     if (!_documentsByIdentity.containsKey(identityAddress)) {
@@ -49,7 +59,7 @@ class MockDocumentRepository implements DocumentRepository {
 
   @override
   Future<Document?> getDocument(String documentId) async {
-    // Simuler un délai réseau
+    // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 300));
     return _documents[documentId];
   }
@@ -69,22 +79,22 @@ class MockDocumentRepository implements DocumentRepository {
     bool isShareable = false,
     EidasLevel eidasLevel = EidasLevel.low,
   }) async {
-    // Simuler un délai réseau et traitement de chiffrement
+    // Simulate network delay and encryption processing
     await Future.delayed(const Duration(milliseconds: 800));
 
-    // Générer un ID unique pour le document
+    // Generate a unique ID for the document
     final documentId = _uuid.v4();
 
-    // Simuler le chiffrement en générant un vecteur d'initialisation
+    // Simulate encryption by generating an initialization vector
     final encryptionIV = _generateRandomHex(16);
 
-    // Calculer le hash du document pour l'intégrité
+    // Calculate document hash for integrity
     final documentHash = sha256.convert(fileBytes).toString();
 
-    // Chemin de stockage simulé
+    // Simulated storage path
     final storagePath = 'documents/$identityAddress/$documentId';
 
-    // Création du document
+    // Create the document
     final now = DateTime.now();
     final document = Document(
       id: documentId,
@@ -107,17 +117,17 @@ class MockDocumentRepository implements DocumentRepository {
       eidasLevel: eidasLevel,
     );
 
-    // Stocker le document et son contenu
+    // Store the document and its content
     _documents[documentId] = document;
     _documentContents[documentId] = fileBytes;
 
-    // Ajouter l'ID du document à la liste des documents de l'utilisateur
+    // Add document ID to the user's document list
     if (!_documentsByIdentity.containsKey(identityAddress)) {
       _documentsByIdentity[identityAddress] = [];
     }
     _documentsByIdentity[identityAddress]!.add(documentId);
 
-    // Créer la première version dans l'historique
+    // Create the first version in history
     final versionId = _uuid.v4();
     final version = DocumentVersion(
       id: versionId,
@@ -148,25 +158,25 @@ class MockDocumentRepository implements DocumentRepository {
     EidasLevel? eidasLevel,
     String? changeNote,
   }) async {
-    // Simuler un délai réseau
+    // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 800));
 
     final existingDocument = _documents[documentId];
     if (existingDocument == null) {
-      throw Exception('Document non trouvé');
+      throw Exception('Document not found');
     }
 
-    // Calculer le hash du nouveau contenu
+    // Calculate hash of the new content
     final documentHash = sha256.convert(fileBytes).toString();
 
-    // Simuler un nouveau vecteur d'initialisation pour le chiffrement
+    // Simulate a new initialization vector for encryption
     final encryptionIV = _generateRandomHex(16);
 
-    // Chemin de stockage simulé pour la nouvelle version
+    // Simulated storage path for the new version
     final storagePath =
         'documents/${existingDocument.ownerIdentityId}/$documentId/v${existingDocument.version + 1}';
 
-    // Créer une nouvelle version dans l'historique
+    // Create a new version in history
     final now = DateTime.now();
     final newVersion = existingDocument.version + 1;
     final versionId = _uuid.v4();
@@ -180,7 +190,7 @@ class MockDocumentRepository implements DocumentRepository {
       changeNote: changeNote,
     );
 
-    // Mettre à jour le document
+    // Update the document
     final updatedDocument = Document(
       id: documentId,
       type: existingDocument.type,
@@ -205,11 +215,11 @@ class MockDocumentRepository implements DocumentRepository {
       eidasLevel: eidasLevel ?? existingDocument.eidasLevel,
     );
 
-    // Stocker le document mis à jour et son contenu
+    // Store the updated document and its content
     _documents[documentId] = updatedDocument;
     _documentContents[documentId] = fileBytes;
 
-    // Ajouter la nouvelle version à l'historique
+    // Add the new version to history
     if (!_documentVersions.containsKey(documentId)) {
       _documentVersions[documentId] = [];
     }
@@ -221,7 +231,7 @@ class MockDocumentRepository implements DocumentRepository {
 
   @override
   Future<bool> deleteDocument(String documentId) async {
-    // Simuler un délai réseau
+    // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 500));
 
     final document = _documents[documentId];
@@ -229,20 +239,20 @@ class MockDocumentRepository implements DocumentRepository {
       return false;
     }
 
-    // Supprimer le document et ses données associées
+    // Delete the document and its associated data
     _documents.remove(documentId);
     _documentContents.remove(documentId);
 
-    // Supprimer de la liste des documents par identité
+    // Remove from the document list by identity
     final identityAddress = document.ownerIdentityId;
     if (_documentsByIdentity.containsKey(identityAddress)) {
       _documentsByIdentity[identityAddress]!.remove(documentId);
     }
 
-    // Supprimer les versions
+    // Remove versions
     _documentVersions.remove(documentId);
 
-    // Supprimer les partages associés
+    // Remove associated shares
     final sharesToRemove = _documentShares.values
         .where((share) => share.documentId == documentId)
         .map((share) => share.id)
@@ -257,12 +267,12 @@ class MockDocumentRepository implements DocumentRepository {
 
   @override
   Future<Uint8List> getDocumentContent(String documentId) async {
-    // Simuler un délai réseau et déchiffrement
+    // Simulate network delay and decryption
     await Future.delayed(const Duration(milliseconds: 500));
 
     final content = _documentContents[documentId];
     if (content == null) {
-      throw Exception('Contenu du document non trouvé');
+      throw Exception('Document content not found');
     }
 
     return content;
@@ -270,7 +280,7 @@ class MockDocumentRepository implements DocumentRepository {
 
   @override
   Future<List<DocumentVersion>> getDocumentVersions(String documentId) async {
-    // Simuler un délai réseau
+    // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 400));
 
     return _documentVersions[documentId] ?? [];
@@ -278,13 +288,15 @@ class MockDocumentRepository implements DocumentRepository {
 
   @override
   Future<Uint8List> getDocumentVersionContent(
-      String documentId, String versionId) async {
-    // Simuler un délai réseau et déchiffrement
+    String documentId,
+    String versionId,
+  ) async {
+    // Simulate network delay and decryption
     await Future.delayed(const Duration(milliseconds: 500));
 
     final content = _versionContents[versionId];
     if (content == null) {
-      throw Exception('Contenu de la version non trouvé');
+      throw Exception('Version content not found');
     }
 
     return content;
@@ -300,26 +312,26 @@ class MockDocumentRepository implements DocumentRepository {
     String? accessCode,
     int? maxAccessCount,
   }) async {
-    // Simuler un délai réseau
+    // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 600));
 
     final document = _documents[documentId];
     if (document == null) {
-      throw Exception('Document non trouvé');
+      throw Exception('Document not found');
     }
 
     if (!document.isShareable) {
-      throw Exception('Ce document n\'est pas partageable');
+      throw Exception('This document is not shareable');
     }
 
-    // Générer un ID unique pour le partage
+    // Generate a unique ID for the share
     final shareId = _uuid.v4();
 
-    // Générer une URL de partage
+    // Generate a share URL
     final shareToken = _generateRandomHex(32);
     final shareUrl = 'https://example.com/shared-docs/$shareToken';
 
-    // Créer le partage
+    // Create the share
     final now = DateTime.now();
     final share = DocumentShare(
       id: shareId,
@@ -335,10 +347,10 @@ class MockDocumentRepository implements DocumentRepository {
       accessType: accessType,
     );
 
-    // Stocker le partage
+    // Store the share
     _documentShares[shareId] = share;
 
-    // Si un destinataire spécifique est identifié, ajouter à ses partages reçus
+    // If a specific recipient is identified, add to their received shares
     if (recipientId != null) {
       if (!_sharesReceivedByIdentity.containsKey(recipientId)) {
         _sharesReceivedByIdentity[recipientId] = [];
@@ -351,7 +363,7 @@ class MockDocumentRepository implements DocumentRepository {
 
   @override
   Future<bool> revokeDocumentShare(String shareId) async {
-    // Simuler un délai réseau
+    // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 400));
 
     final share = _documentShares[shareId];
@@ -359,7 +371,7 @@ class MockDocumentRepository implements DocumentRepository {
       return false;
     }
 
-    // Si le partage est associé à un destinataire, le retirer de sa liste
+    // If the share is associated with a recipient, remove it from their list
     if (share.recipientId != null) {
       final recipientId = share.recipientId!;
       if (_sharesReceivedByIdentity.containsKey(recipientId)) {
@@ -367,14 +379,14 @@ class MockDocumentRepository implements DocumentRepository {
       }
     }
 
-    // Supprimer le partage
+    // Remove the share
     _documentShares.remove(shareId);
     return true;
   }
 
   @override
   Future<List<DocumentShare>> getDocumentShares(String documentId) async {
-    // Simuler un délai réseau
+    // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 400));
 
     return _documentShares.values
@@ -384,70 +396,71 @@ class MockDocumentRepository implements DocumentRepository {
 
   @override
   Future<DocumentVerificationStatus> verifyDocumentAuthenticity(
-      String documentId) async {
-    // Simuler un délai réseau et processus de vérification
+    String documentId,
+  ) async {
+    // Simulate network delay and verification process
     await Future.delayed(const Duration(milliseconds: 1000));
 
     final document = _documents[documentId];
     if (document == null) {
-      throw Exception('Document non trouvé');
+      throw Exception('Document not found');
     }
 
-    // Simuler une vérification simplifiée
-    // Dans une implémentation réelle, cela impliquerait:
-    // 1. Vérifier la signature cryptographique
-    // 2. Vérifier la preuve d'existence sur la blockchain
-    // 3. Vérifier que l'émetteur est dans une liste d'émetteurs de confiance
+    // Simulate a simplified verification
+    // In a real implementation, this would involve:
+    // 1. Verifying the cryptographic signature
+    // 2. Verifying the proof of existence on the blockchain
+    // 3. Checking that the issuer is in a list of trusted issuers
 
-    // Simuler un résultat aléatoire pour la démonstration
+    // Simulate a random result for demonstration
     final result = _random.nextInt(100);
 
     if (result < 70) {
-      // 70% de chance d'être vérifié
+      // 70% chance of being verified
       return DocumentVerificationStatus.verified;
     } else if (result < 85) {
-      // 15% de chance d'être en attente
+      // 15% chance of being pending
       return DocumentVerificationStatus.pending;
     } else if (result < 95) {
-      // 10% de chance d'être rejeté
+      // 10% chance of being rejected
       return DocumentVerificationStatus.rejected;
     } else {
-      // 5% de chance d'être expiré
+      // 5% chance of being expired
       return DocumentVerificationStatus.expired;
     }
   }
 
   @override
   Future<bool> verifyDocumentSignature(String documentId) async {
-    // Simuler un délai réseau et processus de vérification de signature
+    // Simulate network delay and signature verification process
     await Future.delayed(const Duration(milliseconds: 800));
 
     final document = _documents[documentId];
     if (document == null) {
-      throw Exception('Document non trouvé');
+      throw Exception('Document not found');
     }
 
-    // Pour la démonstration, vérifier si le document a une signature
+    // For demonstration, check if the document has a signature
     return document.issuerSignature != null;
   }
 
   @override
   Future<bool> verifyBlockchainProof(String documentId) async {
-    // Simuler un délai réseau et vérification sur la blockchain
+    // Simulate network delay and blockchain verification
     await Future.delayed(const Duration(milliseconds: 1200));
 
     final document = _documents[documentId];
     if (document == null) {
-      throw Exception('Document non trouvé');
+      throw Exception('Document not found');
     }
 
-    // Pour la démonstration, vérifier si le document a un ID de transaction blockchain
+    // For demonstration, check if the document has a blockchain transaction ID
     return document.blockchainTxId != null;
   }
 
   @override
   Future<List<DocumentShare>> getSharedWithMe(String identityAddress) async {
-    // Simuler un délai réseau
+    // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 500));
 
     if (!_sharesReceivedByIdentity.containsKey(identityAddress)) {
@@ -458,48 +471,52 @@ class MockDocumentRepository implements DocumentRepository {
     return shareIds
         .map((id) => _documentShares[id])
         .whereType<DocumentShare>()
-        .where((share) =>
-            share.isActive &&
-            share.expiresAt.isAfter(DateTime.now()) &&
-            (share.maxAccessCount == null ||
-                share.accessCount < share.maxAccessCount!))
+        .where(
+          (share) =>
+              share.isActive &&
+              share.expiresAt.isAfter(DateTime.now()) &&
+              (share.maxAccessCount == null ||
+                  share.accessCount < share.maxAccessCount!),
+        )
         .toList();
   }
 
   @override
   Future<Document?> accessSharedDocument(
-      String shareUrl, String? accessCode) async {
-    // Simuler un délai réseau
+    String shareUrl,
+    String? accessCode,
+  ) async {
+    // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 700));
 
-    // Trouver le partage correspondant à l'URL
+    // Find the share corresponding to the URL
     final share = _documentShares.values.firstWhere(
       (share) => share.shareUrl == shareUrl,
-      orElse: () => throw Exception('Partage non trouvé'),
+      orElse: () => throw Exception('Share not found'),
     );
 
-    // Vérifier si le partage est actif
+    // Check if the share is active
     if (!share.isActive) {
-      throw Exception('Ce partage a été révoqué');
+      throw Exception('This share has been revoked');
     }
 
-    // Vérifier si le partage n'a pas expiré
+    // Check if the share has not expired
     if (share.expiresAt.isBefore(DateTime.now())) {
-      throw Exception('Ce partage a expiré');
+      throw Exception('This share has expired');
     }
 
-    // Vérifier le nombre d'accès maximum
+    // Check the maximum number of accesses
     if (share.maxAccessCount != null &&
         share.accessCount >= share.maxAccessCount!) {
-      throw Exception('Le nombre maximum d\'accès a été atteint');
+      throw Exception('Maximum number of accesses has been reached');
     }
 
-    // Vérifier le code d'accès si nécessaire
+    // Check access code if needed
     if (share.accessCode != null && share.accessCode != accessCode) {
-      throw Exception('Code d\'accès incorrect');
+      throw Exception('Incorrect access code');
     }
 
-    // Créer une nouvelle instance du partage avec le compteur incrémenté et la dernière date d'accès
+    // Create a new instance of the share with incremented counter and last access date
     final updatedShare = DocumentShare(
       id: share.id,
       documentId: share.documentId,
@@ -517,10 +534,10 @@ class MockDocumentRepository implements DocumentRepository {
       lastAccessedAt: DateTime.now(),
     );
 
-    // Mettre à jour le partage dans la map
+    // Update the share in the map
     _documentShares[share.id] = updatedShare;
 
-    // Retourner le document
+    // Return the document
     return _documents[share.documentId];
   }
 
@@ -529,21 +546,21 @@ class MockDocumentRepository implements DocumentRepository {
     required String documentId,
     required String signerIdentityAddress,
   }) async {
-    // Simuler un délai réseau et processus de signature
+    // Simulate network delay and signing process
     await Future.delayed(const Duration(milliseconds: 1000));
 
     final document = _documents[documentId];
     if (document == null) {
-      throw Exception('Document non trouvé');
+      throw Exception('Document not found');
     }
 
-    // Simuler une signature cryptographique
+    // Simulate a cryptographic signature
     final signature = _generateRandomHex(64);
 
-    // Simuler un ID de transaction blockchain
+    // Simulate a blockchain transaction ID
     final blockchainTxId = _generateRandomHex(32);
 
-    // Mettre à jour le document avec la signature
+    // Update the document with the signature
     final updatedDocument = Document(
       id: document.id,
       type: document.type,
@@ -568,13 +585,13 @@ class MockDocumentRepository implements DocumentRepository {
       eidasLevel: document.eidasLevel,
     );
 
-    // Stocker le document mis à jour
+    // Store the updated document
     _documents[documentId] = updatedDocument;
 
     return updatedDocument;
   }
 
-  // Méthode utilitaire pour générer une chaîne hexadécimale aléatoire
+  // Utility method to generate a random hex string
   String _generateRandomHex(int length) {
     final values = List<int>.generate(length, (i) => _random.nextInt(256));
     return values.map((b) => b.toRadixString(16).padLeft(2, '0')).join();

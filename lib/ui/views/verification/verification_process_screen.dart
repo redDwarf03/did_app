@@ -60,7 +60,10 @@ class VerificationProcessScreen extends ConsumerWidget {
           // Step content - this would be filled with actual verification step screens
           Expanded(
             child: _buildPlaceholderStepContent(
-                context, state.currentStepIndex, state.currentStep),
+              context,
+              state.currentStepIndex,
+              state.currentStep,
+            ),
           ),
         ],
       ),
@@ -73,10 +76,10 @@ class VerificationProcessScreen extends ConsumerWidget {
 
     return Card(
       elevation: 2,
-      color: statusColor.withOpacity(0.1),
+      color: statusColor.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: statusColor.withOpacity(0.3)),
+        side: BorderSide(color: statusColor.withValues(alpha: 0.3)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -130,7 +133,7 @@ class VerificationProcessScreen extends ConsumerWidget {
         const SizedBox(height: 8),
         LinearProgressIndicator(
           value: (currentStepIndex + 1) / steps.length,
-          backgroundColor: Colors.grey.withOpacity(0.3),
+          backgroundColor: Colors.grey.withValues(alpha: 0.3),
         ),
         const SizedBox(height: 8),
         const Row(
@@ -165,7 +168,7 @@ class VerificationProcessScreen extends ConsumerWidget {
     return Card(
       elevation: 1,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -192,7 +195,8 @@ class VerificationProcessScreen extends ConsumerWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: _getStepStatusColor(step.status).withOpacity(0.1),
+                    color:
+                        _getStepStatusColor(step.status).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -466,7 +470,8 @@ class VerificationProcessScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('Step Submission'),
         content: const Text(
-            'In a real implementation, this would submit the step data to the verification service.'),
+          'In a real implementation, this would submit the step data to the verification service.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

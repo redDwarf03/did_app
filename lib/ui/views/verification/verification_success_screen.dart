@@ -24,14 +24,14 @@ class VerificationSuccessScreen extends ConsumerWidget {
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             children: [
               // Success Icon
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -113,7 +113,7 @@ class VerificationSuccessScreen extends ConsumerWidget {
     return Card(
       elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -148,7 +148,7 @@ class VerificationSuccessScreen extends ConsumerWidget {
   /// Build an information row with label and value
   Widget _buildInfoRow(String label, String value, {bool copyable = false}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -183,10 +183,10 @@ class VerificationSuccessScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.1),
+        color: Colors.blue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Colors.blue.withOpacity(0.5),
+          color: Colors.blue.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
@@ -235,25 +235,21 @@ class VerificationSuccessScreen extends ConsumerWidget {
 
   /// Show share options for the certificate
   void _shareCertificate(BuildContext context) {
+    // TODO: Implement real certificate sharing functionality
+    // This should:
+    // - Generate a shareable verifiable credential
+    // - Support selective disclosure of certificate details
+    // - Provide options for digital sharing (QR code, deep link, etc.)
+    // - Log sharing activity for audit purposes
+
+    // For now, just show a dialog
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Share Certificate'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'This feature would allow sharing your verification certificate with trusted third parties.',
-            ),
-            SizedBox(height: 16),
-            Text(
-              'In a real implementation, this would integrate with the Archethic blockchain to securely share your verification status while maintaining your privacy.',
-              style: TextStyle(
-                fontSize: 12,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ],
+        content: const Text(
+          'In a real implementation, this would allow sharing your verification certificate with third parties in a secure and privacy-preserving way.',
         ),
         actions: [
           TextButton(

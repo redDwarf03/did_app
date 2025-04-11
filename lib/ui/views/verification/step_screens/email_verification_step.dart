@@ -73,9 +73,9 @@ class _EmailVerificationStepState extends ConsumerState<EmailVerificationStep> {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'We need to verify your email address to proceed with the identity verification process.',
-            style: const TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 24),
 
@@ -83,9 +83,9 @@ class _EmailVerificationStepState extends ConsumerState<EmailVerificationStep> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: Colors.blue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.blue.withOpacity(0.3)),
+              border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -133,9 +133,11 @@ class _EmailVerificationStepState extends ConsumerState<EmailVerificationStep> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.send),
-                label: Text(_isResending
-                    ? 'Sending verification code...'
-                    : 'Send verification code'),
+                label: Text(
+                  _isResending
+                      ? 'Sending verification code...'
+                      : 'Send verification code',
+                ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),

@@ -34,7 +34,7 @@ class IdentityScreen extends ConsumerWidget {
 
   Widget _buildIdentityView(BuildContext context, DigitalIdentity identity) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -42,9 +42,8 @@ class IdentityScreen extends ConsumerWidget {
           Card(
             elevation: 2,
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const CircleAvatar(
                     radius: 40,
@@ -71,7 +70,7 @@ class IdentityScreen extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: _getVerificationColor(identity.verificationStatus)
-                          .withOpacity(0.1),
+                          .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -81,14 +80,16 @@ class IdentityScreen extends ConsumerWidget {
                           _getVerificationIcon(identity.verificationStatus),
                           size: 16,
                           color: _getVerificationColor(
-                              identity.verificationStatus),
+                            identity.verificationStatus,
+                          ),
                         ),
                         const SizedBox(width: 8),
                         Text(
                           _getVerificationLabel(identity.verificationStatus),
                           style: TextStyle(
                             color: _getVerificationColor(
-                                identity.verificationStatus),
+                              identity.verificationStatus,
+                            ),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -168,7 +169,7 @@ class IdentityScreen extends ConsumerWidget {
   Widget _buildNoIdentityView(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -188,7 +189,7 @@ class IdentityScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             const Text(
-              'You don\'t have a digital identity yet. Create one to access all features of this application.',
+              "You don't have a digital identity yet. Create one to access all features of this application.",
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
             ),
@@ -226,15 +227,15 @@ class IdentityScreen extends ConsumerWidget {
       child: InkWell(
         onTap: isEnabled ? onTap : null,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: isEnabled
-                      ? Theme.of(context).primaryColor.withOpacity(0.1)
-                      : Colors.grey.withOpacity(0.1),
+                      ? Theme.of(context).primaryColor.withValues(alpha: 0.1)
+                      : Colors.grey.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(

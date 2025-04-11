@@ -57,7 +57,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
 
   /// Check if the current wallet has an associated identity
   Future<void> _checkForExistingIdentity() async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(identityRepositoryProvider);
@@ -75,7 +75,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to retrieve identity: ${e.toString()}',
+        errorMessage: 'Failed to retrieve identity: $e',
       );
     }
   }
@@ -89,7 +89,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
     DateTime? dateOfBirth,
     String? nationality,
   }) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(identityRepositoryProvider);
@@ -126,7 +126,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to create identity: ${e.toString()}',
+        errorMessage: 'Failed to create identity: $e',
       );
     }
   }
@@ -141,7 +141,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
     String? nationality,
     PhysicalAddress? address,
   }) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(identityRepositoryProvider);
@@ -155,8 +155,9 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
         return;
       }
 
-      // In a real implementation, we would use copyWith methods from freezed models
-      // Since we don't have generated code yet, we'll handle this simply:
+      // TODO: Implement proper identity update with field changes
+      // The current implementation does not actually update any fields
+      // Need to properly handle updates to each field and store them on the blockchain
 
       // For now, we'll just use the mock repository which handles that for us
       final updatedIdentity = await repository.updateIdentity(
@@ -170,7 +171,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to update identity: ${e.toString()}',
+        errorMessage: 'Failed to update identity: $e',
       );
     }
   }

@@ -107,14 +107,14 @@ class _CertificateRenewalScreenState
     return Card(
       elevation: 2,
       color: isExpired
-          ? Colors.red.withOpacity(0.1)
-          : Colors.orange.withOpacity(0.1),
+          ? Colors.red.withValues(alpha: 0.1)
+          : Colors.orange.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
           color: isExpired
-              ? Colors.red.withOpacity(0.3)
-              : Colors.orange.withOpacity(0.3),
+              ? Colors.red.withValues(alpha: 0.3)
+              : Colors.orange.withValues(alpha: 0.3),
         ),
       ),
       child: Padding(
@@ -186,10 +186,10 @@ class _CertificateRenewalScreenState
         const SizedBox(height: 16),
         Card(
           elevation: 0,
-          color: Colors.blue.withOpacity(0.1),
+          color: Colors.blue.withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: Colors.blue.withOpacity(0.3)),
+            side: BorderSide(color: Colors.blue.withValues(alpha: 0.3)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -203,7 +203,7 @@ class _CertificateRenewalScreenState
                 const Expanded(
                   child: Text(
                     'The renewal process is streamlined for existing users. '
-                    'Some of your information may be pre-filled, but you\'ll still need to verify your identity.',
+                    "Some of your information may be pre-filled, but you'll still need to verify your identity.",
                   ),
                 ),
               ],
@@ -237,14 +237,14 @@ class _CertificateRenewalScreenState
         const SizedBox(height: 16),
         ...List.generate(steps.length, (index) {
           return Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
+            padding: const EdgeInsets.only(bottom: 16),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   width: 24,
                   height: 24,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.blue,
                     shape: BoxShape.circle,
                   ),
@@ -276,7 +276,7 @@ class _CertificateRenewalScreenState
   // Helper method for displaying certificate info
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -320,7 +320,7 @@ class _CertificateRenewalScreenState
   }
 
   // Start the renewal process
-  void _startRenewalProcess() async {
+  Future<void> _startRenewalProcess() async {
     setState(() {
       _isLoading = true;
     });
@@ -334,14 +334,14 @@ class _CertificateRenewalScreenState
 
       // Navigate to the verification process screen
       if (mounted) {
-        context.pushNamed('verificationProcess');
+        await context.pushNamed('verificationProcess');
       }
     } catch (e) {
       // Show error
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to start renewal: ${e.toString()}'),
+            content: Text('Failed to start renewal: $e'),
             backgroundColor: Colors.red,
           ),
         );

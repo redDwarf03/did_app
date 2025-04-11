@@ -101,10 +101,10 @@ class _VerificationStartScreenState
         const SizedBox(height: 16),
         Card(
           elevation: 0,
-          color: Colors.blue.withOpacity(0.1),
+          color: Colors.blue.withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: Colors.blue.withOpacity(0.3)),
+            side: BorderSide(color: Colors.blue.withValues(alpha: 0.3)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -209,7 +209,7 @@ class _VerificationStartScreenState
               vertical: 2,
             ),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: Colors.blue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -252,7 +252,7 @@ class _VerificationStartScreenState
         // Documents list based on selected level
         ..._getRequiredDocuments().map(
           (document) => Padding(
-            padding: const EdgeInsets.only(bottom: 12.0),
+            padding: const EdgeInsets.only(bottom: 12),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -402,7 +402,7 @@ class _VerificationStartScreenState
   }
 
   // Start verification process
-  void _startVerification() async {
+  Future<void> _startVerification() async {
     // Validate form
     if (!_formKey.currentState!.validate()) {
       return;
@@ -420,14 +420,14 @@ class _VerificationStartScreenState
 
       // Navigate to verification process screen
       if (mounted) {
-        context.pushNamed('verificationProcess');
+        await context.pushNamed('verificationProcess');
       }
     } catch (e) {
       // Show error message
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to start verification: ${e.toString()}'),
+            content: Text('Failed to start verification: $e'),
             backgroundColor: Colors.red,
           ),
         );

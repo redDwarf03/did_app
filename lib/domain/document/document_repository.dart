@@ -90,7 +90,8 @@ abstract class DocumentRepository {
 
   /// Vérifie l'authenticité d'un document
   Future<DocumentVerificationStatus> verifyDocumentAuthenticity(
-      String documentId);
+    String documentId,
+  );
 
   /// Vérifie la validité de la signature d'un document
   Future<bool> verifyDocumentSignature(String documentId);

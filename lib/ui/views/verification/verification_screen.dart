@@ -31,7 +31,7 @@ class VerificationScreen extends ConsumerWidget {
         ),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -80,7 +80,7 @@ class VerificationScreen extends ConsumerWidget {
         ),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -112,7 +112,8 @@ class VerificationScreen extends ConsumerWidget {
                       ref
                           .read(verificationNotifierProvider.notifier)
                           .loadVerification(
-                              identityState.identity!.identityAddress);
+                            identityState.identity!.identityAddress,
+                          );
                     }
                   },
                   child: const Text('Retry'),
@@ -132,7 +133,7 @@ class VerificationScreen extends ConsumerWidget {
         ),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -197,7 +198,7 @@ class VerificationScreen extends ConsumerWidget {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -274,9 +275,12 @@ class VerificationScreen extends ConsumerWidget {
 
   /// Build a verification step item
   Widget _buildVerificationStep(
-      BuildContext context, String title, IconData icon) {
+    BuildContext context,
+    String title,
+    IconData icon,
+  ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           Icon(

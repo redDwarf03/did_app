@@ -7,6 +7,15 @@ import 'package:did_app/domain/identity/identity_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Mock implementation of the Identity Repository for development and testing
+///
+/// TODO: Replace this mock implementation with a real blockchain-based identity repository
+/// This class simulates identity management with in-memory storage and artificial delays.
+/// A real implementation should:
+/// - Store identity data securely on the Archethic blockchain
+/// - Use proper cryptographic signatures for identity operations
+/// - Implement proper key management for identity control
+/// - Follow SSI (Self-Sovereign Identity) principles
+/// - Implement proper privacy measures for personal information
 class MockIdentityRepository implements IdentityRepository {
   MockIdentityRepository(this.ref);
 

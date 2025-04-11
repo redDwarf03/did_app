@@ -78,7 +78,7 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -241,7 +241,7 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
 
   /// Open date picker for selecting date of birth
   Future<void> _selectDateOfBirth(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    final picked = await showDatePicker(
       context: context,
       initialDate: _dateOfBirth ?? DateTime(2000),
       firstDate: DateTime(1900),

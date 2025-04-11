@@ -146,11 +146,11 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      const Row(
                         children: [
-                          const Icon(Icons.verified_user, size: 20),
-                          const SizedBox(width: 8),
-                          const Text(
+                          Icon(Icons.verified_user, size: 20),
+                          SizedBox(width: 8),
+                          Text(
                             'Identity Certificate',
                             style: TextStyle(
                               fontSize: 16,
@@ -174,7 +174,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                 ),
                 // Actions buttons
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -204,7 +204,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -284,7 +284,9 @@ class CertificatesDashboardScreen extends ConsumerWidget {
 
   // Certificate actions
   void _showCertificateDetails(
-      BuildContext context, VerificationCertificate certificate) {
+    BuildContext context,
+    VerificationCertificate certificate,
+  ) {
     Navigator.of(context).pushNamed(
       '/verification/certificate/details',
       arguments: certificate,
@@ -292,12 +294,14 @@ class CertificatesDashboardScreen extends ConsumerWidget {
   }
 
   void _shareCertificate(
-      BuildContext context, VerificationCertificate certificate) {
+    BuildContext context,
+    VerificationCertificate certificate,
+  ) {
     // Show share options dialog
     showModalBottomSheet(
       context: context,
       builder: (context) => Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -340,7 +344,9 @@ class CertificatesDashboardScreen extends ConsumerWidget {
   }
 
   void _renewCertificate(
-      BuildContext context, VerificationCertificate certificate) {
+    BuildContext context,
+    VerificationCertificate certificate,
+  ) {
     // Navigate to renewal process
     Navigator.of(context).pushNamed('/verification/renew');
   }

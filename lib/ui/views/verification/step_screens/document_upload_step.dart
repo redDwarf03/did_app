@@ -85,12 +85,12 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
                   _buildUploadButton(
                     'Take Photo',
                     Icons.camera_alt,
-                    () => _takePhoto(),
+                    _takePhoto,
                   ),
                   _buildUploadButton(
                     'Upload File',
                     Icons.upload_file,
-                    () => _uploadFile(),
+                    _uploadFile,
                   ),
                 ],
               ),
@@ -124,7 +124,7 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
             ),
           ),
           const SizedBox(height: 8),
-          ..._uploadedDocuments.map((doc) => _buildUploadedItem(doc)),
+          ..._uploadedDocuments.map(_buildUploadedItem),
           const SizedBox(height: 24),
         ],
 
@@ -134,7 +134,7 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
           child: ElevatedButton.icon(
             onPressed: _isUploading || _uploadedDocuments.isEmpty
                 ? null
-                : () => _submitDocuments(),
+                : _submitDocuments,
             icon: _isUploading
                 ? const SizedBox(
                     width: 20,
@@ -156,7 +156,10 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
 
   /// Build an upload button with an icon and label
   Widget _buildUploadButton(
-      String label, IconData icon, VoidCallback onPressed) {
+    String label,
+    IconData icon,
+    VoidCallback onPressed,
+  ) {
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: Icon(icon),
@@ -173,7 +176,7 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
   /// Build a check item with a bullet point
   Widget _buildCheckItem(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
+      padding: const EdgeInsets.only(bottom: 4),
       child: Row(
         children: [
           const Icon(
