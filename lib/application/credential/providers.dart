@@ -197,6 +197,43 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
     }
   }
 
+  /// Ajouter ou mettre à jour une attestation
+  Future<bool> addCredential(Credential credential) async {
+    state = state.copyWith(isLoading: true);
+
+    try {
+      final repository = ref.read(credentialRepositoryProvider);
+      await repository.saveCredential(credential);
+
+      // Vérifier si l'attestation existe déjà
+      final existingIndex = state.credentials.indexWhere(
+        (c) => c.id == credential.id,
+      );
+
+      final List<Credential> updatedCredentials;
+      if (existingIndex >= 0) {
+        // Mise à jour d'une attestation existante
+        updatedCredentials = [...state.credentials];
+        updatedCredentials[existingIndex] = credential;
+      } else {
+        // Ajout d'une nouvelle attestation
+        updatedCredentials = [...state.credentials, credential];
+      }
+
+      state = state.copyWith(
+        credentials: updatedCredentials,
+        isLoading: false,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Erreur lors de l\'ajout de l\'attestation: $e',
+      );
+      return false;
+    }
+  }
+
   /// Créer une présentation sélective
   Future<CredentialPresentation?> createPresentation({
     required List<String> credentialIds,

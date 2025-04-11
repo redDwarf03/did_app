@@ -538,18 +538,7 @@ class _CredentialPresentationScreenState
   }
 
   String _getPredicateDescription(CredentialPredicate predicate) {
-    switch (predicate.predicateType) {
-      case PredicateType.greaterThan:
-        return '> ${predicate.value}';
-      case PredicateType.greaterThanOrEqual:
-        return '≥ ${predicate.value}';
-      case PredicateType.lessThan:
-        return '< ${predicate.value}';
-      case PredicateType.lessThanOrEqual:
-        return '≤ ${predicate.value}';
-      case PredicateType.equal:
-        return '= ${predicate.value}';
-    }
+    return '${predicate.predicateType.humanReadable} ${predicate.value}';
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:did_app/application/credential/eidas_provider.dart';
 import 'package:did_app/application/credential/providers.dart';
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,8 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:did_app/ui/common/app_card.dart';
 import 'package:did_app/ui/common/section_title.dart';
 import 'package:did_app/ui/views/credential/credential_certificate_screen.dart';
+import 'package:did_app/ui/views/credential/credential_presentation_screen.dart';
+import 'package:did_app/ui/views/credential/eidas_interop_screen.dart';
 
 /// Écran affichant les détails d'une attestation vérifiable
 class CredentialDetailScreen extends ConsumerWidget {
@@ -20,11 +23,41 @@ class CredentialDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final credentialAsync = ref.watch(credentialByIdProvider(credentialId));
+    final eidasNotifier = ref.watch(eidasNotifierProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Détails de l\'attestation'),
         actions: [
+          // Action pour convertir au format eIDAS
+          credentialAsync.maybeWhen(
+            data: (credential) {
+              if (credential != null) {
+                // Si l'attestation est déjà compatible eIDAS, afficher un badge
+                if (eidasNotifier.isEidasCompatible(credential)) {
+                  return Tooltip(
+                    message: 'Compatible eIDAS 2.0',
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Icon(
+                        Icons.euro_symbol,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  );
+                } else {
+                  // Sinon, afficher un bouton pour convertir
+                  return IconButton(
+                    icon: const Icon(Icons.euro_symbol),
+                    tooltip: 'Convertir au format eIDAS 2.0',
+                    onPressed: () => _convertToEidas(context, ref, credential),
+                  );
+                }
+              }
+              return const SizedBox.shrink();
+            },
+            orElse: () => const SizedBox.shrink(),
+          ),
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: () {
@@ -79,10 +112,11 @@ class CredentialDetailScreen extends ConsumerWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      // TODO: Navigate to presentation screen
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Écran de présentation à venir'),
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => CredentialPresentationScreen(
+                            credentialIds: [credential.id],
+                          ),
                         ),
                       );
                     },
@@ -96,6 +130,60 @@ class CredentialDetailScreen extends ConsumerWidget {
         orElse: () => null,
       ),
     );
+  }
+
+  // Méthode pour convertir une attestation au format eIDAS
+  Future<void> _convertToEidas(
+    BuildContext context,
+    WidgetRef ref,
+    Credential credential,
+  ) async {
+    final eidasNotifier = ref.read(eidasNotifierProvider.notifier);
+    final credentialNotifier = ref.read(credentialNotifierProvider.notifier);
+
+    try {
+      final eidasCredential =
+          await eidasNotifier.makeEidasCompatible(credential);
+      if (eidasCredential != null) {
+        // Mettre à jour l'attestation
+        final success = await credentialNotifier.addCredential(eidasCredential);
+
+        if (context.mounted) {
+          if (success) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Attestation convertie au format eIDAS 2.0'),
+                backgroundColor: Colors.green,
+              ),
+            );
+
+            // Ouvrir l'écran d'interopérabilité eIDAS
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const EidasInteropScreen(),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Erreur lors de la conversion'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildCredentialDetails(BuildContext context, Credential credential) {

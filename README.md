@@ -67,6 +67,27 @@ lib/
    - Well-defined navigation flows between features
    - Confirmation dialogs for critical actions
    - Loading indicators and error states
+   
+5. **Verifiable Attestations and Certifications**
+   - Reception and storage of verifiable credentials (attestations)
+   - Management of credentials by type and issuer
+   - Credential details view with attribute display
+   - Verification of credential authenticity
+   - Organizing credentials by type (identity, diploma, health insurance, etc.)
+   
+6. **Authorization and Sharing**
+   - Selective credential presentation creation
+   - Attribute selection for fine-grained data sharing
+   - Generating shareable presentation links
+   - QR code support for in-person credential presentation
+   - Support for predicates and zero-knowledge proofs in presentations
+
+7. **eIDAS 2.0 Interoperability**
+   - EUDI Wallet compatibility for importing and exporting credentials
+   - Support for standardized eIDAS data formats and certificates
+   - Conversion of existing credentials to eIDAS compatible format
+   - Import/export functionality for JSON-based eIDAS credentials
+   - Integration with EU Digital Identity frameworks
 
 ### Partially Implemented Features
 
@@ -82,39 +103,23 @@ lib/
    - UI for document management is implemented
    - Secure document storage implementation is pending
 
+4. **Third-Party Service Integration**
+   - Basic framework for credential issuance and verification is in place
+   - Need to expand API for integration with more service providers
+
 ### Features To Be Implemented
 
-1. **Authorization and Sharing**
-   - Granular consent system for data sharing
-   - Temporary/limited sharing of identity proofs
-   - Access tracking and authorization revocation
-
-2. **eIDAS 2.0 Interoperability**
-   - EUDI Wallet compatibility
-   - Support for standardized data formats and certificates
-   - Cross-border interoperability features
-
-3. **Secure Authentication**
+1. **Secure Authentication**
    - Biometric authentication (fingerprint, facial recognition)
    - Multi-factor authentication
    - Passwordless authentication
 
-4. **Verifiable Attestations and Certifications**
-   - Reception and storage of verifiable attestations
-   - Third-party validation system
-   - Management of expired/revoked certifications
-
-5. **Third-Party Service Integration**
-   - API for integration with financial services
-   - Simplified connection to public and private services
-   - Integration framework for partners
-
-6. **Privacy and Security Enhancements**
+2. **Privacy and Security Enhancements**
    - End-to-end encryption of data
    - Decentralized storage on Archethic blockchain
-   - Selective information disclosure (zero-knowledge proofs)
+   - Enhance selective information disclosure with more complex zero-knowledge proofs
 
-7. **Regulatory Compliance**
+3. **Regulatory Compliance**
    - Reporting tools for compliance
    - Audit trails for data access
    - Regular updates according to evolving regulations

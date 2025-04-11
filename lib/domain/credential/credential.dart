@@ -323,7 +323,23 @@ enum PredicateType {
   lessThanOrEqual,
 
   /// Égal à
-  equal,
+  equal;
+
+  /// Retourne une représentation du prédicat lisible par un humain
+  String get humanReadable {
+    switch (this) {
+      case PredicateType.greaterThan:
+        return '>';
+      case PredicateType.greaterThanOrEqual:
+        return '≥';
+      case PredicateType.lessThan:
+        return '<';
+      case PredicateType.lessThanOrEqual:
+        return '≤';
+      case PredicateType.equal:
+        return '=';
+    }
+  }
 }
 
 /// Prédicat pour une preuve à divulgation nulle

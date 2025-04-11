@@ -26,177 +26,206 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:did_app/ui/views/verification/verification_process_screen.dart';
+import 'package:did_app/application/credential/providers.dart';
+import 'package:did_app/application/document/providers.dart';
+import 'package:did_app/application/identity/providers.dart';
+import 'package:did_app/application/verification/providers.dart';
+import 'package:did_app/application/session/provider.dart';
+import 'package:did_app/ui/views/credential/credential_detail_screen.dart'
+    as credential_detail;
+import 'package:did_app/ui/views/credential/eidas_interop_screen.dart';
+import 'package:did_app/ui/views/splash_screen.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize the service locator
-  await setupServiceLocator();
 
   runApp(
     ProviderScope(
-      observers: [
-        aedappfm.ProvidersLogger(),
-      ],
-      child: const ProvidersInitialization(child: MyApp()),
+      child: MainApp(),
     ),
   );
 }
 
-/// Eagerly initializes providers for app startup
-class ProvidersInitialization extends ConsumerWidget {
-  const ProvidersInitialization({required this.child, super.key});
-
-  final Widget child;
+class MainApp extends ConsumerWidget {
+  MainApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Initialize session provider
-    ref.watch(sessionNotifierProvider);
-    return child;
-  }
-}
-
-class MyApp extends ConsumerStatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  ConsumerState<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends ConsumerState<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-
-    // Optional: Start UCO price subscription if needed
-    unawaited(
-      ref
-          .read(
-            aedappfm.ArchethicOracleUCOProviders.archethicOracleUCO.notifier,
-          )
-          .startSubscription(),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Router configuration
-    final router = GoRouter(
-      routes: [
-        GoRoute(
-          path: '/',
-          name: 'home',
-          builder: (context, state) => const MainScreen(),
-        ),
-        GoRoute(
-          path: '/welcome',
-          builder: (context, state) => const WelcomeScreen(),
-        ),
-        GoRoute(
-          path: '/identity',
-          builder: (context, state) => const IdentityScreen(),
-        ),
-        GoRoute(
-          path: '/identity/create',
-          name: 'createIdentity',
-          builder: (context, state) => const CreateIdentityScreen(),
-        ),
-        GoRoute(
-          path: '/identity/:address',
-          name: 'identityDetails',
-          builder: (context, state) {
-            final address = state.pathParameters['address']!;
-            return IdentityDetailsScreen(address: address);
-          },
-        ),
-        GoRoute(
-          path: '/verification/certificates',
-          builder: (context, state) => const CertificatesDashboardScreen(),
-        ),
-        GoRoute(
-          path: '/verification/certificate/details',
-          builder: (context, state) {
-            final certificate = state.extra! as VerificationCertificate;
-            return CertificateDetailsScreen(certificate: certificate);
-          },
-        ),
-        GoRoute(
-          path: '/verification/success',
-          name: 'verificationSuccess',
-          builder: (context, state) {
-            final certificate = state.extra! as VerificationCertificate;
-            return VerificationSuccessScreen(certificate: certificate);
-          },
-        ),
-        GoRoute(
-          path: '/verification/start',
-          name: 'verificationStart',
-          builder: (context, state) => const VerificationStartScreen(),
-        ),
-        GoRoute(
-          path: '/verification/renew',
-          name: 'verificationRenew',
-          builder: (context, state) {
-            final certificate = state.extra as VerificationCertificate?;
-            return CertificateRenewalScreen(certificate: certificate);
-          },
-        ),
-        GoRoute(
-          path: '/verification/process',
-          name: 'verificationProcess',
-          builder: (context, state) => const VerificationScreen(),
-        ),
-        GoRoute(
-          path: '/documents',
-          name: 'documents',
-          builder: (context, state) => const DocumentListScreen(),
-        ),
-        GoRoute(
-          path: '/document/:id',
-          builder: (context, state) {
-            final documentId = state.pathParameters['id']!;
-            return DocumentDetailScreen(documentId: documentId);
-          },
-        ),
-        GoRoute(
-          path: '/document/:id/versions',
-          builder: (context, state) {
-            final documentId = state.pathParameters['id']!;
-            return DocumentVersionsScreen(documentId: documentId);
-          },
-        ),
-        // Nouvelles routes pour les attestations (Verifiable Credentials)
-        GoRoute(
-          path: '/credentials',
-          name: 'credentials',
-          builder: (context, state) => const CredentialListScreen(),
-        ),
-        // Autres routes à ajouter au besoin
-      ],
-    );
+    // Initialize providers
+    loadDefaultProvidersData(ref);
 
     return MaterialApp.router(
-      routerConfig: router,
-      title: 'Archethic Digital Identity',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
         useMaterial3: true,
         colorSchemeSeed: Colors.blue,
       ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        useMaterial3: true,
-        colorSchemeSeed: Colors.blue,
-      ),
       localizationsDelegates: const [
         AppLocalizations.delegate,
-        aedappfm.AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: GoRouter(
+        initialLocation: '/',
+        redirect: (context, state) {
+          final sessionState = ref.read(sessionNotifierProvider);
+          if (state.uri.path != '/welcome' &&
+              state.uri.path != '/' &&
+              !sessionState.isConnected) {
+            return '/welcome';
+          }
+          if (state.uri.path == '/welcome' && sessionState.isConnected) {
+            return '/main';
+          }
+          return null;
+        },
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const SplashScreen(),
+          ),
+          GoRoute(
+            path: '/welcome',
+            builder: (context, state) => const WelcomeScreen(),
+          ),
+          GoRoute(
+            path: '/main',
+            builder: (context, state) => const MainScreen(),
+            routes: [
+              GoRoute(
+                path: 'identity',
+                builder: (context, state) => const IdentityScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'createIdentity',
+                    builder: (context, state) => const CreateIdentityScreen(),
+                  ),
+                  GoRoute(
+                    path: 'identityDetails',
+                    builder: (context, state) => IdentityDetailsScreen(),
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: 'verification',
+                builder: (context, state) => const VerificationScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'start',
+                    builder: (context, state) =>
+                        const VerificationStartScreen(),
+                  ),
+                  GoRoute(
+                    path: 'process/:processIdentifier',
+                    builder: (context, state) => VerificationProcessScreen(
+                      verificationProcess: VerificationProcess.fromJson(
+                        state.uri.queryParameters,
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'success',
+                    builder: (context, state) => VerificationSuccessScreen(
+                      certificate: VerificationCertificate(
+                        id: 'sample-id',
+                        issuer: 'Sample Authority',
+                        issuedAt: DateTime.now(),
+                        expiresAt:
+                            DateTime.now().add(const Duration(days: 365)),
+                        eidasLevel: EidasLevel.substantial,
+                        signature: 'sample-signature',
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'dashboard',
+                    builder: (context, state) =>
+                        const CertificatesDashboardScreen(),
+                  ),
+                  GoRoute(
+                    path: 'certificate-display',
+                    builder: (context, state) {
+                      return CertificateDetailsScreen(
+                        certificate: VerificationCertificate(
+                          id: 'sample-id',
+                          issuer: 'Sample Authority',
+                          issuedAt: DateTime.now(),
+                          expiresAt:
+                              DateTime.now().add(const Duration(days: 365)),
+                          eidasLevel: EidasLevel.substantial,
+                          signature: 'sample-signature',
+                        ),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: 'certificate/renewal',
+                    builder: (context, state) {
+                      return CertificateRenewalScreen(
+                        certificate: VerificationCertificate(
+                          id: 'sample-id',
+                          issuer: 'Sample Authority',
+                          issuedAt: DateTime.now(),
+                          expiresAt:
+                              DateTime.now().add(const Duration(days: 365)),
+                          eidasLevel: EidasLevel.substantial,
+                          signature: 'sample-signature',
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: 'documents',
+                builder: (context, state) => const DocumentListScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'detail/:documentId',
+                    builder: (context, state) => DocumentDetailScreen(
+                      documentId: state.pathParameters['documentId']!,
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'versions/:documentId',
+                    builder: (context, state) => DocumentVersionsScreen(
+                      documentId: state.pathParameters['documentId']!,
+                    ),
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: 'credentials',
+                builder: (context, state) => const CredentialListScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'detail/:credentialId',
+                    builder: (context, state) {
+                      final id = state.pathParameters['credentialId']!;
+                      return credential_detail.CredentialDetailScreen(
+                        credentialId: id,
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: 'eidas',
+                    builder: (context, state) => const EidasInteropScreen(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
+}
+
+void loadDefaultProvidersData(WidgetRef ref) {
+  ref.read(identityNotifierProvider.notifier).refreshIdentity();
+  ref.read(documentNotifierProvider.notifier).loadDocuments('all');
+  ref.read(credentialNotifierProvider.notifier).loadCredentials();
 }

@@ -1,6 +1,7 @@
 import 'package:did_app/application/credential/providers.dart';
 import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/domain/credential/credential.dart';
+import 'package:did_app/ui/views/credential/eidas_interop_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -35,6 +36,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
   Widget build(BuildContext context) {
     final credentialState = ref.watch(credentialNotifierProvider);
     final identityState = ref.watch(identityNotifierProvider);
+    final hasIdentity = identityState.identity != null;
 
     if (identityState.identity == null) {
       return Scaffold(
@@ -85,13 +87,23 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
       appBar: AppBar(
         title: const Text('Mes Attestations'),
         actions: [
-          // Bouton pour rafraîchir la liste
+          IconButton(
+            icon: const Icon(Icons.euro),
+            tooltip: 'Interopérabilité eIDAS',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const EidasInteropScreen(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: credentialState.isLoading ? null : _loadCredentials,
             tooltip: 'Actualiser',
+            onPressed: _loadCredentials,
           ),
-          // Bouton pour scanner un QR code
           IconButton(
             icon: const Icon(Icons.qr_code_scanner),
             onPressed:
