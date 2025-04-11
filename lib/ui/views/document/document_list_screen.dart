@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:did_app/ui/views/document/document_detail_screen.dart';
+import 'package:did_app/ui/views/document/document_form_screen.dart';
+import 'package:did_app/ui/views/document/shared_documents_screen.dart';
+import 'package:did_app/ui/views/document/widgets/document_share_dialog.dart';
+import 'package:did_app/ui/views/document/widgets/document_card.dart';
 
 /// Screen displaying the user's document list
 class DocumentListScreen extends ConsumerStatefulWidget {
@@ -161,235 +166,34 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
   }
 
   Widget _buildDocumentCard(BuildContext context, Document document) {
-    // Formatter dates
-    final dateFormat = DateFormat('dd/MM/yyyy');
-    final issuedAt = dateFormat.format(document.issuedAt);
-    final expiresAt = document.expiresAt != null
-        ? dateFormat.format(document.expiresAt!)
-        : 'Non applicable';
-
-    // Color based on verification status
-    final statusColor = _getStatusColor(document.verificationStatus);
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      child: InkWell(
-        onTap: () => _openDocumentDetails(context, document),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title and document type
-              Row(
-                children: [
-                  Icon(
-                    _getDocumentTypeIcon(document.type),
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      document.title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      _getVerificationStatusText(document.verificationStatus),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: statusColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              // Description
-              if (document.description != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    document.description!,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ),
-
-              // Issuer
-              Row(
-                children: [
-                  const Icon(Icons.business, size: 16, color: Colors.grey),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Issuer: ${document.issuer}',
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-
-              // Issued and expiration dates
-              Row(
-                children: [
-                  const Icon(
-                    Icons.calendar_today,
-                    size: 16,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Issued: $issuedAt',
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                  const SizedBox(width: 16),
-                  if (document.expiresAt != null)
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.event_busy,
-                          size: 16,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Expire: $expiresAt',
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-              const SizedBox(height: 4),
-
-              // Tags
-              if (document.tags != null && document.tags!.isNotEmpty)
-                Wrap(
-                  spacing: 8,
-                  children: document.tags!
-                      .map(
-                        (tag) => Chip(
-                          label: Text(tag),
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          labelStyle: const TextStyle(fontSize: 12),
-                          padding: EdgeInsets.zero,
-                        ),
-                      )
-                      .toList(),
-                ),
-
-              const SizedBox(height: 8),
-
-              // Action buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  // Download button
-                  IconButton(
-                    icon: const Icon(Icons.download),
-                    tooltip: 'Download',
-                    onPressed: () => _downloadDocument(context, document),
-                  ),
-                  // Share button (if document is shareable)
-                  if (document.isShareable)
-                    IconButton(
-                      icon: const Icon(Icons.share),
-                      tooltip: 'Share',
-                      onPressed: () => _showShareDialog(context, document),
-                    ),
-                  // Verify button
-                  IconButton(
-                    icon: const Icon(Icons.verified_user),
-                    tooltip: 'Verify authenticity',
-                    onPressed: () => _verifyDocument(context, document),
-                  ),
-                  // Context menu button
-                  PopupMenuButton<String>(
-                    onSelected: (value) =>
-                        _handleMenuAction(context, value, document),
-                    itemBuilder: (context) => [
-                      const PopupMenuItem<String>(
-                        value: 'edit',
-                        child: Text('Edit'),
-                      ),
-                      const PopupMenuItem<String>(
-                        value: 'versions',
-                        child: Text('View versions'),
-                      ),
-                      if (document.verificationStatus !=
-                          DocumentVerificationStatus.verified)
-                        const PopupMenuItem<String>(
-                          value: 'sign',
-                          child: Text('Sign'),
-                        ),
-                      const PopupMenuItem<String>(
-                        value: 'delete',
-                        child: Text('Delete'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+    return DocumentCard(
+      document: document,
+      onTap: () => _openDocumentDetails(context, document),
+      onDownload: () => _downloadDocument(context, document),
+      onShare: document.isShareable
+          ? () => _showShareDialog(context, document)
+          : null,
+      onVerify: () => _verifyDocument(context, document),
+      onEdit: () => _editDocument(context, document),
+      onDelete: () => _confirmDeleteDocument(context, document),
     );
   }
 
   // Show document add dialog
   Future<void> _showAddDocumentDialog(BuildContext context) async {
-    // In a complete implementation, this would open a file selection dialog
-    // and input document metadata
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add document'),
-        content: const Text('This feature will be implemented soon.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-        ],
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const DocumentFormScreen(),
       ),
     );
   }
 
   // Open document details
   void _openDocumentDetails(BuildContext context, Document document) {
-    // For a complete implementation, this would navigate to the document details screen
-    // context.push('/documents/${document.id}');
-
-    // For now, show a simple dialog
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(document.title),
-        content: const Text(
-          'The document details screen will be implemented soon.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-        ],
+    // Navigate to the document details screen
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => DocumentDetailScreen(documentId: document.id),
       ),
     );
   }
@@ -422,21 +226,19 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
 
   // Show document share dialog
   Future<void> _showShareDialog(BuildContext context, Document document) async {
-    // For a complete implementation, this would open a share dialog
+    if (!document.isShareable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This document is not shareable'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Share document'),
-        content: const Text(
-          'The document sharing feature will be implemented soon.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
+      builder: (context) => DocumentShareDialog(document: document),
     );
   }
 
@@ -515,53 +317,11 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
 
   // Show documents shared with user
   Future<void> _showSharedWithMe(BuildContext context) async {
-    final identity = ref.read(identityNotifierProvider).identity;
-    if (identity == null) return;
-
-    try {
-      // Load shared documents
-      await ref
-          .read(documentNotifierProvider.notifier)
-          .loadSharedWithMe(identity.identityAddress);
-
-      // Navigate to shared documents screen
-      // context.push('/documents/shared-with-me');
-
-      // For now, show a simple dialog
-      if (context.mounted) {
-        await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Documents shared with me'),
-            content: const Text(
-              'The shared documents screen will be implemented soon.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
-              ),
-            ],
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: Text('An error occurred: $e'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
-              ),
-            ],
-          ),
-        );
-      }
-    }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SharedDocumentsScreen(),
+      ),
+    );
   }
 
   // Handle context menu actions
@@ -588,20 +348,9 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
 
   // Edit document
   void _editDocument(BuildContext context, Document document) {
-    // For a complete implementation, this would open an edit dialog
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit document'),
-        content: const Text(
-          'The document editing feature will be implemented soon.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-        ],
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => DocumentFormScreen(documentId: document.id),
       ),
     );
   }

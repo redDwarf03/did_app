@@ -4,7 +4,10 @@ import 'package:archethic_dapp_framework_flutter/archethic_dapp_framework_flutte
     as aedappfm;
 import 'package:did_app/application/session/provider.dart';
 import 'package:did_app/domain/verification/verification_process.dart';
+import 'package:did_app/ui/views/credential/credential_list_screen.dart';
+import 'package:did_app/ui/views/document/document_detail_screen.dart';
 import 'package:did_app/ui/views/document/document_list_screen.dart';
+import 'package:did_app/ui/views/document/document_versions_screen.dart';
 import 'package:did_app/ui/views/identity/create_identity_screen.dart';
 import 'package:did_app/ui/views/identity/identity_details_screen.dart';
 import 'package:did_app/ui/views/identity/identity_screen.dart';
@@ -22,6 +25,7 @@ import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:did_app/ui/views/verification/verification_process_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -148,7 +152,27 @@ class _MyAppState extends ConsumerState<MyApp> {
           name: 'documents',
           builder: (context, state) => const DocumentListScreen(),
         ),
-        // Add more routes as needed
+        GoRoute(
+          path: '/document/:id',
+          builder: (context, state) {
+            final documentId = state.pathParameters['id']!;
+            return DocumentDetailScreen(documentId: documentId);
+          },
+        ),
+        GoRoute(
+          path: '/document/:id/versions',
+          builder: (context, state) {
+            final documentId = state.pathParameters['id']!;
+            return DocumentVersionsScreen(documentId: documentId);
+          },
+        ),
+        // Nouvelles routes pour les attestations (Verifiable Credentials)
+        GoRoute(
+          path: '/credentials',
+          name: 'credentials',
+          builder: (context, state) => const CredentialListScreen(),
+        ),
+        // Autres routes à ajouter au besoin
       ],
     );
 

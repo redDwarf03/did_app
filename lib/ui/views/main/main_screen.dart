@@ -1,4 +1,5 @@
 import 'package:did_app/application/session/provider.dart';
+import 'package:did_app/ui/views/credential/credential_list_screen.dart';
 import 'package:did_app/ui/views/document/document_list_screen.dart';
 import 'package:did_app/ui/views/identity/identity_screen.dart';
 import 'package:did_app/ui/views/verification/certificates_dashboard_screen.dart';
@@ -36,12 +37,17 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home),
-            label: 'Home',
+            label: 'Accueil',
           ),
           NavigationDestination(
             icon: Icon(Icons.badge_outlined),
             selectedIcon: Icon(Icons.badge),
-            label: 'Identity',
+            label: 'Identité',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.card_membership_outlined),
+            selectedIcon: Icon(Icons.card_membership),
+            label: 'Attestations',
           ),
           NavigationDestination(
             icon: Icon(Icons.folder_outlined),
@@ -51,7 +57,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           NavigationDestination(
             icon: Icon(Icons.verified_user_outlined),
             selectedIcon: Icon(Icons.verified_user),
-            label: 'Verification',
+            label: 'Vérification',
           ),
         ],
       ),
@@ -65,8 +71,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       case 1:
         return const IdentityScreen();
       case 2:
-        return const DocumentListScreen();
+        return const CredentialListScreen();
       case 3:
+        return const DocumentListScreen();
+      case 4:
         return const CertificatesDashboardScreen();
       default:
         return const WelcomeScreen();
