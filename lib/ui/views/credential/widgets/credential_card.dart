@@ -39,7 +39,7 @@ class CredentialCard extends StatelessWidget {
     final issuedAt = dateFormat.format(credential.issuedAt);
     final expiresAt = credential.expiresAt != null
         ? dateFormat.format(credential.expiresAt!)
-        : 'Pas d\'expiration';
+        : 'Illimité';
 
     // Couleur basée sur le statut de vérification
     final statusColor = _getStatusColor(credential.verificationStatus);
@@ -58,13 +58,14 @@ class CredentialCard extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                    _getCredentialTypeIcon(credential.type),
+                    _getCredentialTypeIcon(
+                        _getCredentialTypeFromList(credential.type)),
                     color: Theme.of(context).primaryColor,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      credential.name,
+                      credential.name ?? 'Attestation',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -224,12 +225,13 @@ class CredentialCard extends StatelessWidget {
 
   // Construit un aperçu des claims (attributs) de l'attestation
   Widget _buildClaimsPreview(BuildContext context) {
-    if (credential.claims.isEmpty) {
+    final claims = credential.claims;
+    if (claims == null || claims.isEmpty) {
       return const SizedBox.shrink();
     }
 
     // Limiter le nombre de claims affichés dans l'aperçu
-    final previewClaims = credential.claims.entries.take(3).toList();
+    final previewClaims = claims.entries.take(3).toList();
 
     return Container(
       padding: const EdgeInsets.all(8),
@@ -250,47 +252,21 @@ class CredentialCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          ...previewClaims.map((entry) {
-            final key = entry.key;
-            final value = entry.value.toString();
-
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 100,
-                    child: Text(
-                      key,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      value,
-                      style: const TextStyle(fontSize: 12),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-          if (credential.claims.length > 3)
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                '+ ${credential.claims.length - 3} autres',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey.shade600,
-                  fontStyle: FontStyle.italic,
-                ),
+          ...previewClaims.map(
+            (entry) => Text(
+              '• ${entry.key}: ${entry.value}',
+              style: const TextStyle(fontSize: 12),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          // Afficher indication s'il y a d'autres attributs
+          if (claims.length > 3)
+            Text(
+              '+ ${claims.length - 3} autres',
+              style: TextStyle(
+                fontSize: 10,
+                fontStyle: FontStyle.italic,
+                color: Colors.grey.shade600,
               ),
             ),
         ],
@@ -349,6 +325,29 @@ class CredentialCard extends StatelessWidget {
         return 'Expiré';
       case VerificationStatus.revoked:
         return 'Révoqué';
+    }
+  }
+
+  // Convertit une liste de types en CredentialType
+  CredentialType _getCredentialTypeFromList(List<String> types) {
+    if (types.contains('IdentityCredential')) {
+      return CredentialType.identity;
+    } else if (types.contains('UniversityDegreeCredential')) {
+      return CredentialType.diploma;
+    } else if (types.contains('HealthInsuranceCredential')) {
+      return CredentialType.healthInsurance;
+    } else if (types.contains('EmploymentCredential')) {
+      return CredentialType.employmentProof;
+    } else if (types.contains('DrivingLicenseCredential')) {
+      return CredentialType.drivingLicense;
+    } else if (types.contains('AgeVerificationCredential')) {
+      return CredentialType.ageVerification;
+    } else if (types.contains('AddressProofCredential')) {
+      return CredentialType.addressProof;
+    } else if (types.contains('MembershipCardCredential')) {
+      return CredentialType.membershipCard;
+    } else {
+      return CredentialType.other;
     }
   }
 }

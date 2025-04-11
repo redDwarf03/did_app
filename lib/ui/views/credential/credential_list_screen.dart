@@ -27,9 +27,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
   Future<void> _loadCredentials() async {
     final identity = ref.read(identityNotifierProvider).identity;
     if (identity != null) {
-      await ref
-          .read(credentialNotifierProvider.notifier)
-          .loadCredentials(identity.identityAddress);
+      await ref.read(credentialNotifierProvider.notifier).loadCredentials();
     }
   }
 
@@ -169,12 +167,16 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
       itemCount: state.credentials.length,
       itemBuilder: (context, index) {
         final credential = state.credentials[index];
-        return CredentialCard(
-          credential: credential,
+        return ListTile(
+          leading: Icon(_getCredentialTypeIcon(
+              _getCredentialTypeFromList(credential.type))),
+          title: Text(credential.name ?? 'Attestation'),
+          subtitle: Text(credential.type.join(', ')),
           onTap: () => _openCredentialDetails(context, credential),
-          onPresent: () => _presentCredential(context, credential),
-          onVerify: () => _verifyCredential(context, credential),
-          onDelete: () => _confirmDeleteCredential(context, credential),
+          trailing: IconButton(
+            icon: const Icon(Icons.more_vert),
+            onPressed: () => _showCredentialOptions(context, credential),
+          ),
         );
       },
     );
@@ -555,8 +557,9 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
             itemBuilder: (context, index) {
               final credential = credentials[index];
               return ListTile(
-                leading: Icon(_getCredentialTypeIcon(credential.type)),
-                title: Text(credential.name),
+                leading: Icon(_getCredentialTypeIcon(
+                    _getCredentialTypeFromList(credential.type))),
+                title: Text(credential.name ?? 'Attestation'),
                 subtitle: Text(credential.issuer),
                 onTap: () {
                   Navigator.of(context).pop();
@@ -685,6 +688,68 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
       case CredentialType.other:
         return Icons.badge;
     }
+  }
+
+  CredentialType _getCredentialTypeFromList(List<String> types) {
+    if (types.contains('IdentityCredential')) {
+      return CredentialType.identity;
+    } else if (types.contains('UniversityDegreeCredential')) {
+      return CredentialType.diploma;
+    } else if (types.contains('HealthInsuranceCredential')) {
+      return CredentialType.healthInsurance;
+    } else if (types.contains('EmploymentCredential')) {
+      return CredentialType.employmentProof;
+    } else if (types.contains('DrivingLicenseCredential')) {
+      return CredentialType.drivingLicense;
+    } else if (types.contains('AgeVerificationCredential')) {
+      return CredentialType.ageVerification;
+    } else if (types.contains('AddressProofCredential')) {
+      return CredentialType.addressProof;
+    } else if (types.contains('MembershipCardCredential')) {
+      return CredentialType.membershipCard;
+    } else {
+      return CredentialType.other;
+    }
+  }
+
+  // Afficher les options pour une attestation
+  void _showCredentialOptions(BuildContext context, Credential credential) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.qr_code),
+              title: const Text('Présenter'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _presentCredential(context, credential);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.verified_user),
+              title: const Text('Vérifier l\'authenticité'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _verifyCredential(context, credential);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete),
+              title: const Text('Supprimer'),
+              textColor: Colors.red,
+              iconColor: Colors.red,
+              onTap: () {
+                Navigator.of(context).pop();
+                _confirmDeleteCredential(context, credential);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

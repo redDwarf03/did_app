@@ -9,6 +9,19 @@ final credentialRepositoryProvider = Provider<CredentialRepository>((ref) {
   return MockCredentialRepository();
 });
 
+/// Provider pour récupérer une attestation par son ID
+final credentialByIdProvider = FutureProvider.family<Credential?, String>(
+  (ref, credentialId) async {
+    final repository = ref.watch(credentialRepositoryProvider);
+
+    try {
+      return await repository.getCredentialById(credentialId);
+    } catch (e) {
+      throw Exception('Erreur lors de la récupération de l\'attestation: $e');
+    }
+  },
+);
+
 /// État pour la gestion des attestations
 class CredentialState {
   const CredentialState({
@@ -71,12 +84,12 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
   final Ref ref;
 
   /// Charger les attestations de l'utilisateur
-  Future<void> loadCredentials(String identityAddress) async {
+  Future<void> loadCredentials() async {
     state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(credentialRepositoryProvider);
-      final credentials = await repository.getCredentials(identityAddress);
+      final credentials = await repository.getCredentials();
 
       state = state.copyWith(
         credentials: credentials,
@@ -91,22 +104,25 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
   }
 
   /// Charger une attestation spécifique
-  Future<void> loadCredential(String credentialId) async {
+  Future<Credential?> loadCredentialById(String credentialId) async {
     state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(credentialRepositoryProvider);
-      final credential = await repository.getCredential(credentialId);
+      final credential = await repository.getCredentialById(credentialId);
 
       state = state.copyWith(
         selectedCredential: credential,
         isLoading: false,
       );
+
+      return credential;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Erreur lors du chargement de l\'attestation: $e',
       );
+      return null;
     }
   }
 
@@ -116,25 +132,18 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
 
     try {
       final repository = ref.read(credentialRepositoryProvider);
-      final success = await repository.deleteCredential(credentialId);
+      await repository.deleteCredential(credentialId);
 
-      if (success) {
-        // Supprimer l'attestation de la liste
-        final updatedCredentials =
-            state.credentials.where((cred) => cred.id != credentialId).toList();
+      // Supprimer l'attestation de la liste
+      final updatedCredentials =
+          state.credentials.where((cred) => cred.id != credentialId).toList();
 
-        state = state.copyWith(
-          credentials: updatedCredentials,
-          isLoading: false,
-        );
-      } else {
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: 'Échec de la suppression de l\'attestation',
-        );
-      }
+      state = state.copyWith(
+        credentials: updatedCredentials,
+        isLoading: false,
+      );
 
-      return success;
+      return true;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -150,7 +159,12 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
 
     try {
       final repository = ref.read(credentialRepositoryProvider);
-      final isValid = await repository.verifyCredential(credentialId);
+      final credential = state.credentials.firstWhere(
+        (c) => c.id == credentialId,
+        orElse: () => throw Exception('Attestation non trouvée'),
+      );
+
+      final isValid = await repository.verifyCredential(credential);
 
       // Mettre à jour le statut de vérification si nécessaire
       if (isValid) {
@@ -185,20 +199,38 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
 
   /// Créer une présentation sélective
   Future<CredentialPresentation?> createPresentation({
-    required String identityAddress,
     required List<String> credentialIds,
     required Map<String, List<String>> revealedAttributes,
     List<CredentialPredicate>? predicates,
+    String? challenge,
+    String? domain,
   }) async {
     state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(credentialRepositoryProvider);
+
+      // Récupérer les objets Credential à partir de leurs IDs
+      final credentials = <Credential>[];
+      for (final id in credentialIds) {
+        final credential = state.credentials.firstWhere(
+          (c) => c.id == id,
+          orElse: () => throw Exception('Attestation non trouvée: $id'),
+        );
+        credentials.add(credential);
+      }
+
+      // Convertir les attributs révélés en selectiveDisclosure format
+      final selectiveDisclosure = <String, List<String>>{};
+      for (final entry in revealedAttributes.entries) {
+        selectiveDisclosure[entry.key] = entry.value;
+      }
+
       final presentation = await repository.createPresentation(
-        identityAddress: identityAddress,
-        credentialIds: credentialIds,
-        revealedAttributes: revealedAttributes,
-        predicates: predicates,
+        credentials: credentials,
+        selectiveDisclosure: selectiveDisclosure,
+        challenge: challenge,
+        domain: domain,
       );
 
       // Mettre à jour la liste des présentations
@@ -220,13 +252,18 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
     }
   }
 
-  /// Générer un lien de partage pour une présentation
-  Future<String?> generatePresentationLink(String presentationId) async {
+  /// Partager une présentation
+  Future<String?> sharePresentation(String presentationId) async {
     state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(credentialRepositoryProvider);
-      final link = await repository.generatePresentationLink(presentationId);
+      final presentation = state.presentations.firstWhere(
+        (p) => p.id == presentationId,
+        orElse: () => throw Exception('Présentation non trouvée'),
+      );
+
+      final link = await repository.sharePresentation(presentation);
 
       state = state.copyWith(isLoading: false);
       return link;
@@ -239,23 +276,15 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
     }
   }
 
-  /// Accepter une offre d'attestation
-  Future<Credential?> acceptCredentialOffer({
-    required String identityAddress,
-    required String offerId,
-    required Map<String, dynamic> consents,
-  }) async {
+  /// Recevoir une attestation depuis un URI
+  Future<Credential?> receiveCredential(String uri) async {
     state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(credentialRepositoryProvider);
-      final credential = await repository.acceptCredentialOffer(
-        identityAddress: identityAddress,
-        offerId: offerId,
-        consents: consents,
-      );
+      final credential = await repository.receiveCredential(uri);
 
-      // Ajouter la nouvelle attestation à la liste
+      // Ajouter l'attestation à la liste
       final updatedCredentials = [...state.credentials, credential];
 
       state = state.copyWith(
@@ -268,36 +297,7 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors de l\'acceptation de l\'attestation: $e',
-      );
-      return null;
-    }
-  }
-
-  /// Créer une demande d'attestation
-  Future<String?> createCredentialRequest({
-    required String identityAddress,
-    required String issuerId,
-    required String credentialType,
-    Map<String, dynamic>? additionalInfo,
-  }) async {
-    state = state.copyWith(isLoading: true);
-
-    try {
-      final repository = ref.read(credentialRepositoryProvider);
-      final requestId = await repository.createCredentialRequest(
-        identityAddress: identityAddress,
-        issuerId: issuerId,
-        credentialType: credentialType,
-        additionalInfo: additionalInfo,
-      );
-
-      state = state.copyWith(isLoading: false);
-      return requestId;
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'Erreur lors de la création de la demande: $e',
+        errorMessage: 'Erreur lors de la réception de l\'attestation: $e',
       );
       return null;
     }

@@ -1,60 +1,42 @@
 import 'package:did_app/domain/credential/credential.dart';
 
-/// Interface du repository pour la gestion des attestations vérifiables
+/// Interface définissant les opérations sur les attestations
 abstract class CredentialRepository {
-  /// Vérifie si un utilisateur a déjà des attestations
-  Future<bool> hasCredentials(String identityAddress);
+  /// Récupère toutes les attestations de l'utilisateur
+  Future<List<Credential>> getCredentials();
 
-  /// Récupère toutes les attestations d'un utilisateur
-  Future<List<Credential>> getCredentials(String identityAddress);
+  /// Récupère une attestation par son identifiant
+  Future<Credential?> getCredentialById(String id);
 
-  /// Récupère une attestation spécifique
-  Future<Credential?> getCredential(String credentialId);
-
-  /// Ajoute une nouvelle attestation reçue d'un émetteur
-  Future<Credential> addCredential({
-    required String identityAddress,
-    required Map<String, dynamic> credentialData,
-  });
+  /// Sauvegarde une attestation
+  Future<void> saveCredential(Credential credential);
 
   /// Supprime une attestation
-  Future<bool> deleteCredential(String credentialId);
+  Future<void> deleteCredential(String id);
 
-  /// Vérifie la validité d'une attestation
-  Future<bool> verifyCredential(String credentialId);
+  /// Vérifie une attestation
+  Future<bool> verifyCredential(Credential credential);
 
-  /// Vérifie le statut de révocation d'une attestation
-  Future<RevocationStatus> checkRevocationStatus(String credentialId);
-
-  /// Crée une présentation à partir d'attestations
+  /// Crée une présentation d'attestation avec divulgation sélective
   Future<CredentialPresentation> createPresentation({
-    required String identityAddress,
-    required List<String> credentialIds,
-    required Map<String, List<String>> revealedAttributes,
-    List<CredentialPredicate>? predicates,
+    required List<Credential> credentials,
+    required Map<String, List<String>> selectiveDisclosure,
+    String? challenge,
+    String? domain,
   });
 
-  /// Vérifie une présentation reçue
+  /// Vérifie une présentation d'attestation
   Future<bool> verifyPresentation(CredentialPresentation presentation);
 
-  /// Génère un lien ou QR code pour partager une présentation
-  Future<String> generatePresentationLink(String presentationId);
+  /// Partage une présentation d'attestation (retourne un URI ou code QR)
+  Future<String> sharePresentation(CredentialPresentation presentation);
 
-  /// Récupère une présentation à partir d'un lien
-  Future<CredentialPresentation?> getPresentationFromLink(String link);
+  /// Récupère une attestation depuis un URI ou un code QR
+  Future<Credential> receiveCredential(String uri);
 
-  /// Accepte une demande d'attestation
-  Future<Credential> acceptCredentialOffer({
-    required String identityAddress,
-    required String offerId,
-    required Map<String, dynamic> consents,
-  });
+  /// Récupère une demande de présentation depuis un URI ou un code QR
+  Future<Map<String, dynamic>> receivePresentationRequest(String uri);
 
-  /// Crée une demande d'attestation pour envoyer à un émetteur
-  Future<String> createCredentialRequest({
-    required String identityAddress,
-    required String issuerId,
-    required String credentialType,
-    Map<String, dynamic>? additionalInfo,
-  });
+  /// Écoute les changements dans les attestations
+  Stream<List<Credential>> watchCredentials();
 }
