@@ -1,35 +1,26 @@
 import 'package:flutter/material.dart';
 
-/// Widget de titre de section avec une ligne de séparation
+/// Widget pour afficher un titre de section
 class SectionTitle extends StatelessWidget {
   const SectionTitle({
     super.key,
     required this.title,
+    this.margin = const EdgeInsets.only(bottom: 8),
   });
 
   final String title;
+  final EdgeInsets margin;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Divider(
-            color: theme.colorScheme.primary.withOpacity(0.2),
-            thickness: 1.0,
-          ),
-        ],
+    return Container(
+      margin: margin,
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

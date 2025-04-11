@@ -3,6 +3,7 @@ import 'package:did_app/domain/document/document.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen displaying the version history of a document
 class DocumentVersionsScreen extends ConsumerStatefulWidget {
@@ -45,7 +46,7 @@ class _DocumentVersionsScreenState
       final document = ref.read(documentNotifierProvider).selectedDocument;
       if (document == null) {
         setState(() {
-          _errorMessage = 'Document not found';
+          _errorMessage = AppLocalizations.of(context)!.documentNotFoundTitle;
         });
         return;
       }
@@ -60,7 +61,8 @@ class _DocumentVersionsScreenState
       });
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error loading document: $e';
+        _errorMessage = AppLocalizations.of(context)!
+            .documentVersionsErrorLoading(e.toString());
       });
     } finally {
       setState(() {
@@ -85,14 +87,13 @@ class _DocumentVersionsScreenState
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Compare Versions'),
-        content: const Text(
-          'The version comparison feature will be implemented in a future release.',
-        ),
+        title: Text(AppLocalizations.of(context)!.compareVersionsDialogTitle),
+        content: Text(
+            AppLocalizations.of(context)!.compareVersionsFeatureNotAvailable),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(AppLocalizations.of(context)!.closeButton),
           ),
         ],
       ),
@@ -102,19 +103,20 @@ class _DocumentVersionsScreenState
   @override
   Widget build(BuildContext context) {
     final document = ref.watch(documentNotifierProvider).selectedDocument;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(document?.title ?? 'Document Versions'),
+        title: Text(document?.title ?? l10n.documentVersionsTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.compare),
-            tooltip: 'Compare versions',
+            tooltip: l10n.compareVersionsAction,
             onPressed: _versions.length > 1 ? _compareVersions : null,
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
+            tooltip: l10n.refreshAction,
             onPressed: _isLoading ? null : _loadDocument,
           ),
         ],
@@ -144,9 +146,10 @@ class _DocumentVersionsScreenState
   }
 
   Widget _buildVersionsScreen(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_versions.isEmpty) {
-      return const Center(
-        child: Text('No version history available for this document'),
+      return Center(
+        child: Text(l10n.noVersionHistory),
       );
     }
 
@@ -170,7 +173,7 @@ class _DocumentVersionsScreenState
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    'Version History (${_versions.length})',
+                    l10n.versionHistoryTitle(_versions.length),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -197,7 +200,7 @@ class _DocumentVersionsScreenState
                           child: Text('v${version.versionNumber}'),
                         ),
                         title: Text(
-                          'Version ${version.versionNumber}',
+                          l10n.versionLabel(version.versionNumber),
                           style: TextStyle(
                             fontWeight: isSelected
                                 ? FontWeight.bold
@@ -221,16 +224,17 @@ class _DocumentVersionsScreenState
         // Version content - right panel
         Expanded(
           child: _selectedVersion != null
-              ? _buildVersionDetails(_selectedVersion!)
-              : const Center(
-                  child: Text('Select a version to view details'),
+              ? _buildVersionDetails(_selectedVersion!, context)
+              : Center(
+                  child: Text(l10n.selectVersionPrompt),
                 ),
         ),
       ],
     );
   }
 
-  Widget _buildVersionDetails(DocumentVersion version) {
+  Widget _buildVersionDetails(DocumentVersion version, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final dateFormat = DateFormat('dd MMM yyyy HH:mm');
 
     return SingleChildScrollView(
@@ -253,7 +257,7 @@ class _DocumentVersionsScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Version ${version.versionNumber}',
+                      l10n.versionLabel(version.versionNumber),
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -261,7 +265,7 @@ class _DocumentVersionsScreenState
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Created on ${dateFormat.format(version.createdAt)}',
+                      l10n.createdOnLabel(dateFormat.format(version.createdAt)),
                       style: TextStyle(
                         color: Colors.grey.shade700,
                       ),
@@ -270,9 +274,9 @@ class _DocumentVersionsScreenState
                 ),
               ),
               ElevatedButton.icon(
-                onPressed: () => _downloadVersionContent(version),
+                onPressed: () => _downloadVersionContent(version, context),
                 icon: const Icon(Icons.download),
-                label: const Text('Download'),
+                label: Text(l10n.downloadVersionButton),
               ),
             ],
           ),
@@ -280,9 +284,9 @@ class _DocumentVersionsScreenState
 
           // Change notes
           if (version.changeNote != null) ...[
-            const Text(
-              'Change Notes:',
-              style: TextStyle(
+            Text(
+              l10n.changeNotesLabel,
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -302,9 +306,9 @@ class _DocumentVersionsScreenState
           ],
 
           // Document preview placeholder
-          const Text(
-            'Document Preview:',
-            style: TextStyle(
+          Text(
+            l10n.documentPreviewLabel,
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
@@ -317,7 +321,7 @@ class _DocumentVersionsScreenState
               border: Border.all(color: Colors.grey.shade300),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Center(
+            child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -327,11 +331,12 @@ class _DocumentVersionsScreenState
                     color: Colors.grey,
                   ),
                   SizedBox(height: 16),
-                  Text('Document preview not available'),
+                  Text(AppLocalizations.of(context)!
+                      .documentPreviewNotAvailableVersions),
                   SizedBox(height: 8),
                   Text(
-                    'Download the document to view its contents',
-                    style: TextStyle(color: Colors.grey),
+                    AppLocalizations.of(context)!.downloadToViewInstructions,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ],
               ),
@@ -340,9 +345,9 @@ class _DocumentVersionsScreenState
           const SizedBox(height: 24),
 
           // Technical details
-          const Text(
-            'Technical Details:',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.technicalDetailsLabel,
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
@@ -354,18 +359,21 @@ class _DocumentVersionsScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildInfoRow('Version ID:', version.id),
-                  const Divider(),
-                  _buildInfoRow('Document Hash:', version.documentHash),
+                  _buildInfoRow(
+                      AppLocalizations.of(context)!.versionIdLabel, version.id),
                   const Divider(),
                   _buildInfoRow(
-                    'Storage Path:',
+                      AppLocalizations.of(context)!.documentHashLabelDetail,
+                      version.documentHash),
+                  const Divider(),
+                  _buildInfoRow(
+                    AppLocalizations.of(context)!.storagePathLabel,
                     version.encryptedStoragePath,
                   ),
                   if (version.blockchainTxId != null) ...[
                     const Divider(),
                     _buildInfoRow(
-                      'Blockchain Transaction:',
+                      AppLocalizations.of(context)!.blockchainTxLabelDetail,
                       version.blockchainTxId!,
                     ),
                   ],
@@ -407,16 +415,18 @@ class _DocumentVersionsScreenState
     );
   }
 
-  Future<void> _downloadVersionContent(DocumentVersion version) async {
+  Future<void> _downloadVersionContent(
+      DocumentVersion version, BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
+      builder: (context) => AlertDialog(
         content: Row(
           children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 16),
-            Text('Downloading version...'),
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Text(l10n.downloadingVersionDialog),
           ],
         ),
       ),
@@ -438,17 +448,18 @@ class _DocumentVersionsScreenState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Downloaded version ${version.versionNumber} '
-                '(${(content.length / 1024).toStringAsFixed(2)} KB)',
+                l10n.downloadSuccessMessage(version.versionNumber,
+                    (content.length / 1024).toStringAsFixed(2)),
               ),
               behavior: SnackBarBehavior.floating,
             ),
           );
         } else {
+          // Handle download error
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to download version content'),
-              behavior: SnackBarBehavior.floating,
+            SnackBar(
+              content: Text(l10n.documentDownloadUnexpectedError(
+                  'Download failed: Content was null')),
               backgroundColor: Colors.red,
             ),
           );
@@ -464,8 +475,7 @@ class _DocumentVersionsScreenState
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
-            behavior: SnackBarBehavior.floating,
+            content: Text(l10n.documentDownloadUnexpectedError(e.toString())),
             backgroundColor: Colors.red,
           ),
         );

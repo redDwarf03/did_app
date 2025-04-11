@@ -2,6 +2,7 @@ import 'package:did_app/application/verification/providers.dart';
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen that displays all certificates of the user
 class CertificatesDashboardScreen extends ConsumerWidget {
@@ -11,10 +12,11 @@ class CertificatesDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Watching the verification state
     final verificationState = ref.watch(verificationNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Identity Certificates'),
+        title: Text(l10n.credentialsMenuTitle),
       ),
       body: verificationState.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -24,13 +26,14 @@ class CertificatesDashboardScreen extends ConsumerWidget {
           // Navigate to start a new verification
           Navigator.of(context).pushNamed('/verification/start');
         },
-        tooltip: 'Start New Verification',
+        tooltip: l10n.verifyStatusButton,
         child: const Icon(Icons.add),
       ),
     );
   }
 
   Widget _buildCertificatesList(BuildContext context, VerificationState state) {
+    final l10n = AppLocalizations.of(context)!;
     // Mock certificates for UI development
     // In a real app, these would come from the blockchain
     final certificates = [
@@ -65,16 +68,16 @@ class CertificatesDashboardScreen extends ConsumerWidget {
               color: Colors.grey,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'No Certificates Yet',
-              style: TextStyle(
+            Text(
+              l10n.noEidasCompatibleCredentials,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Complete identity verification to get your first certificate',
+            Text(
+              l10n.aboutDigitalCredentialsInfo1,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -83,7 +86,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                 Navigator.of(context).pushNamed('/verification/start');
               },
               icon: const Icon(Icons.add_circle_outline),
-              label: const Text('Start Verification'),
+              label: Text(l10n.verifyStatusButton),
             ),
           ],
         ),
@@ -124,7 +127,8 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          _getCertificateStatus(isExpired, isExpiringSoon),
+                          _getCertificateStatus(
+                              isExpired, isExpiringSoon, l10n),
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -132,7 +136,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        _getEidasLevelText(certificate.eidasLevel),
+                        _getEidasLevelText(certificate.eidasLevel, l10n),
                         style: const TextStyle(
                           color: Colors.white,
                         ),
@@ -146,13 +150,13 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.verified_user, size: 20),
-                          SizedBox(width: 8),
+                          const Icon(Icons.verified_user, size: 20),
+                          const SizedBox(width: 8),
                           Text(
-                            'Identity Certificate',
-                            style: TextStyle(
+                            l10n.documentTypeCertificate,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -160,13 +164,14 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      _buildInfoRow('ID', _truncateId(certificate.id)),
                       _buildInfoRow(
-                        'Issued',
+                          l10n.identifierLabel, _truncateId(certificate.id)),
+                      _buildInfoRow(
+                        l10n.issuanceDateLabel,
                         _formatDate(certificate.issuedAt),
                       ),
                       _buildInfoRow(
-                        'Expires',
+                        l10n.expirationDateLabel,
                         _formatDate(certificate.expiresAt),
                       ),
                     ],
@@ -180,16 +185,16 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                     children: [
                       TextButton.icon(
                         onPressed: () =>
-                            _shareCertificate(context, certificate),
+                            _shareCertificate(context, certificate, l10n),
                         icon: const Icon(Icons.share, size: 18),
-                        label: const Text('Share'),
+                        label: Text(l10n.shareButtonLabel),
                       ),
                       if (isExpired || isExpiringSoon)
                         TextButton.icon(
                           onPressed: () =>
-                              _renewCertificate(context, certificate),
+                              _renewCertificate(context, certificate, l10n),
                           icon: const Icon(Icons.refresh, size: 18),
-                          label: const Text('Renew'),
+                          label: Text(l10n.requestButton ?? "Renew"),
                         ),
                     ],
                   ),
@@ -256,10 +261,11 @@ class CertificatesDashboardScreen extends ConsumerWidget {
     return Icons.check_circle;
   }
 
-  String _getCertificateStatus(bool isExpired, bool isExpiringSoon) {
-    if (isExpired) return 'Expired';
-    if (isExpiringSoon) return 'Expiring Soon';
-    return 'Valid';
+  String _getCertificateStatus(
+      bool isExpired, bool isExpiringSoon, AppLocalizations l10n) {
+    if (isExpired) return l10n.expiredStatus;
+    if (isExpiringSoon) return l10n.notVerifiedStatus;
+    return l10n.verifiedStatus;
   }
 
   String _truncateId(String id) {
@@ -268,17 +274,21 @@ class CertificatesDashboardScreen extends ConsumerWidget {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year;
+
+    return '$day/$month/$year';
   }
 
-  String _getEidasLevelText(EidasLevel level) {
+  String _getEidasLevelText(EidasLevel level, AppLocalizations l10n) {
     switch (level) {
       case EidasLevel.low:
-        return 'eIDAS Low';
+        return "eIDAS Low";
       case EidasLevel.substantial:
-        return 'eIDAS Substantial';
+        return "eIDAS Substantial";
       case EidasLevel.high:
-        return 'eIDAS High';
+        return "eIDAS High";
     }
   }
 
@@ -296,6 +306,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
   void _shareCertificate(
     BuildContext context,
     VerificationCertificate certificate,
+    AppLocalizations l10n,
   ) {
     // Show share options dialog
     showModalBottomSheet(
@@ -305,9 +316,9 @@ class CertificatesDashboardScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Share Certificate',
-              style: TextStyle(
+            Text(
+              l10n.shareButtonLabel,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -315,7 +326,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.qr_code),
-              title: const Text('Show QR Code'),
+              title: Text(l10n.scanQrCodeTooltip),
               onTap: () {
                 Navigator.pop(context);
                 // Show QR code dialog
@@ -323,7 +334,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.file_download),
-              title: const Text('Export as PDF'),
+              title: Text("Export as PDF"),
               onTap: () {
                 Navigator.pop(context);
                 // Export as PDF
@@ -331,7 +342,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.link),
-              title: const Text('Generate Verifiable Link'),
+              title: Text("Generate Link"),
               onTap: () {
                 Navigator.pop(context);
                 // Generate and copy link
@@ -346,8 +357,12 @@ class CertificatesDashboardScreen extends ConsumerWidget {
   void _renewCertificate(
     BuildContext context,
     VerificationCertificate certificate,
+    AppLocalizations l10n,
   ) {
-    // Navigate to renewal process
-    Navigator.of(context).pushNamed('/verification/renew');
+    // Navigate to renewal process with the certificate as argument
+    Navigator.of(context).pushNamed(
+      '/verification/renew',
+      arguments: certificate,
+    );
   }
 }

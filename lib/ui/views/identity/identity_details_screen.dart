@@ -2,6 +2,7 @@ import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/domain/identity/digital_identity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen to display and manage details of a digital identity
 class IdentityDetailsScreen extends ConsumerWidget {
@@ -25,10 +26,11 @@ class IdentityDetailsScreen extends ConsumerWidget {
         (identityState.identity?.identityAddress == address
             ? identityState.identity!
             : throw Exception('Identity not found for address: $address'));
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Identity Details'),
+        title: Text(l10n.identityDetailsTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -36,7 +38,7 @@ class IdentityDetailsScreen extends ConsumerWidget {
               // Navigate to edit screen
               // Will be implemented later
             },
-            tooltip: 'Edit Identity',
+            tooltip: l10n.editIdentityTooltip,
           ),
         ],
       ),
@@ -45,16 +47,16 @@ class IdentityDetailsScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildIdentityHeader(context, currentIdentity),
+            _buildIdentityHeader(context, currentIdentity, l10n),
             const SizedBox(height: 24),
-            _buildStatusCard(context, currentIdentity),
+            _buildStatusCard(context, currentIdentity, l10n),
             const SizedBox(height: 24),
-            _buildPersonalInfoSection(context, currentIdentity),
+            _buildPersonalInfoSection(context, currentIdentity, l10n),
             const SizedBox(height: 24),
             if (currentIdentity.personalInfo.address != null)
-              _buildAddressSection(context, currentIdentity),
+              _buildAddressSection(context, currentIdentity, l10n),
             const SizedBox(height: 32),
-            _buildBlockchainInfoCard(context, currentIdentity),
+            _buildBlockchainInfoCard(context, currentIdentity, l10n),
           ],
         ),
       ),
@@ -65,6 +67,7 @@ class IdentityDetailsScreen extends ConsumerWidget {
   Widget _buildIdentityHeader(
     BuildContext context,
     DigitalIdentity currentIdentity,
+    AppLocalizations l10n,
   ) {
     return Center(
       child: Column(
@@ -98,7 +101,7 @@ class IdentityDetailsScreen extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                _getVerificationLabel(currentIdentity.verificationStatus),
+                _getVerificationLabel(currentIdentity.verificationStatus, l10n),
                 style: TextStyle(
                   color:
                       _getVerificationColor(currentIdentity.verificationStatus),
@@ -115,6 +118,7 @@ class IdentityDetailsScreen extends ConsumerWidget {
   Widget _buildStatusCard(
     BuildContext context,
     DigitalIdentity currentIdentity,
+    AppLocalizations l10n,
   ) {
     return Card(
       elevation: 2,
@@ -123,9 +127,9 @@ class IdentityDetailsScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Verification Status',
-              style: TextStyle(
+            Text(
+              l10n.verificationStatusSectionTitle,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -139,7 +143,7 @@ class IdentityDetailsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              _getVerificationMessage(currentIdentity.verificationStatus),
+              _getVerificationMessage(currentIdentity.verificationStatus, l10n),
               style: const TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 16),
@@ -150,7 +154,7 @@ class IdentityDetailsScreen extends ConsumerWidget {
                   // Start verification process
                   // Will be implemented in the verification feature
                 },
-                child: const Text('Start Verification'),
+                child: Text(l10n.startVerificationButtonDetails),
               ),
           ],
         ),
@@ -162,44 +166,50 @@ class IdentityDetailsScreen extends ConsumerWidget {
   Widget _buildPersonalInfoSection(
     BuildContext context,
     DigitalIdentity currentIdentity,
+    AppLocalizations l10n,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Personal Information',
-          style: TextStyle(
+        Text(
+          l10n.personalInfoSectionTitle,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 16),
         _buildInfoRow(
+          context,
           Icons.person_outline,
-          'Full Name',
+          l10n.fullNameLabelDetails,
           currentIdentity.personalInfo.fullName,
         ),
         _buildInfoRow(
+          context,
           Icons.email_outlined,
-          'Email',
+          l10n.emailLabelDetails,
           currentIdentity.personalInfo.email,
         ),
         if (currentIdentity.personalInfo.phoneNumber != null)
           _buildInfoRow(
+            context,
             Icons.phone_outlined,
-            'Phone',
+            l10n.phoneLabelDetails,
             currentIdentity.personalInfo.phoneNumber!,
           ),
         if (currentIdentity.personalInfo.dateOfBirth != null)
           _buildInfoRow(
+            context,
             Icons.cake_outlined,
-            'Date of Birth',
+            l10n.dobLabelDetails,
             _formatDate(currentIdentity.personalInfo.dateOfBirth!),
           ),
         if (currentIdentity.personalInfo.nationality != null)
           _buildInfoRow(
+            context,
             Icons.flag_outlined,
-            'Nationality',
+            l10n.nationalityLabelDetails,
             currentIdentity.personalInfo.nationality!,
           ),
       ],
@@ -210,44 +220,50 @@ class IdentityDetailsScreen extends ConsumerWidget {
   Widget _buildAddressSection(
     BuildContext context,
     DigitalIdentity currentIdentity,
+    AppLocalizations l10n,
   ) {
     final address = currentIdentity.personalInfo.address!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Address',
-          style: TextStyle(
+        Text(
+          l10n.addressSectionTitle,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 16),
         _buildInfoRow(
+          context,
           Icons.location_on_outlined,
-          'Street',
+          l10n.streetLabel,
           address.street,
         ),
         _buildInfoRow(
+          context,
           Icons.location_city_outlined,
-          'City',
+          l10n.cityLabel,
           address.city,
         ),
         if (address.state != null)
           _buildInfoRow(
+            context,
             Icons.map_outlined,
-            'State/Region',
+            l10n.stateRegionLabel,
             address.state!,
           ),
         _buildInfoRow(
+          context,
           Icons.markunread_mailbox_outlined,
-          'Postal Code',
+          l10n.postalCodeLabel,
           address.postalCode,
         ),
         _buildInfoRow(
+          context,
           Icons.public_outlined,
-          'Country',
+          l10n.countryLabel,
           address.country,
         ),
       ],
@@ -258,6 +274,7 @@ class IdentityDetailsScreen extends ConsumerWidget {
   Widget _buildBlockchainInfoCard(
     BuildContext context,
     DigitalIdentity currentIdentity,
+    AppLocalizations l10n,
   ) {
     return Card(
       margin: EdgeInsets.zero,
@@ -267,28 +284,31 @@ class IdentityDetailsScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Blockchain Information',
-              style: TextStyle(
+            Text(
+              l10n.blockchainInfoSectionTitle,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 16),
             _buildInfoRow(
+              context,
               Icons.fingerprint,
-              'Identity Address',
+              l10n.identityAddressLabel,
               currentIdentity.identityAddress,
               truncate: true,
             ),
             _buildInfoRow(
+              context,
               Icons.calendar_today_outlined,
-              'Created',
+              l10n.createdLabel,
               _formatDate(currentIdentity.createdAt),
             ),
             _buildInfoRow(
+              context,
               Icons.update_outlined,
-              'Last Updated',
+              l10n.lastUpdatedLabelDetails,
               _formatDate(currentIdentity.updatedAt),
             ),
           ],
@@ -299,11 +319,13 @@ class IdentityDetailsScreen extends ConsumerWidget {
 
   /// Helper to build consistent info rows
   Widget _buildInfoRow(
+    BuildContext context,
     IconData icon,
     String label,
     String value, {
     bool truncate = false,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -343,7 +365,7 @@ class IdentityDetailsScreen extends ConsumerWidget {
                 // Copy to clipboard feature
                 // Will be implemented later
               },
-              tooltip: 'Copy to clipboard',
+              tooltip: l10n.copyToClipboardTooltip,
             ),
         ],
       ),
@@ -382,18 +404,19 @@ class IdentityDetailsScreen extends ConsumerWidget {
     }
   }
 
-  String _getVerificationLabel(IdentityVerificationStatus status) {
+  String _getVerificationLabel(
+      IdentityVerificationStatus status, AppLocalizations l10n) {
     switch (status) {
       case IdentityVerificationStatus.fullyVerified:
-        return 'Fully Verified';
+        return l10n.identityVerificationStatusFullyVerified;
       case IdentityVerificationStatus.basicVerified:
-        return 'Basic Verification';
+        return l10n.identityVerificationStatusBasicVerified;
       case IdentityVerificationStatus.pending:
-        return 'Verification Pending';
+        return l10n.identityVerificationStatusPending;
       case IdentityVerificationStatus.rejected:
-        return 'Verification Rejected';
+        return l10n.identityVerificationStatusRejected;
       case IdentityVerificationStatus.unverified:
-        return 'Not Verified';
+        return l10n.identityVerificationStatusNotVerified;
     }
   }
 
@@ -412,18 +435,19 @@ class IdentityDetailsScreen extends ConsumerWidget {
     }
   }
 
-  String _getVerificationMessage(IdentityVerificationStatus status) {
+  String _getVerificationMessage(
+      IdentityVerificationStatus status, AppLocalizations l10n) {
     switch (status) {
       case IdentityVerificationStatus.fullyVerified:
-        return 'Your identity is fully verified and compliant with KYC/AML regulations.';
+        return l10n.verificationMessageFullyVerified;
       case IdentityVerificationStatus.basicVerified:
-        return 'Basic verification complete. Additional verification needed for full compliance.';
+        return l10n.verificationMessageBasicVerified;
       case IdentityVerificationStatus.pending:
-        return 'Your verification is being processed. This may take 24-48 hours.';
+        return l10n.verificationMessagePending;
       case IdentityVerificationStatus.rejected:
-        return 'Your verification was rejected. Please check your information and try again.';
+        return l10n.verificationMessageRejected;
       case IdentityVerificationStatus.unverified:
-        return 'Your identity has not been verified. Verification is required for certain services.';
+        return l10n.verificationMessageUnverified;
     }
   }
 

@@ -4,6 +4,7 @@ import 'package:did_app/application/verification/providers.dart';
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Generic document upload step component for verification process
 class DocumentUploadStep extends ConsumerStatefulWidget {
@@ -43,6 +44,8 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -71,7 +74,7 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Upload ${widget.documentType}',
+                l10n.uploadDocumentTitle(widget.documentType),
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -83,12 +86,12 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildUploadButton(
-                    'Take Photo',
+                    l10n.takePhotoButton,
                     Icons.camera_alt,
                     _takePhoto,
                   ),
                   _buildUploadButton(
-                    'Upload File',
+                    l10n.uploadFileButton,
                     Icons.upload_file,
                     _uploadFile,
                   ),
@@ -97,18 +100,18 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
 
               // Instructions
               const SizedBox(height: 16),
-              const Text(
-                'Make sure your documents are:',
-                style: TextStyle(
+              Text(
+                l10n.documentRequirementsTitle,
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
               ),
               const SizedBox(height: 8),
-              _buildCheckItem('Clear and readable'),
-              _buildCheckItem('Showing all 4 corners'),
-              _buildCheckItem('Not expired'),
-              _buildCheckItem('Without glare or shadows'),
+              _buildCheckItem(l10n.documentRequirementClear),
+              _buildCheckItem(l10n.documentRequirementCorners),
+              _buildCheckItem(l10n.documentRequirementExpiry),
+              _buildCheckItem(l10n.documentRequirementGlare),
             ],
           ),
         ),
@@ -116,9 +119,9 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
 
         // Uploaded documents list
         if (_uploadedDocuments.isNotEmpty) ...[
-          const Text(
-            'Uploaded Documents',
-            style: TextStyle(
+          Text(
+            l10n.uploadedDocumentsTitle,
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
@@ -144,7 +147,9 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
                     ),
                   )
                 : const Icon(Icons.send),
-            label: Text(_isUploading ? 'Submitting...' : 'Submit Documents'),
+            label: Text(_isUploading
+                ? l10n.submittingButton
+                : l10n.submitDocumentsButton),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),

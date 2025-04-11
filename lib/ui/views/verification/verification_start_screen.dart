@@ -2,6 +2,7 @@ import 'package:did_app/application/verification/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen to start a new identity verification process
 class VerificationStartScreen extends ConsumerStatefulWidget {
@@ -24,18 +25,19 @@ class _VerificationStartScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Start Verification'),
+        title: Text(l10n.verificationBottomNavLabel),
       ),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Initializing verification process...'),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(l10n.verificationInProgress),
                 ],
               ),
             )
@@ -47,30 +49,32 @@ class _VerificationStartScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Intro section
-                    _buildIntro(),
+                    _buildIntro(l10n),
                     const SizedBox(height: 24),
 
                     // Verification level selection
-                    _buildVerificationLevelSelection(),
+                    _buildVerificationLevelSelection(l10n),
                     const SizedBox(height: 32),
 
                     // Required documents
-                    _buildRequiredDocumentsSection(),
+                    _buildRequiredDocumentsSection(l10n),
                     const SizedBox(height: 32),
 
                     // Terms and conditions checkbox
-                    _buildTermsAndConditions(),
+                    _buildTermsAndConditions(l10n),
                     const SizedBox(height: 32),
 
                     // Start button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _acceptedTerms ? _startVerification : null,
+                        onPressed: _acceptedTerms
+                            ? () => _startVerification(l10n)
+                            : null,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: const Text('Start Verification Process'),
+                        child: Text(l10n.startVerificationButtonMain),
                       ),
                     ),
                   ],
@@ -81,30 +85,29 @@ class _VerificationStartScreenState
   }
 
   // Introduction and description
-  Widget _buildIntro() {
+  Widget _buildIntro(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Identity Verification',
-          style: TextStyle(
+        Text(
+          l10n.digitalIdentityTitle,
+          style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
-          'Complete the verification process to prove your identity on the Archethic blockchain. '
-          'This verification complies with KYC/AML regulations and eIDAS 2.0 standards.',
-          style: TextStyle(fontSize: 16),
+        Text(
+          l10n.digitalIdentityDescription,
+          style: const TextStyle(fontSize: 16),
         ),
         const SizedBox(height: 16),
         Card(
           elevation: 0,
-          color: Colors.blue.withValues(alpha: 0.1),
+          color: Colors.blue.withOpacity(0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: Colors.blue.withValues(alpha: 0.3)),
+            side: BorderSide(color: Colors.blue.withOpacity(0.3)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -115,10 +118,9 @@ class _VerificationStartScreenState
                   color: Colors.blue.shade300,
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Your data is encrypted and securely stored on the blockchain. '
-                    'You maintain full control over your information.',
+                    l10n.securityDescription,
                   ),
                 ),
               ],
@@ -130,13 +132,13 @@ class _VerificationStartScreenState
   }
 
   // Verification level selection
-  Widget _buildVerificationLevelSelection() {
+  Widget _buildVerificationLevelSelection(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Select Verification Level',
-          style: TextStyle(
+        Text(
+          l10n.eidasLevelLabel,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -150,24 +152,27 @@ class _VerificationStartScreenState
             child: Column(
               children: [
                 _buildLevelOption(
-                  title: 'Basic Verification',
-                  subtitle: 'Email and phone verification only',
+                  title: l10n.eidasLevelLowLabel,
+                  subtitle: l10n.eidasLevelLowDescription,
                   level: VerificationLevel.basic,
-                  eidasLevel: 'eIDAS Low',
+                  eidasLevel: l10n.eidasLevelLow,
+                  l10n: l10n,
                 ),
                 const Divider(),
                 _buildLevelOption(
-                  title: 'Standard Verification',
-                  subtitle: 'ID document and address verification',
+                  title: l10n.eidasLevelSubstantialLabel,
+                  subtitle: l10n.eidasLevelSubstantialDescription,
                   level: VerificationLevel.standard,
-                  eidasLevel: 'eIDAS Substantial',
+                  eidasLevel: l10n.eidasLevelSubstantial,
+                  l10n: l10n,
                 ),
                 const Divider(),
                 _buildLevelOption(
-                  title: 'Advanced Verification',
-                  subtitle: 'Includes biometric verification',
+                  title: l10n.eidasLevelHighLabel,
+                  subtitle: l10n.eidasLevelHighDescription,
                   level: VerificationLevel.advanced,
-                  eidasLevel: 'eIDAS High',
+                  eidasLevel: l10n.eidasLevelHigh,
+                  l10n: l10n,
                 ),
               ],
             ),
@@ -183,6 +188,7 @@ class _VerificationStartScreenState
     required String subtitle,
     required VerificationLevel level,
     required String eidasLevel,
+    required AppLocalizations l10n,
   }) {
     final isSelected = _selectedLevel == level;
 
@@ -209,7 +215,7 @@ class _VerificationStartScreenState
               vertical: 2,
             ),
             decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.1),
+              color: Colors.blue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -237,20 +243,20 @@ class _VerificationStartScreenState
   }
 
   // Required documents section
-  Widget _buildRequiredDocumentsSection() {
+  Widget _buildRequiredDocumentsSection(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Required Documents',
-          style: TextStyle(
+        Text(
+          l10n.documentsSection,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 16),
         // Documents list based on selected level
-        ..._getRequiredDocuments().map(
+        ..._getRequiredDocuments(l10n).map(
           (document) => Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: Row(
@@ -272,7 +278,7 @@ class _VerificationStartScreenState
   }
 
   // Terms and conditions
-  Widget _buildTermsAndConditions() {
+  Widget _buildTermsAndConditions(AppLocalizations l10n) {
     return CheckboxListTile(
       value: _acceptedTerms,
       onChanged: (value) {
@@ -282,14 +288,14 @@ class _VerificationStartScreenState
           });
         }
       },
-      title: const Text(
-        'I agree to the terms and conditions of the verification process',
+      title: Text(
+        "I agree to the terms and privacy policy",
       ),
       subtitle: GestureDetector(
-        onTap: _showTermsAndConditions,
-        child: const Text(
-          'View terms and privacy policy',
-          style: TextStyle(
+        onTap: () => _showTermsAndConditions(l10n),
+        child: Text(
+          l10n.aboutRegistryTitle,
+          style: const TextStyle(
             color: Colors.blue,
             decoration: TextDecoration.underline,
           ),
@@ -313,80 +319,70 @@ class _VerificationStartScreenState
   }
 
   // Get required documents based on selected level
-  List<String> _getRequiredDocuments() {
-    switch (_selectedLevel) {
-      case VerificationLevel.basic:
-        return [
-          'Valid email address',
-          'Mobile phone for SMS verification',
-        ];
-      case VerificationLevel.standard:
-        return [
-          'Valid email address',
-          'Mobile phone for SMS verification',
-          "Government-issued ID (passport, driver's license, or national ID)",
-          'Proof of address (utility bill, bank statement, etc.)',
-        ];
-      case VerificationLevel.advanced:
-        return [
-          'Valid email address',
-          'Mobile phone for SMS verification',
-          "Government-issued ID (passport, driver's license, or national ID)",
-          'Proof of address (utility bill, bank statement, etc.)',
-          'Selfie or video for biometric verification',
-        ];
+  List<String> _getRequiredDocuments(AppLocalizations l10n) {
+    final documents = <String>[];
+    // Common documents for all levels
+    documents.add("Email Verification");
+    documents.add("Phone Number");
+
+    if (_selectedLevel == VerificationLevel.standard ||
+        _selectedLevel == VerificationLevel.advanced) {
+      documents.add("Government ID (Passport, National ID)");
+      documents.add("Proof of Address");
     }
+
+    if (_selectedLevel == VerificationLevel.advanced) {
+      documents.add("Biometric Verification");
+    }
+
+    return documents;
   }
 
   // Show terms and conditions dialog
-  void _showTermsAndConditions() {
+  void _showTermsAndConditions(AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Terms & Privacy Policy'),
-        content: const SingleChildScrollView(
+        title: Text(l10n.aboutRegistryTitle),
+        content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Terms of Service',
-                style: TextStyle(
+                l10n.aboutEidasTitle,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'By using this verification service, you agree to provide accurate and truthful information. '
-                'False information may result in rejection of your verification.',
+                l10n.eidasInteropDescription,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
-                'Privacy Policy',
-                style: TextStyle(
+                l10n.trustRegistryTitle,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'Your information is securely stored on the Archethic blockchain using encryption. '
-                'You retain control over your data and can revoke access at any time. '
-                'We collect only the information necessary for identity verification purposes.',
+                l10n.eidasTrustRegistryDescription,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
-                'Data Sharing',
-                style: TextStyle(
+                l10n.securityDescription,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'Your data will only be shared with authorized verifiers when you explicitly consent. '
-                'All data sharing is recorded on the blockchain for transparency.',
+                l10n.reliabilityDescription,
               ),
             ],
           ),
@@ -394,7 +390,7 @@ class _VerificationStartScreenState
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(l10n.closeButton),
           ),
         ],
       ),
@@ -402,7 +398,7 @@ class _VerificationStartScreenState
   }
 
   // Start verification process
-  Future<void> _startVerification() async {
+  Future<void> _startVerification(AppLocalizations l10n) async {
     // Validate form
     if (!_formKey.currentState!.validate()) {
       return;
@@ -418,16 +414,21 @@ class _VerificationStartScreenState
           .read(verificationNotifierProvider.notifier)
           .startVerificationWithLevel(_selectedLevel);
 
+      final verificationProcess =
+          ref.read(verificationNotifierProvider).verificationProcess;
+
       // Navigate to verification process screen
-      if (mounted) {
+      if (mounted && verificationProcess != null) {
+        // Convert process to a Map of string key-value pairs for query parameters
+        final queryParams = <String, String>{
+          'level': _selectedLevel.toString(),
+          'timestamp': DateTime.now().toIso8601String(),
+        };
+
         await context.pushNamed(
           'verificationProcess',
           pathParameters: {'processIdentifier': 'latest'},
-          queryParameters: ref
-                  .read(verificationNotifierProvider)
-                  .verificationProcess
-                  ?.toJson() ??
-              {},
+          queryParameters: queryParams,
         );
       }
     } catch (e) {
@@ -435,7 +436,7 @@ class _VerificationStartScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to start verification: $e'),
+            content: Text(l10n.errorOccurredMessage(e.toString())),
             backgroundColor: Colors.red,
           ),
         );

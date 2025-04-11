@@ -4,6 +4,7 @@ import 'package:did_app/ui/views/verification/verification_process_screen.dart';
 import 'package:did_app/ui/views/verification/verification_success_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Main screen for identity verification
 class VerificationScreen extends ConsumerWidget {
@@ -13,6 +14,7 @@ class VerificationScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final identityState = ref.watch(identityNotifierProvider);
     final verificationState = ref.watch(verificationNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     // Show loading spinner while either identity or verification is loading
     if (identityState.isLoading || verificationState.isLoading) {
@@ -27,7 +29,7 @@ class VerificationScreen extends ConsumerWidget {
     if (identityState.errorMessage != null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Verification Error'),
+          title: Text(l10n.identityErrorTitle),
         ),
         body: Center(
           child: Padding(
@@ -41,9 +43,9 @@ class VerificationScreen extends ConsumerWidget {
                   size: 80,
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'Identity Error',
-                  style: TextStyle(
+                Text(
+                  l10n.identityErrorTitle,
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -63,7 +65,7 @@ class VerificationScreen extends ConsumerWidget {
                         .read(identityNotifierProvider.notifier)
                         .refreshIdentity();
                   },
-                  child: const Text('Retry'),
+                  child: Text(l10n.retryButtonVerification),
                 ),
               ],
             ),
@@ -76,7 +78,7 @@ class VerificationScreen extends ConsumerWidget {
     if (verificationState.errorMessage != null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Verification Error'),
+          title: Text(l10n.verificationErrorTitle),
         ),
         body: Center(
           child: Padding(
@@ -90,9 +92,9 @@ class VerificationScreen extends ConsumerWidget {
                   size: 80,
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'Verification Error',
-                  style: TextStyle(
+                Text(
+                  l10n.verificationErrorTitle,
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -116,7 +118,7 @@ class VerificationScreen extends ConsumerWidget {
                           );
                     }
                   },
-                  child: const Text('Retry'),
+                  child: Text(l10n.retryButtonVerification),
                 ),
               ],
             ),
@@ -129,7 +131,7 @@ class VerificationScreen extends ConsumerWidget {
     if (identityState.identity == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Identity Verification'),
+          title: Text(l10n.identityVerificationTitle),
         ),
         body: Center(
           child: Padding(
@@ -163,7 +165,7 @@ class VerificationScreen extends ConsumerWidget {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Go Back'),
+                  child: Text(l10n.goBackButton),
                 ),
               ],
             ),
@@ -190,7 +192,7 @@ class VerificationScreen extends ConsumerWidget {
     // No verification process yet, show the start screen
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Identity Verification'),
+        title: Text(l10n.identityVerificationTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -208,18 +210,18 @@ class VerificationScreen extends ConsumerWidget {
                 size: 80,
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Verify Your Identity',
-                style: TextStyle(
+              Text(
+                l10n.verifyYourIdentityTitle,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Complete the verification process to comply with KYC/AML regulations and eIDAS 2.0 standards. This will allow you to use your digital identity for regulated services.',
+              Text(
+                l10n.verifyYourIdentityDescription,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                 ),
               ),
@@ -234,22 +236,22 @@ class VerificationScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               _buildVerificationStep(
                 context,
-                'Email & Phone Verification',
+                l10n.verificationStepEmailPhone,
                 Icons.phone_android,
               ),
               _buildVerificationStep(
                 context,
-                'ID Document Verification',
+                l10n.verificationStepIdDocument,
                 Icons.badge,
               ),
               _buildVerificationStep(
                 context,
-                'Address Proof',
+                l10n.verificationStepAddressProof,
                 Icons.home,
               ),
               _buildVerificationStep(
                 context,
-                'Liveness Check',
+                l10n.verificationStepLiveness,
                 Icons.face,
               ),
               const SizedBox(height: 32),
@@ -258,7 +260,7 @@ class VerificationScreen extends ConsumerWidget {
                   _startVerificationProcess(context, ref);
                 },
                 icon: const Icon(Icons.verified_user),
-                label: const Text('Start Verification'),
+                label: Text(l10n.startVerificationButtonMain),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,

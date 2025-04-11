@@ -1,8 +1,10 @@
 import 'package:did_app/application/credential/providers.dart';
 import 'package:did_app/application/identity/providers.dart';
+import 'package:did_app/application/providers/credential_presentation_provider.dart';
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Écran pour la présentation sélective d'attributs avec ZKP
 class CredentialPresentationScreen extends ConsumerStatefulWidget {
@@ -76,76 +78,102 @@ class _CredentialPresentationScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Présentation sélective'),
+        title: Text(l10n.credentialPresentationTitle),
       ),
-      body: _isGenerating
-          ? _buildLoadingState()
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(),
-                  const SizedBox(height: 24),
-                  ..._credentials.map(_buildCredentialSection).toList(),
-                  if (_usePredicate && _credentials.isNotEmpty)
-                    _buildPredicatesSection(),
-                  const SizedBox(height: 16),
-                  _buildMessageSection(),
-                  if (_errorMessage != null) _buildErrorMessage(),
-                  const SizedBox(height: 24),
-                  _buildActions(),
-                ],
+      body: Consumer(
+        builder: (context, ref, child) {
+          final state = ref.watch(credentialPresentationProvider);
+
+          return Column(
+            children: [
+              // Bannière explicative pour débutants
+              const _BeginnerInfoBox(),
+
+              Expanded(
+                child: state.loading
+                    ? _buildLoadingState(context)
+                    : _buildContent(context, ref),
               ),
-            ),
+            ],
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildLoadingState() {
-    return const Center(
+  Widget _buildLoadingState(BuildContext context) {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(),
-          SizedBox(height: 24),
+          const CircularProgressIndicator(),
+          const SizedBox(height: 24),
           Text(
-            'Génération de la présentation...',
-            style: TextStyle(fontSize: 16),
+            l10n.verificationInProgress,
+            style: const TextStyle(fontSize: 16),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
-            'Création des preuves cryptographiques',
-            style: TextStyle(fontSize: 12, color: Colors.grey),
+            l10n.credentialPresentationTitle,
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ],
       ),
     );
   }
 
+  Widget _buildContent(BuildContext context, WidgetRef ref) {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(),
+          const SizedBox(height: 24),
+          // Liste des attestations
+          ..._credentials
+              .map((credential) => _buildCredentialSection(credential)),
+          const SizedBox(height: 24),
+          // Section prédicat (si affichée)
+          if (_usePredicate) _buildPredicatesSection(),
+          const SizedBox(height: 24),
+          // Message facultatif
+          _buildMessageSection(),
+          const SizedBox(height: 32),
+          // Actions en bas d'écran
+          _buildActionButtons(context, ref),
+        ],
+      ),
+    );
+  }
+
   Widget _buildHeader() {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Présentation sélective d\'attributs',
+          l10n.credentialPresentationTitle,
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: 8),
-        const Text(
-          'Sélectionnez les attributs que vous souhaitez partager. Vous pouvez '
-          'également créer des preuves sans révéler les valeurs exactes.',
-          style: TextStyle(color: Colors.grey),
+        Text(
+          l10n.selectiveDisclosureDescription,
+          style: const TextStyle(color: Colors.grey),
         ),
         if (_credentials.any((c) => c.supportsZkp))
           Padding(
             padding: const EdgeInsets.only(top: 16),
             child: SwitchListTile(
-              title: const Text('Utiliser des prédicats (ZKP)'),
-              subtitle: const Text(
-                'Prouver une condition sans révéler la valeur exacte',
-                style: TextStyle(fontSize: 12),
+              title: Text(l10n.beginnerZkpTitle),
+              subtitle: Text(
+                l10n.selectiveDisclosureDescription,
+                style: const TextStyle(fontSize: 12),
               ),
               value: _usePredicate,
               onChanged: (value) {
@@ -156,12 +184,11 @@ class _CredentialPresentationScreenState
             ),
           )
         else
-          const Padding(
-            padding: EdgeInsets.only(top: 16),
+          Padding(
+            padding: const EdgeInsets.only(top: 16),
             child: Text(
-              'Les attestations sélectionnées ne supportent pas les preuves à '
-              'divulgation nulle de connaissance (ZKP).',
-              style: TextStyle(color: Colors.orange, fontSize: 12),
+              l10n.noEidasCompatibleCredentials,
+              style: const TextStyle(color: Colors.orange, fontSize: 12),
             ),
           ),
       ],
@@ -169,6 +196,7 @@ class _CredentialPresentationScreenState
   }
 
   Widget _buildCredentialSection(Credential credential) {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
@@ -186,7 +214,7 @@ class _CredentialPresentationScreenState
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    credential.name ?? 'Attestation',
+                    credential.name ?? l10n.defaultCredentialName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -195,7 +223,7 @@ class _CredentialPresentationScreenState
                 ),
                 if (credential.supportsZkp)
                   Tooltip(
-                    message: 'Supporte la preuve à divulgation nulle',
+                    message: l10n.beginnerZkpTitle,
                     child: Icon(
                       Icons.lock,
                       size: 16,
@@ -205,9 +233,9 @@ class _CredentialPresentationScreenState
               ],
             ),
             const Divider(height: 24),
-            const Text(
-              'Attributs à partager:',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              l10n.selectiveDisclosureDescription,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             ...(credential.claims?.keys ?? []).map((attr) {
@@ -244,6 +272,7 @@ class _CredentialPresentationScreenState
   }
 
   Widget _buildPredicatesSection() {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     // Dans une implémentation réelle, cette section permettrait de créer des prédicats
     // pour des preuves à divulgation nulle de connaissance
     return Card(
@@ -262,7 +291,7 @@ class _CredentialPresentationScreenState
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Prédicats (ZKP)',
+                    l10n.beginnerZkpTitle,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -270,7 +299,7 @@ class _CredentialPresentationScreenState
                 ),
                 IconButton(
                   icon: const Icon(Icons.add_circle),
-                  tooltip: 'Ajouter un prédicat',
+                  tooltip: l10n.addCredentialButton,
                   onPressed: () {
                     // Pour la démo, on ajoute un prédicat factice
                     setState(() {
@@ -281,22 +310,18 @@ class _CredentialPresentationScreenState
                       );
 
                       // Trouver un attribut numérique
-                      String? numericAttr;
-                      credential.claims?.forEach((key, value) {
-                        if (value is num ||
-                            value is String && int.tryParse(value) != null) {
-                          numericAttr = key;
-                        }
-                      });
+                      String? numericAttr = _getNumericAttribute(credential);
 
                       if (numericAttr != null) {
-                        _predicates.add(
-                          CredentialPredicate(
-                            attributeName: numericAttr!,
-                            predicateType: PredicateType.greaterThan,
-                            value: 18,
-                          ),
+                        final predicate = CredentialPredicate(
+                          credentialId: credential.id,
+                          attribute: numericAttr,
+                          attributeName: numericAttr,
+                          predicate: '>',
+                          predicateType: PredicateType.greaterThan,
+                          value: 18,
                         );
+                        _predicates.add(predicate);
                       }
                     });
                   },
@@ -305,12 +330,12 @@ class _CredentialPresentationScreenState
             ),
             const Divider(height: 24),
             if (_predicates.isEmpty)
-              const Center(
+              Center(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   child: Text(
-                    'Aucun prédicat ajouté',
-                    style: TextStyle(fontStyle: FontStyle.italic),
+                    l10n.noCredentials,
+                    style: const TextStyle(fontStyle: FontStyle.italic),
                   ),
                 ),
               )
@@ -335,10 +360,9 @@ class _CredentialPresentationScreenState
                 }).toList(),
               ),
             const SizedBox(height: 8),
-            const Text(
-              'Note: Les prédicats permettent de prouver une condition (par exemple, "âge > 18") '
-              'sans révéler la valeur exacte de l\'attribut.',
-              style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+            Text(
+              l10n.beginnerZkpMessage,
+              style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
             ),
           ],
         ),
@@ -347,6 +371,7 @@ class _CredentialPresentationScreenState
   }
 
   Widget _buildMessageSection() {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
@@ -355,19 +380,15 @@ class _CredentialPresentationScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Message au destinataire',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              l10n.credentialTypeLabel,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             TextField(
               controller: _messageController,
-              decoration: const InputDecoration(
-                labelText: 'Message (optionnel)',
-                hintText:
-                    'Ex: Voici les informations demandées pour ma candidature',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: l10n.howToUseCredentialContent,
+                border: const OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
@@ -377,116 +398,61 @@ class _CredentialPresentationScreenState
     );
   }
 
-  Widget _buildErrorMessage() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.only(top: 16),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.error_outline, color: Colors.red, size: 24),
-          const SizedBox(width: 12),
-          Expanded(
+  Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ElevatedButton.icon(
+          icon: const Icon(Icons.check_circle),
+          label: Text(l10n.createPresentationButton),
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 48),
+            backgroundColor: Theme.of(context).primaryColor,
+          ),
+          onPressed: _isGenerating ? null : () => _generatePresentation(ref),
+        ),
+        const SizedBox(height: 16),
+        OutlinedButton.icon(
+          icon: const Icon(Icons.cancel),
+          label: Text(l10n.closeButton),
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 48),
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        if (_errorMessage != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 16),
             child: Text(
               _errorMessage!,
               style: const TextStyle(color: Colors.red),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActions() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        OutlinedButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
-        ),
-        const SizedBox(width: 16),
-        FilledButton.icon(
-          onPressed: _generatePresentation,
-          icon: const Icon(Icons.send),
-          label: const Text('Générer la présentation'),
-        ),
       ],
     );
   }
 
-  Future<void> _generatePresentation() async {
-    // Vérifier que des attributs ont été sélectionnés
-    bool hasAttributes = false;
-    for (final attrs in _selectedAttributes.values) {
-      if (attrs.isNotEmpty) {
-        hasAttributes = true;
-        break;
-      }
-    }
-
-    if (!hasAttributes && _predicates.isEmpty) {
-      setState(() {
-        _errorMessage =
-            'Veuillez sélectionner au moins un attribut ou ajouter un prédicat';
-      });
-      return;
-    }
-
+  Future<void> _generatePresentation(WidgetRef ref) async {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     setState(() {
       _isGenerating = true;
       _errorMessage = null;
     });
 
     try {
-      // Récupérer l'identité
-      final identity = ref.read(identityNotifierProvider).identity;
-      if (identity == null) {
-        throw Exception('Identité non disponible');
-      }
+      // Dans une implémentation réelle, nous utiliserions le provider pour générer
+      // une présentation avec les attributs sélectionnés
+      await Future.delayed(const Duration(seconds: 2)); // Simuler un délai
 
-      // Créer la présentation
-      final presentation = await ref
-          .read(credentialNotifierProvider.notifier)
-          .createPresentation(
-            credentialIds: widget.credentialIds,
-            revealedAttributes: _selectedAttributes,
-            predicates: _predicates.isEmpty ? null : _predicates,
-          );
-
-      // Générer un lien pour la présentation
-      String? link;
-      if (presentation != null) {
-        link = await ref
-            .read(credentialNotifierProvider.notifier)
-            .sharePresentation(presentation.id);
-      }
-
-      // Réinitialiser l'état et naviguer vers la page de résultat
-      setState(() {
-        _isGenerating = false;
-      });
-
-      if (context.mounted && presentation != null) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => PresentationResultScreen(
-              presentation: presentation,
-              link: link,
-              message: _messageController.text,
-            ),
-          ),
-        );
-      }
+      Navigator.of(context).pop(true);
     } catch (e) {
       setState(() {
+        _errorMessage = l10n.errorOccurredMessage(e.toString());
+      });
+    } finally {
+      setState(() {
         _isGenerating = false;
-        _errorMessage = 'Erreur lors de la génération: $e';
       });
     }
   }
@@ -510,7 +476,12 @@ class _CredentialPresentationScreenState
         return Icons.card_membership;
       case CredentialType.healthInsurance:
         return Icons.medical_services;
+      case CredentialType.medicalCertificate:
+        return Icons.local_hospital;
+      case CredentialType.professionalBadge:
+        return Icons.badge;
       case CredentialType.other:
+      default:
         return Icons.badge;
     }
   }
@@ -532,6 +503,10 @@ class _CredentialPresentationScreenState
       return CredentialType.addressProof;
     } else if (types.contains('MembershipCardCredential')) {
       return CredentialType.membershipCard;
+    } else if (types.contains('MedicalCertificateCredential')) {
+      return CredentialType.medicalCertificate;
+    } else if (types.contains('ProfessionalBadgeCredential')) {
+      return CredentialType.professionalBadge;
     } else {
       return CredentialType.other;
     }
@@ -539,6 +514,19 @@ class _CredentialPresentationScreenState
 
   String _getPredicateDescription(CredentialPredicate predicate) {
     return '${predicate.predicateType.humanReadable} ${predicate.value}';
+  }
+
+  String? _getNumericAttribute(Credential credential) {
+    if (credential.claims != null) {
+      for (final key in credential.claims!.keys) {
+        if (credential.claims![key] is num ||
+            (credential.claims![key] is String &&
+                int.tryParse(credential.claims![key] as String) != null)) {
+          return key;
+        }
+      }
+    }
+    return null;
   }
 }
 
@@ -557,9 +545,10 @@ class PresentationResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Présentation générée'),
+        title: Text(l10n.credentialPresentationTitle),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -573,7 +562,7 @@ class PresentationResultScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Présentation générée avec succès',
+              l10n.verificationResult,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -609,17 +598,16 @@ class PresentationResultScreen extends StatelessWidget {
             const SizedBox(height: 32),
             _buildInfoCard(
               context,
-              title: 'Informations partagées',
+              title: l10n.generalInformationSection,
               children: [
-                _buildInfoRow('Nombre d\'attestations',
+                _buildInfoRow(l10n.credentialTypeLabel,
                     '${presentation.verifiableCredentials.length}'),
-                _buildInfoRow('Attributs révélés',
+                _buildInfoRow(l10n.documentTypeLabel,
                     '${presentation.revealedAttributes?.length ?? 0}'),
-                if (presentation.predicates != null &&
-                    presentation.predicates!.isNotEmpty)
-                  _buildInfoRow(
-                      'Prédicats', '${presentation.predicates!.length}'),
-                _buildInfoRow('Créée le',
+                if (presentation.verifiableCredentials.isNotEmpty)
+                  _buildInfoRow(l10n.credentialsSection,
+                      '${presentation.verifiableCredentials.length}'),
+                _buildInfoRow(l10n.createdLabel,
                     _formatDate(presentation.created ?? DateTime.now())),
               ],
             ),
@@ -627,7 +615,7 @@ class PresentationResultScreen extends StatelessWidget {
               const SizedBox(height: 16),
               _buildInfoCard(
                 context,
-                title: 'Message',
+                title: l10n.understandCredentialTitle,
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -638,7 +626,7 @@ class PresentationResultScreen extends StatelessWidget {
             ],
             const SizedBox(height: 32),
             Text(
-              'Partagez ce QR code ou ce lien avec le destinataire',
+              l10n.onlySelectedInfoShared,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontStyle: FontStyle.italic,
                   ),
@@ -648,7 +636,7 @@ class PresentationResultScreen extends StatelessWidget {
             FilledButton.icon(
               onPressed: () => Navigator.of(context).pop(),
               icon: const Icon(Icons.check),
-              label: const Text('Terminé'),
+              label: Text(l10n.comprehendButton),
             ),
           ],
         ),
@@ -714,5 +702,181 @@ class PresentationResultScreen extends StatelessWidget {
     final minute = date.minute.toString().padLeft(2, '0');
 
     return '$day/$month/$year $hour:$minute';
+  }
+}
+
+/// Panneau d'explication pour les débutants sur la divulgation sélective
+class _BeginnerInfoBox extends StatefulWidget {
+  const _BeginnerInfoBox();
+
+  @override
+  State<_BeginnerInfoBox> createState() => _BeginnerInfoBoxState();
+}
+
+class _BeginnerInfoBoxState extends State<_BeginnerInfoBox> {
+  bool _expanded = false;
+  bool _dismissed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+
+    if (_dismissed) return const SizedBox.shrink();
+
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.lightbulb, color: Colors.amber.shade700),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.selectiveDisclosureDescription,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    _expanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    size: 20,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _expanded = !_expanded;
+                    });
+                  },
+                  tooltip: _expanded
+                      ? l10n.closeButtonTooltip
+                      : l10n.aboutCredentialsTooltip,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 16),
+                  onPressed: () {
+                    setState(() {
+                      _dismissed = true;
+                    });
+                  },
+                  tooltip: l10n.closeButtonTooltip,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.howToUseCredentialContent,
+            ),
+            if (_expanded) ...[
+              const SizedBox(height: 16),
+              Text(
+                l10n.understandCredentialTitle,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              _buildBulletPoint(
+                l10n.beginnerZkpMessage,
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.play_circle_outline),
+                label: Text(l10n.beginnerZkpTitle),
+                onPressed: () => _showZkpExplanation(context),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBulletPoint(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('• ', style: TextStyle(fontWeight: FontWeight.bold)),
+          Expanded(child: Text(text)),
+        ],
+      ),
+    );
+  }
+
+  void _showZkpExplanation(BuildContext context) {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(l10n.beginnerZkpTitle),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildExplanationWithImage(
+                  l10n.beginnerZkpMessage,
+                ),
+                const SizedBox(height: 16),
+                _buildExplanationWithImage(
+                  l10n.tutorialPage3Desc,
+                  imageName: 'zkp_example.png',
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'C\'est comme prouver que vous connaissez le code d\'un coffre-fort sans révéler le code lui-même.',
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.selectiveDisclosureDescription,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.comprehendButton),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildExplanationWithImage(String text, {String? imageName}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(text),
+        if (imageName != null) ...[
+          const SizedBox(height: 8),
+          Center(
+            child: Image.asset(
+              'assets/images/$imageName',
+              height: 120,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                // Fallback icon if image is not available
+                return Icon(
+                  Icons.privacy_tip,
+                  size: 80,
+                  color: Colors.blue.shade200,
+                );
+              },
+            ),
+          ),
+        ],
+      ],
+    );
   }
 }

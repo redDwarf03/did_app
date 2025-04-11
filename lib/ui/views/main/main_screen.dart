@@ -7,6 +7,7 @@ import 'package:did_app/ui/views/welcome/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Main application screen with bottom navigation
 class MainScreen extends ConsumerStatefulWidget {
@@ -48,9 +49,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     ref.watch(
       sessionNotifierProvider.select((session) => session.isConnected),
     );
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      body: widget.child ?? _buildScreen(_selectedIndex),
+      body: widget.child ?? _buildScreen(_selectedIndex, l10n),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) {
@@ -77,61 +79,61 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               break;
           }
         },
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Accueil',
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            label: l10n.navHome,
           ),
           NavigationDestination(
-            icon: Icon(Icons.badge_outlined),
-            selectedIcon: Icon(Icons.badge),
-            label: 'Identité',
+            icon: const Icon(Icons.badge_outlined),
+            selectedIcon: const Icon(Icons.badge),
+            label: l10n.navIdentity,
           ),
           NavigationDestination(
-            icon: Icon(Icons.card_membership_outlined),
-            selectedIcon: Icon(Icons.card_membership),
-            label: 'Attestations',
+            icon: const Icon(Icons.card_membership_outlined),
+            selectedIcon: const Icon(Icons.card_membership),
+            label: l10n.navCredentials,
           ),
           NavigationDestination(
-            icon: Icon(Icons.folder_outlined),
-            selectedIcon: Icon(Icons.folder),
-            label: 'Documents',
+            icon: const Icon(Icons.folder_outlined),
+            selectedIcon: const Icon(Icons.folder),
+            label: l10n.navDocuments,
           ),
           NavigationDestination(
-            icon: Icon(Icons.verified_user_outlined),
-            selectedIcon: Icon(Icons.verified_user),
-            label: 'Vérification',
+            icon: const Icon(Icons.verified_user_outlined),
+            selectedIcon: const Icon(Icons.verified_user),
+            label: l10n.navVerification,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildScreen(int index) {
+  Widget _buildScreen(int index, AppLocalizations l10n) {
     switch (index) {
       case 0:
-        return const Center(
+        return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.account_balance_wallet,
                 size: 80,
                 color: Colors.blue,
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               Text(
-                'DID Wallet',
-                style: TextStyle(
+                l10n.didWalletTitle,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
-                'Votre portefeuille d\'identité numérique',
-                style: TextStyle(fontSize: 16),
+                l10n.didWalletSubtitle,
+                style: const TextStyle(fontSize: 16),
               ),
             ],
           ),
@@ -145,7 +147,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       case 4:
         return const VerificationScreen();
       default:
-        return const Center(child: Text('Page non trouvée'));
+        return Center(child: Text(l10n.pageNotFound));
     }
   }
 }

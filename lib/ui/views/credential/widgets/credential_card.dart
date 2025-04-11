@@ -36,7 +36,9 @@ class CredentialCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // Formatter les dates
     final dateFormat = DateFormat('dd/MM/yyyy');
-    final issuedAt = dateFormat.format(credential.issuedAt);
+    final issuedAt = credential.issuedAt != null
+        ? dateFormat.format(credential.issuedAt!)
+        : dateFormat.format(credential.issuanceDate);
     final expiresAt = credential.expiresAt != null
         ? dateFormat.format(credential.expiresAt!)
         : 'Illimité';
@@ -293,6 +295,10 @@ class CredentialCard extends StatelessWidget {
         return Icons.card_membership;
       case CredentialType.healthInsurance:
         return Icons.medical_services;
+      case CredentialType.medicalCertificate:
+        return Icons.local_hospital;
+      case CredentialType.professionalBadge:
+        return Icons.work_outline;
       case CredentialType.other:
         return Icons.badge;
     }
@@ -346,8 +352,40 @@ class CredentialCard extends StatelessWidget {
       return CredentialType.addressProof;
     } else if (types.contains('MembershipCardCredential')) {
       return CredentialType.membershipCard;
+    } else if (types.contains('MedicalCertificateCredential')) {
+      return CredentialType.medicalCertificate;
+    } else if (types.contains('ProfessionalBadgeCredential')) {
+      return CredentialType.professionalBadge;
     } else {
       return CredentialType.other;
+    }
+  }
+
+  /// Obtient la couleur associée au type d'attestation
+  Color _getTypeColor(CredentialType type) {
+    switch (type) {
+      case CredentialType.identity:
+        return Colors.blue;
+      case CredentialType.diploma:
+        return Colors.amber;
+      case CredentialType.drivingLicense:
+        return Colors.green;
+      case CredentialType.ageVerification:
+        return Colors.purple;
+      case CredentialType.addressProof:
+        return Colors.brown;
+      case CredentialType.employmentProof:
+        return Colors.teal;
+      case CredentialType.professionalBadge:
+        return Colors.deepOrange;
+      case CredentialType.membershipCard:
+        return Colors.indigo;
+      case CredentialType.healthInsurance:
+        return Colors.red;
+      case CredentialType.medicalCertificate:
+        return Colors.pink;
+      case CredentialType.other:
+        return Colors.grey;
     }
   }
 }

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Phone verification step component for verification process
 class PhoneVerificationStep extends ConsumerStatefulWidget {
@@ -64,22 +65,24 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Phone Verification',
-            style: TextStyle(
+          Text(
+            l10n.phoneVerificationTitle,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'We need to verify your phone number to proceed with the identity verification process.',
-            style: TextStyle(fontSize: 16),
+          Text(
+            l10n.phoneVerificationDescription,
+            style: const TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 24),
           if (!_phoneSubmitted) ...[
@@ -100,7 +103,9 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
                       )
                     : const Icon(Icons.send),
                 label: Text(
-                  _isSubmitting ? 'Sending...' : 'Send verification code',
+                  _isSubmitting
+                      ? l10n.sendingButton
+                      : l10n.sendVerificationCodeSmsButton,
                 ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -125,7 +130,9 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
                       )
                     : const Icon(Icons.sms),
                 label: Text(
-                  _isResending ? 'Sending code...' : 'Send verification code',
+                  _isResending
+                      ? l10n.sendingCodeButton
+                      : l10n.sendVerificationCodeSmsButton,
                 ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -138,7 +145,7 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
             TextButton.icon(
               onPressed: _resetPhoneSubmission,
               icon: const Icon(Icons.edit, size: 16),
-              label: const Text('Change phone number'),
+              label: Text(l10n.changePhoneNumberButton),
             ),
           ] else ...[
             // Phone number display
@@ -147,7 +154,7 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
 
             // Code verification form
             Text(
-              'Enter the 6-digit verification code sent to $_completePhoneNumber',
+              l10n.enterPhoneVerificationCodePrompt(_completePhoneNumber),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -172,7 +179,8 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Demo: Your verification code is $_mockVerificationCode',
+                        l10n.demoPhoneVerificationCodeMessage(
+                            _mockVerificationCode),
                         style: const TextStyle(
                           fontStyle: FontStyle.italic,
                           fontSize: 14,
@@ -186,10 +194,10 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
             // Code entry field
             TextFormField(
               controller: _codeController,
-              decoration: const InputDecoration(
-                labelText: 'Verification Code',
-                hintText: '6-digit code',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.verificationCodeLabel,
+                hintText: l10n.verificationCodeHint,
+                border: const OutlineInputBorder(),
               ),
               keyboardType: TextInputType.number,
               inputFormatters: [
@@ -198,10 +206,7 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
               ],
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter the verification code';
-                }
-                if (value.length < 6) {
-                  return 'Please enter all 6 digits';
+                  return l10n.verificationCodeRequired;
                 }
                 return null;
               },

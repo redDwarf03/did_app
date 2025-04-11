@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen displayed when verification is successfully completed
 class VerificationSuccessScreen extends ConsumerWidget {
@@ -15,9 +16,11 @@ class VerificationSuccessScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Verification Complete'),
+        title: Text(l10n.verificationCompleteTitle),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false, // Remove back button
@@ -43,9 +46,9 @@ class VerificationSuccessScreen extends ConsumerWidget {
               const SizedBox(height: 24),
 
               // Success title
-              const Text(
-                'Verification Successful!',
-                style: TextStyle(
+              Text(
+                l10n.verificationSuccessTitle,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.green,
@@ -55,26 +58,26 @@ class VerificationSuccessScreen extends ConsumerWidget {
               const SizedBox(height: 16),
 
               // Success description
-              const Text(
-                'Your identity has been successfully verified and is now compliant with KYC/AML regulations and eIDAS 2.0 standards.',
-                style: TextStyle(fontSize: 16),
+              Text(
+                l10n.verificationSuccessDescription,
+                style: const TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
 
               // Certificate information
-              _buildCertificateCard(context),
+              _buildCertificateCard(context, l10n),
               const SizedBox(height: 32),
 
               // eIDAS compliance badge
-              _buildEidasComplianceBadge(context),
+              _buildEidasComplianceBadge(context, l10n),
               const SizedBox(height: 32),
 
               // Actions
               ElevatedButton.icon(
                 onPressed: () => context.go('/main'), // Go to home page
                 icon: const Icon(Icons.home),
-                label: const Text('Return to Home'),
+                label: Text(l10n.returnToHomeButton),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
@@ -87,7 +90,7 @@ class VerificationSuccessScreen extends ConsumerWidget {
                 onPressed: () =>
                     context.go('/main/identity'), // Go to identity screen
                 icon: const Icon(Icons.person),
-                label: const Text('View My Identity'),
+                label: Text(l10n.viewMyIdentityButton),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
@@ -97,9 +100,9 @@ class VerificationSuccessScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               TextButton.icon(
-                onPressed: () => _shareCertificate(context),
+                onPressed: () => _shareCertificate(context, l10n),
                 icon: const Icon(Icons.share),
-                label: const Text('Share Certificate'),
+                label: Text(l10n.shareCertificateButton),
               ),
             ],
           ),
@@ -109,7 +112,7 @@ class VerificationSuccessScreen extends ConsumerWidget {
   }
 
   /// Build the certificate card with details
-  Widget _buildCertificateCard(BuildContext context) {
+  Widget _buildCertificateCard(BuildContext context, AppLocalizations l10n) {
     return Card(
       elevation: 2,
       child: Padding(
@@ -117,27 +120,31 @@ class VerificationSuccessScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Verification Certificate',
-              style: TextStyle(
+            Text(
+              l10n.verificationCertificateTitle,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 16),
-            _buildInfoRow('Certificate ID', certificate.id, copyable: true),
+            _buildInfoRow(l10n.certificateIdLabel, certificate.id,
+                copyable: true, l10n: l10n),
             _buildInfoRow(
-              'Issued Date',
+              l10n.issuedDateLabel,
               _formatDate(certificate.issuedAt),
+              l10n: l10n,
             ),
             _buildInfoRow(
-              'Expiry Date',
+              l10n.expiryDateLabel,
               _formatDate(certificate.expiresAt),
+              l10n: l10n,
             ),
-            _buildInfoRow('Issuer', certificate.issuer),
+            _buildInfoRow(l10n.issuerLabel, certificate.issuer, l10n: l10n),
             _buildInfoRow(
-              'eIDAS Level',
-              _getEidasLevelText(certificate.eidasLevel),
+              l10n.eidasLevelLabel,
+              _getEidasLevelText(certificate.eidasLevel, l10n),
+              l10n: l10n,
             ),
           ],
         ),
@@ -146,7 +153,8 @@ class VerificationSuccessScreen extends ConsumerWidget {
   }
 
   /// Build an information row with label and value
-  Widget _buildInfoRow(String label, String value, {bool copyable = false}) {
+  Widget _buildInfoRow(String label, String value,
+      {bool copyable = false, required AppLocalizations l10n}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -168,8 +176,8 @@ class VerificationSuccessScreen extends ConsumerWidget {
           if (copyable)
             IconButton(
               icon: const Icon(Icons.copy, size: 16),
-              onPressed: () => _copyToClipboard(value),
-              tooltip: 'Copy to clipboard',
+              onPressed: () => _copyToClipboard(value, l10n),
+              tooltip: l10n.copyToClipboardTooltip,
               constraints: const BoxConstraints(),
               padding: EdgeInsets.zero,
             ),
@@ -179,7 +187,8 @@ class VerificationSuccessScreen extends ConsumerWidget {
   }
 
   /// Build the eIDAS compliance badge
-  Widget _buildEidasComplianceBadge(BuildContext context) {
+  Widget _buildEidasComplianceBadge(
+      BuildContext context, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -200,7 +209,7 @@ class VerificationSuccessScreen extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'eIDAS ${_getEidasLevelText(certificate.eidasLevel)} Compliant',
+                '${l10n.eidasCompliantLevelDisplay}: ${_getEidasLevelText(certificate.eidasLevel, l10n)}',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.blue[700],
@@ -210,7 +219,7 @@ class VerificationSuccessScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            _getEidasLevelDescription(certificate.eidasLevel),
+            _getEidasLevelDescription(certificate.eidasLevel, l10n),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12,
@@ -223,18 +232,18 @@ class VerificationSuccessScreen extends ConsumerWidget {
   }
 
   /// Copy text to clipboard and show a snackbar
-  void _copyToClipboard(String text) {
+  void _copyToClipboard(String text, AppLocalizations l10n) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(scaffoldKey.currentContext!).showSnackBar(
-      const SnackBar(
-        content: Text('Copied to clipboard'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(l10n.copiedToClipboardMessage),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
 
   /// Show share options for the certificate
-  void _shareCertificate(BuildContext context) {
+  void _shareCertificate(BuildContext context, AppLocalizations l10n) {
     // TODO: Implement real certificate sharing functionality
     // This should:
     // - Generate a shareable verifiable credential
@@ -247,14 +256,14 @@ class VerificationSuccessScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Share Certificate'),
-        content: const Text(
-          'In a real implementation, this would allow sharing your verification certificate with third parties in a secure and privacy-preserving way.',
+        title: Text(l10n.shareCertificateDialogTitle),
+        content: Text(
+          l10n.shareCertificateDialogContent,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.closeButton),
           ),
         ],
       ),
@@ -267,26 +276,26 @@ class VerificationSuccessScreen extends ConsumerWidget {
   }
 
   /// Get a user-friendly text for eIDAS level
-  String _getEidasLevelText(EidasLevel level) {
+  String _getEidasLevelText(EidasLevel level, AppLocalizations l10n) {
     switch (level) {
       case EidasLevel.low:
-        return 'Low';
+        return l10n.low;
       case EidasLevel.substantial:
-        return 'Substantial';
+        return l10n.substantial;
       case EidasLevel.high:
-        return 'High';
+        return l10n.high;
     }
   }
 
   /// Get a description for eIDAS level
-  String _getEidasLevelDescription(EidasLevel level) {
+  String _getEidasLevelDescription(EidasLevel level, AppLocalizations l10n) {
     switch (level) {
       case EidasLevel.low:
-        return 'Basic assurance level sufficient for simple online services';
+        return l10n.eidasLevelLowDescription;
       case EidasLevel.substantial:
-        return 'Substantial assurance level suitable for most financial and public services';
+        return l10n.eidasLevelSubstantialDescription;
       case EidasLevel.high:
-        return 'High assurance level suitable for the most sensitive transactions and services';
+        return l10n.eidasLevelHighDescription;
     }
   }
 

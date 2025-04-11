@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Écran affichant l'attestation sous forme de certificat visuel
 class CredentialCertificateScreen extends ConsumerWidget {
@@ -18,17 +19,18 @@ class CredentialCertificateScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Certificat'),
+        title: Text(l10n.credentialDetailTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Fonctionnalité de partage à venir'),
+                SnackBar(
+                  content: Text(l10n.shareFunctionalityMessage),
                 ),
               );
             },
@@ -37,8 +39,8 @@ class CredentialCertificateScreen extends ConsumerWidget {
             icon: const Icon(Icons.print),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Fonctionnalité d\'impression à venir'),
+                SnackBar(
+                  content: Text(l10n.shareFunctionalityMessage),
                 ),
               );
             },
@@ -49,20 +51,20 @@ class CredentialCertificateScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            _buildCertificate(context),
+            _buildCertificate(context, l10n),
             const SizedBox(height: 24),
-            const SectionTitle(title: 'Informations du certificat'),
-            _buildCertificateInfo(context),
+            SectionTitle(title: l10n.documentInfoSectionTitle),
+            _buildCertificateInfo(context, l10n),
             const SizedBox(height: 24),
-            const SectionTitle(title: 'Validité'),
-            _buildValidityInfo(context),
+            SectionTitle(title: l10n.verificationSectionTitle),
+            _buildValidityInfo(context, l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCertificate(BuildContext context) {
+  Widget _buildCertificate(BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
     final dateFormat = DateFormat('dd/MM/yyyy');
     final size = MediaQuery.of(context).size;
@@ -70,44 +72,52 @@ class CredentialCertificateScreen extends ConsumerWidget {
     // On détermine le type d'attestation pour personnaliser le certificat
     final credentialType = _getCredentialTypeFromList(credential.type);
     IconData typeIcon = _getCredentialTypeIcon(credentialType);
-    String typeTitle = 'Attestation';
+    String typeTitle = l10n.defaultCredentialName;
     Color accentColor = theme.colorScheme.primary;
 
     switch (credentialType) {
       case CredentialType.identity:
-        typeTitle = "Attestation d'identité";
+        typeTitle = l10n.credentialIdentityType;
         accentColor = Colors.blue;
         break;
       case CredentialType.diploma:
-        typeTitle = "Diplôme";
+        typeTitle = l10n.credentialDiplomaType;
         accentColor = Colors.purple;
         break;
       case CredentialType.healthInsurance:
-        typeTitle = "Attestation de santé";
+        typeTitle = l10n.credentialHealthInsuranceType;
         accentColor = Colors.green;
         break;
       case CredentialType.employmentProof:
-        typeTitle = "Attestation d'emploi";
+        typeTitle = l10n.credentialEmploymentProofType;
         accentColor = Colors.orange;
         break;
       case CredentialType.drivingLicense:
-        typeTitle = "Permis de conduire";
+        typeTitle = l10n.credentialDrivingLicenseType;
         accentColor = Colors.red;
         break;
       case CredentialType.ageVerification:
-        typeTitle = "Vérification d'âge";
+        typeTitle = l10n.credentialAgeVerificationType;
         accentColor = Colors.amber;
         break;
       case CredentialType.addressProof:
-        typeTitle = "Justificatif de domicile";
+        typeTitle = l10n.credentialAddressProofType;
         accentColor = Colors.teal;
         break;
       case CredentialType.membershipCard:
-        typeTitle = "Carte de membre";
+        typeTitle = l10n.credentialMembershipCardType;
         accentColor = Colors.indigo;
         break;
+      case CredentialType.medicalCertificate:
+        typeTitle = l10n.credentialMedicalCertificateType;
+        accentColor = Colors.pink;
+        break;
+      case CredentialType.professionalBadge:
+        typeTitle = l10n.credentialProfessionalBadgeType;
+        accentColor = Colors.deepOrange;
+        break;
       case CredentialType.other:
-        typeTitle = "Attestation";
+        typeTitle = l10n.defaultCredentialName;
         accentColor = theme.colorScheme.primary;
         break;
     }
@@ -186,7 +196,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
                 // Titre
                 Center(
                   child: Text(
-                    'CERTIFICAT OFFICIEL',
+                    l10n.verifiableCredentialsTitle,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,
@@ -198,7 +208,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
                 // Sous-titre
                 Center(
                   child: Text(
-                    _getCredentialName(),
+                    _getCredentialName(l10n),
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -209,12 +219,12 @@ class CredentialCertificateScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
 
                 // Contenu principal
-                ..._buildCertificateContent(context),
+                ..._buildCertificateContent(context, l10n),
 
                 const SizedBox(height: 24),
 
                 // Pied avec signature
-                _buildSignature(context),
+                _buildSignature(context, l10n),
               ],
             ),
           ),
@@ -237,17 +247,17 @@ class CredentialCertificateScreen extends ConsumerWidget {
                     const Icon(Icons.verified, size: 16),
                     const SizedBox(width: 8),
                     Text(
-                      'Vérifié',
+                      l10n.verifiedLabel,
                       style: theme.textTheme.bodySmall,
                     ),
                   ],
                 ),
                 Text(
-                  'ID: ${credential.id.substring(0, 8)}...',
+                  '${l10n.identifierLabel}: ${credential.id.substring(0, 8)}...',
                   style: theme.textTheme.bodySmall,
                 ),
                 Text(
-                  'Émis le: ${dateFormat.format(credential.issuanceDate)}',
+                  '${l10n.issuanceDateLabel}: ${dateFormat.format(credential.issuanceDate)}',
                   style: theme.textTheme.bodySmall,
                 ),
               ],
@@ -258,35 +268,33 @@ class CredentialCertificateScreen extends ConsumerWidget {
     );
   }
 
-  String _getCredentialName() {
+  String _getCredentialName(AppLocalizations l10n) {
     // Détermine un nom plus lisible pour l'attestation
     final subjectData = credential.credentialSubject;
     if (credential.type.contains('IdentityCredential')) {
       final firstName = subjectData['firstName'] as String? ?? '';
       final lastName = subjectData['lastName'] as String? ?? '';
-      return 'Identité de $firstName $lastName';
+      return '${l10n.credentialIdentityType} - $firstName $lastName';
     } else if (credential.type.contains('UniversityDegreeCredential')) {
-      final degreeType =
-          (subjectData['degree'] as Map<String, dynamic>)['type'] as String? ??
-              '';
-      final field =
-          (subjectData['degree'] as Map<String, dynamic>)['field'] as String? ??
-              '';
-      return '$degreeType en $field';
+      final degree = subjectData['degree'] as Map<String, dynamic>? ?? {};
+      final degreeType = degree['type'] as String? ?? '';
+      final field = degree['field'] as String? ?? '';
+      return '${l10n.credentialDiplomaType} - $degreeType $field';
     } else if (credential.type.contains('HealthInsuranceCredential')) {
       final provider = subjectData['insuranceProvider'] as String? ?? '';
-      return 'Assurance santé - $provider';
+      return '${l10n.credentialHealthInsuranceType} - $provider';
     } else if (credential.type.contains('EmploymentCredential')) {
       final position = subjectData['position'] as String? ?? '';
       final employer = (subjectData['employer'] as Map<String, dynamic>)['name']
               as String? ??
           '';
-      return '$position chez $employer';
+      return '${l10n.credentialEmploymentProofType} - $position ($employer)';
     }
     return credential.type.join(', ');
   }
 
-  List<Widget> _buildCertificateContent(BuildContext context) {
+  List<Widget> _buildCertificateContent(
+      BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
     final subjectData = credential.credentialSubject;
     final widgets = <Widget>[];
@@ -294,45 +302,55 @@ class CredentialCertificateScreen extends ConsumerWidget {
     if (credential.type.contains('IdentityCredential')) {
       // Pour une attestation d'identité
       widgets.addAll([
-        _buildContentRow('Nom complet',
+        _buildContentRow(l10n.fullNameLabelDetails,
             '${subjectData['firstName']} ${subjectData['lastName']}'),
-        _buildContentRow('Date de naissance', subjectData['dateOfBirth'] ?? ''),
-        _buildContentRow('Nationalité', subjectData['nationality'] ?? ''),
+        _buildContentRow(
+            l10n.dobLabelDetails, subjectData['dateOfBirth'] ?? ''),
+        _buildContentRow(
+            l10n.nationalityLabelDetails, subjectData['nationality'] ?? ''),
         if (subjectData['documentNumber'] != null)
-          _buildContentRow('N° de document', subjectData['documentNumber']),
+          _buildContentRow(
+              l10n.documentIdLabelDetail, subjectData['documentNumber']),
       ]);
     } else if (credential.type.contains('UniversityDegreeCredential')) {
       // Pour un diplôme
       final degree = subjectData['degree'] as Map<String, dynamic>? ?? {};
       widgets.addAll([
-        _buildContentRow('Diplôme', '${degree['type']} en ${degree['field']}'),
-        _buildContentRow('Établissement',
+        _buildContentRow(
+            l10n.documentTypeLabel, '${degree['type']} en ${degree['field']}'),
+        _buildContentRow(l10n.issuerLabelDetail,
             credential.issuer.replaceAll('did:archethic:', '')),
         _buildContentRow(
-            'Date d\'obtention', subjectData['graduationDate'] ?? ''),
+            l10n.issueDateLabelDetail, subjectData['graduationDate'] ?? ''),
         if (subjectData['gpa'] != null)
-          _buildContentRow('GPA', subjectData['gpa']),
+          _buildContentRow(l10n.documentDescriptionLabel, subjectData['gpa']),
       ]);
     } else if (credential.type.contains('HealthInsuranceCredential')) {
       // Pour une attestation d'assurance santé
       widgets.addAll([
-        _buildContentRow('Assureur', subjectData['insuranceProvider'] ?? ''),
-        _buildContentRow('N° de police', subjectData['policyNumber'] ?? ''),
         _buildContentRow(
-            'Début de couverture', subjectData['coverageStart'] ?? ''),
-        _buildContentRow('Fin de couverture', subjectData['coverageEnd'] ?? ''),
+            l10n.issuerLabelDetail, subjectData['insuranceProvider'] ?? ''),
         _buildContentRow(
-            'Type de couverture', subjectData['coverageType'] ?? ''),
+            l10n.documentIdLabelDetail, subjectData['policyNumber'] ?? ''),
+        _buildContentRow(
+            l10n.issueDateLabelDetail, subjectData['coverageStart'] ?? ''),
+        _buildContentRow(
+            l10n.expirationDateLabelDetail, subjectData['coverageEnd'] ?? ''),
+        _buildContentRow(
+            l10n.documentTypeLabel, subjectData['coverageType'] ?? ''),
       ]);
     } else if (credential.type.contains('EmploymentCredential')) {
       // Pour une attestation d'emploi
       final employer = subjectData['employer'] as Map<String, dynamic>? ?? {};
       widgets.addAll([
-        _buildContentRow('Fonction', subjectData['position'] ?? ''),
-        _buildContentRow('Employeur', employer['name'] ?? ''),
-        _buildContentRow('Département', subjectData['department'] ?? ''),
-        _buildContentRow('Date d\'embauche', subjectData['startDate'] ?? ''),
-        _buildContentRow('ID employé', subjectData['employeeId'] ?? ''),
+        _buildContentRow(l10n.documentTypeLabel, subjectData['position'] ?? ''),
+        _buildContentRow(l10n.issuerLabelDetail, employer['name'] ?? ''),
+        _buildContentRow(
+            l10n.documentDescriptionLabel, subjectData['department'] ?? ''),
+        _buildContentRow(
+            l10n.issueDateLabelDetail, subjectData['startDate'] ?? ''),
+        _buildContentRow(
+            l10n.documentIdLabelDetail, subjectData['employeeId'] ?? ''),
       ]);
     } else {
       // Pour tout autre type d'attestation, afficher tous les attributs
@@ -379,7 +397,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSignature(BuildContext context) {
+  Widget _buildSignature(BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
 
     return Column(
@@ -416,7 +434,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
                     ),
                   ),
                   child: Text(
-                    'Émetteur: ${credential.issuer.replaceAll('did:archethic:', '')}',
+                    '${l10n.issuerLabel}: ${credential.issuer.replaceAll('did:archethic:', '')}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontStyle: FontStyle.italic,
                     ),
@@ -424,7 +442,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Signature numérique vérifiée',
+                  l10n.signatureAuthenticityInfo,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: Colors.grey,
                     fontSize: 10,
@@ -438,7 +456,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCertificateInfo(BuildContext context) {
+  Widget _buildCertificateInfo(BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
     final dateFormat = DateFormat('dd/MM/yyyy');
 
@@ -450,28 +468,28 @@ class CredentialCertificateScreen extends ConsumerWidget {
             _buildInfoRow(
               context,
               Icons.fingerprint,
-              'Identifiant',
+              l10n.identifierLabel,
               credential.id,
             ),
             const Divider(),
             _buildInfoRow(
               context,
               Icons.business,
-              'Émetteur',
+              l10n.issuerLabelDetail,
               credential.issuer,
             ),
             const Divider(),
             _buildInfoRow(
               context,
               Icons.person,
-              'Sujet',
-              credential.subject,
+              l10n.credentialTypeLabel,
+              credential.subject ?? 'N/A',
             ),
             const Divider(),
             _buildInfoRow(
               context,
               Icons.category,
-              'Type',
+              l10n.documentTypeLabel,
               credential.type.join(', '),
             ),
           ],
@@ -480,7 +498,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildValidityInfo(BuildContext context) {
+  Widget _buildValidityInfo(BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
     final dateFormat = DateFormat('dd/MM/yyyy');
 
@@ -492,7 +510,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
             _buildInfoRow(
               context,
               Icons.calendar_today,
-              'Date d\'émission',
+              l10n.issuanceDateLabel,
               dateFormat.format(credential.issuanceDate),
             ),
             if (credential.expirationDate != null) ...[
@@ -500,7 +518,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
               _buildInfoRow(
                 context,
                 Icons.event_busy,
-                'Date d\'expiration',
+                l10n.expirationDateLabel,
                 dateFormat.format(credential.expirationDate!),
               ),
             ],
@@ -508,8 +526,8 @@ class CredentialCertificateScreen extends ConsumerWidget {
             _buildInfoRow(
               context,
               credential.isValid ? Icons.check_circle : Icons.cancel,
-              'Statut de validité',
-              credential.isValid ? 'Valide' : 'Expiré',
+              l10n.verificationStatus,
+              credential.isValid ? l10n.verifiedStatus : l10n.expiredStatus,
               valueColor: credential.isValid ? Colors.green : Colors.red,
             ),
             if (credential.status != null) ...[
@@ -517,8 +535,8 @@ class CredentialCertificateScreen extends ConsumerWidget {
               _buildInfoRow(
                 context,
                 credential.isRevoked ? Icons.gpp_bad : Icons.gpp_good,
-                'Statut de révocation',
-                credential.isRevoked ? 'Révoqué' : 'Non révoqué',
+                l10n.status,
+                credential.isRevoked ? l10n.revokedStatus : l10n.verifiedStatus,
                 valueColor: credential.isRevoked ? Colors.red : Colors.green,
               ),
             ],
@@ -589,7 +607,12 @@ class CredentialCertificateScreen extends ConsumerWidget {
         return Icons.card_membership;
       case CredentialType.healthInsurance:
         return Icons.medical_services;
+      case CredentialType.medicalCertificate:
+        return Icons.medical_services;
+      case CredentialType.professionalBadge:
+        return Icons.badge;
       case CredentialType.other:
+      default:
         return Icons.badge;
     }
   }
@@ -612,6 +635,10 @@ class CredentialCertificateScreen extends ConsumerWidget {
       return CredentialType.addressProof;
     } else if (types.contains('MembershipCardCredential')) {
       return CredentialType.membershipCard;
+    } else if (types.contains('MedicalCertificateCredential')) {
+      return CredentialType.medicalCertificate;
+    } else if (types.contains('ProfessionalBadgeCredential')) {
+      return CredentialType.professionalBadge;
     } else {
       return CredentialType.other;
     }

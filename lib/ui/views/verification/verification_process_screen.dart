@@ -2,6 +2,7 @@ import 'package:did_app/application/verification/providers.dart';
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen that guides the user through the verification process steps
 class VerificationProcessScreen extends ConsumerWidget {
@@ -15,10 +16,11 @@ class VerificationProcessScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch the verification state to get currentStepIndex and isLoading
     final verificationState = ref.watch(verificationNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Identity Verification'),
+        title: Text(l10n.navVerification),
         // Back button with confirmation dialog
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -28,14 +30,23 @@ class VerificationProcessScreen extends ConsumerWidget {
           // Help button
           IconButton(
             icon: const Icon(Icons.help_outline),
-            tooltip: 'Help',
+            tooltip: l10n.verificationProcessHelpTooltip,
             onPressed: () => _showHelpDialog(context),
           ),
         ],
       ),
       body: verificationState.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _buildVerificationProcessView(context, verificationState),
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(l10n.verificationInProgress),
+                ],
+              ),
+            )
+          : _buildVerificationProcessView(context, verificationState, l10n),
     );
   }
 
@@ -43,6 +54,7 @@ class VerificationProcessScreen extends ConsumerWidget {
   Widget _buildVerificationProcessView(
     BuildContext context,
     VerificationState state,
+    AppLocalizations l10n,
   ) {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -50,11 +62,11 @@ class VerificationProcessScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Status card
-          _buildStatusCard(context),
+          _buildStatusCard(context, l10n),
           const SizedBox(height: 24),
 
           // Progress indicator
-          _buildProgressIndicator(state.currentStepIndex),
+          _buildProgressIndicator(state.currentStepIndex, l10n),
           const SizedBox(height: 24),
 
           // Step content - this would be filled with actual verification step screens
@@ -63,6 +75,7 @@ class VerificationProcessScreen extends ConsumerWidget {
               context,
               state.currentStepIndex,
               state.currentStep,
+              l10n,
             ),
           ),
         ],
@@ -71,15 +84,15 @@ class VerificationProcessScreen extends ConsumerWidget {
   }
 
   // Display verification status
-  Widget _buildStatusCard(BuildContext context) {
+  Widget _buildStatusCard(BuildContext context, AppLocalizations l10n) {
     final statusColor = _getStatusColor(verificationProcess.status);
 
     return Card(
       elevation: 2,
-      color: statusColor.withValues(alpha: 0.1),
+      color: statusColor.withOpacity(0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: statusColor.withValues(alpha: 0.3)),
+        side: BorderSide(color: statusColor.withOpacity(0.3)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -96,7 +109,7 @@ class VerificationProcessScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _getStatusText(verificationProcess.status),
+                    _getStatusText(verificationProcess.status, l10n),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: statusColor,
@@ -104,7 +117,7 @@ class VerificationProcessScreen extends ConsumerWidget {
                     ),
                   ),
                   Text(
-                    _getStatusDescription(verificationProcess.status),
+                    _getStatusDescription(verificationProcess.status, l10n),
                     style: const TextStyle(fontSize: 14),
                   ),
                 ],
@@ -117,14 +130,16 @@ class VerificationProcessScreen extends ConsumerWidget {
   }
 
   // Show progress through steps
-  Widget _buildProgressIndicator(int currentStepIndex) {
+  Widget _buildProgressIndicator(int currentStepIndex, AppLocalizations l10n) {
     final steps = verificationProcess.steps;
+    final progress =
+        (steps.isEmpty) ? 0.0 : (currentStepIndex + 1) / steps.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Step ${currentStepIndex + 1} of ${steps.length}',
+          "Step ${currentStepIndex + 1} of ${steps.length}",
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 14,
@@ -132,15 +147,15 @@ class VerificationProcessScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         LinearProgressIndicator(
-          value: (currentStepIndex + 1) / steps.length,
-          backgroundColor: Colors.grey.withValues(alpha: 0.3),
+          value: progress,
+          backgroundColor: Colors.grey.withOpacity(0.3),
         ),
         const SizedBox(height: 8),
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Start'),
-            Text('Complete'),
+            Text("Start"),
+            Text("Complete"),
           ],
         ),
       ],
@@ -152,6 +167,7 @@ class VerificationProcessScreen extends ConsumerWidget {
     BuildContext context,
     int currentStepIndex,
     VerificationStep? currentStep,
+    AppLocalizations l10n,
   ) {
     // Use the current step if provided from state, or determine step based on currentStepIndex
     final step = currentStep ??
@@ -160,8 +176,8 @@ class VerificationProcessScreen extends ConsumerWidget {
             : null);
 
     if (step == null) {
-      return const Center(
-        child: Text('No step information available.'),
+      return Center(
+        child: Text("No step information available"),
       );
     }
 
@@ -182,7 +198,7 @@ class VerificationProcessScreen extends ConsumerWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    _getStepTitle(step.type),
+                    _getStepTitle(step.type, l10n),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -195,12 +211,11 @@ class VerificationProcessScreen extends ConsumerWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color:
-                        _getStepStatusColor(step.status).withValues(alpha: 0.1),
+                    color: _getStepStatusColor(step.status).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    _getStepStatusText(step.status),
+                    _getStepStatusText(step.status, l10n),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -219,10 +234,9 @@ class VerificationProcessScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Placeholder content
-            const Center(
+            Center(
               child: Text(
-                'This is a placeholder for the verification step content.\n'
-                'In a real implementation, this would be replaced with specific UI for each step type.',
+                "Complete this step according to the instructions",
                 textAlign: TextAlign.center,
               ),
             ),
@@ -234,11 +248,11 @@ class VerificationProcessScreen extends ConsumerWidget {
               children: [
                 TextButton(
                   onPressed: () => _confirmCancelVerification(context),
-                  child: const Text('Cancel'),
+                  child: Text(l10n.closeButton),
                 ),
                 ElevatedButton(
                   onPressed: () => _mockStepSubmission(context, step.id),
-                  child: const Text('Submit'),
+                  child: Text(l10n.submitButton ?? "Submit"),
                 ),
               ],
             ),
@@ -262,7 +276,7 @@ class VerificationProcessScreen extends ConsumerWidget {
       case VerificationStatus.rejected:
         return Colors.red;
       case VerificationStatus.expired:
-        return Colors.red[300]!;
+        return Colors.red[300] ?? Colors.red;
     }
   }
 
@@ -283,37 +297,38 @@ class VerificationProcessScreen extends ConsumerWidget {
     }
   }
 
-  String _getStatusText(VerificationStatus status) {
+  String _getStatusText(VerificationStatus status, AppLocalizations l10n) {
     switch (status) {
       case VerificationStatus.notStarted:
-        return 'Not Started';
+        return l10n.verificationStatusUnverified;
       case VerificationStatus.inProgress:
-        return 'In Progress';
+        return l10n.verificationInProgress;
       case VerificationStatus.pendingReview:
-        return 'Pending Review';
+        return l10n.verificationStatusPending;
       case VerificationStatus.completed:
-        return 'Completed';
+        return l10n.verificationStatusVerified;
       case VerificationStatus.rejected:
-        return 'Rejected';
+        return l10n.verificationStatusRejectedDetail;
       case VerificationStatus.expired:
-        return 'Expired';
+        return l10n.verificationStatusExpiredDetail;
     }
   }
 
-  String _getStatusDescription(VerificationStatus status) {
+  String _getStatusDescription(
+      VerificationStatus status, AppLocalizations l10n) {
     switch (status) {
       case VerificationStatus.notStarted:
-        return 'Your verification process is ready to begin.';
+        return l10n.verificationMessageUnverified;
       case VerificationStatus.inProgress:
-        return 'Complete all required steps to verify your identity.';
+        return l10n.verificationMessagePending;
       case VerificationStatus.pendingReview:
-        return 'Your information is being reviewed by our verification team.';
+        return l10n.verificationMessagePending;
       case VerificationStatus.completed:
-        return 'Your identity has been successfully verified.';
+        return l10n.verificationMessageFullyVerified;
       case VerificationStatus.rejected:
-        return 'Your verification was rejected. Please check the reason and try again.';
+        return l10n.verificationMessageRejected;
       case VerificationStatus.expired:
-        return 'Your verification has expired. Please start a new verification.';
+        return "Your verification has expired. Please request a new verification.";
     }
   }
 
@@ -336,22 +351,22 @@ class VerificationProcessScreen extends ConsumerWidget {
     }
   }
 
-  String _getStepTitle(VerificationStepType type) {
+  String _getStepTitle(VerificationStepType type, AppLocalizations l10n) {
     switch (type) {
       case VerificationStepType.emailVerification:
-        return 'Email Verification';
+        return "Email Verification";
       case VerificationStepType.phoneVerification:
-        return 'Phone Verification';
+        return "Phone Verification";
       case VerificationStepType.idDocumentVerification:
-        return 'ID Document Verification';
+        return "ID Document Verification";
       case VerificationStepType.addressVerification:
-        return 'Address Verification';
+        return "Address Verification";
       case VerificationStepType.livenessCheck:
-        return 'Liveness Check';
+        return "Liveness Check";
       case VerificationStepType.biometricVerification:
-        return 'Biometric Verification';
+        return "Biometric Verification";
       case VerificationStepType.additionalDocuments:
-        return 'Additional Documents';
+        return "Additional Documents";
     }
   }
 
@@ -370,34 +385,35 @@ class VerificationProcessScreen extends ConsumerWidget {
     }
   }
 
-  String _getStepStatusText(VerificationStepStatus status) {
+  String _getStepStatusText(
+      VerificationStepStatus status, AppLocalizations l10n) {
     switch (status) {
       case VerificationStepStatus.notStarted:
-        return 'Not Started';
+        return "Not Started";
       case VerificationStepStatus.inProgress:
-        return 'In Progress';
+        return "In Progress";
       case VerificationStepStatus.completed:
-        return 'Completed';
+        return "Completed";
       case VerificationStepStatus.rejected:
-        return 'Rejected';
+        return "Rejected";
       case VerificationStepStatus.actionRequired:
-        return 'Action Required';
+        return "Action Required";
     }
   }
 
   // Display confirmation dialog before cancelling verification
   void _confirmCancelVerification(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cancel Verification?'),
-        content: const Text(
-          'Are you sure you want to cancel the verification process? Your progress will be lost.',
-        ),
+        title: Text("Cancel Verification?"),
+        content: Text(
+            "If you cancel now, your progress will be lost. Do you want to continue with verification?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('No, Continue'),
+            child: Text("Continue Verification"),
           ),
           TextButton(
             onPressed: () {
@@ -408,7 +424,7 @@ class VerificationProcessScreen extends ConsumerWidget {
               // Optional: You can also cancel the verification request on the server
               // ref.read(verificationNotifierProvider.notifier).cancelVerification();
             },
-            child: const Text('Yes, Cancel'),
+            child: Text("Cancel Verification"),
           ),
         ],
       ),
@@ -417,37 +433,38 @@ class VerificationProcessScreen extends ConsumerWidget {
 
   // Show help dialog with information about the verification process
   void _showHelpDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Verification Help'),
-        content: const SingleChildScrollView(
+        title: Text("Verification Help"),
+        content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'About Identity Verification',
-                style: TextStyle(
+                "About Verification",
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'This process verifies your identity according to KYC/AML regulations. Complete all steps to obtain a verified digital identity certificate.',
+                "Identity verification ensures the security and compliance of your digital identity. Complete all steps to verify your identity.",
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
-                'Need Assistance?',
-                style: TextStyle(
+                "Need Assistance?",
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'If you encounter any issues during the verification process, please contact our support team at support@example.com',
+                "If you encounter any issues during the verification process, please contact our support team for assistance.",
               ),
             ],
           ),
@@ -455,7 +472,7 @@ class VerificationProcessScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.closeButton),
           ),
         ],
       ),
@@ -464,21 +481,42 @@ class VerificationProcessScreen extends ConsumerWidget {
 
   // Mock submission of a step
   void _mockStepSubmission(BuildContext context, String stepId) {
-    // In a real app, this would call the verification notifier to submit the step
+    final l10n = AppLocalizations.of(context)!;
+
+    // Show loading indicator
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('Step Submission'),
-        content: const Text(
-          'In a real implementation, this would submit the step data to the verification service.',
+        content: Row(
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Text(l10n.verificationInProgress),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          ),
-        ],
       ),
     );
+
+    // Simulate network delay
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.of(context).pop(); // Close loading dialog
+
+      // In a real app, this would call the verification notifier to submit the step
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.verificationResultDialogTitle),
+          content: Text(
+              "Step submitted successfully. You can now proceed to the next step."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.closeButton),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }

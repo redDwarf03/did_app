@@ -30,6 +30,9 @@ class MockCredentialRepository implements CredentialRepository {
       issuanceDate: DateTime.now().subtract(const Duration(days: 15)),
       issuer: 'did:archethic:government_authority',
       subject: 'did:archethic:user123',
+      name: 'Carte d\'identité',
+      description:
+          'Carte d\'identité nationale émise par les autorités françaises',
       credentialSubject: {
         'id': 'did:archethic:user123',
         'firstName': 'Jean',
@@ -39,22 +42,25 @@ class MockCredentialRepository implements CredentialRepository {
         'documentNumber': 'FR12345678',
       },
       expirationDate: DateTime.now().add(const Duration(days: 365 * 5)),
-      proof: CredentialProof(
-        type: 'ArchethicSignature2023',
-        created: DateTime.now().subtract(const Duration(days: 15)),
-        verificationMethod: 'did:archethic:government_authority#key-1',
-        proofPurpose: 'assertionMethod',
-        proofValue:
+      proof: {
+        'type': 'ArchethicSignature2023',
+        'created':
+            DateTime.now().subtract(const Duration(days: 15)).toIso8601String(),
+        'verificationMethod': 'did:archethic:government_authority#key-1',
+        'proofPurpose': 'assertionMethod',
+        'proofValue':
             'z3JyoALNdX5BoQYJAjZqEJC2Qka1aLxmz2B4c59VX7rFXU9nwxXpQe5jdUfEpyHT5eEnESbQaFMB5zXdJNKQPMiB',
-      ),
-      status: CredentialStatus(
-        id: 'https://example.gov/status/24',
-        type: 'CredentialStatusList2021',
-      ),
-      credentialSchema: CredentialSchema(
-        id: 'https://example.gov/schemas/identity/1.0',
-        type: 'JsonSchema',
-      ),
+      },
+      status: {
+        'id': 'https://example.gov/status/24',
+        'type': 'CredentialStatusList2021',
+      },
+      credentialSchema: {
+        'id': 'https://example.gov/schemas/identity/1.0',
+        'type': 'JsonSchema',
+      },
+      statusListUrl: 'https://example.gov/status/24',
+      statusListIndex: 42,
     );
 
     final diplomaCredential = Credential(
@@ -67,6 +73,8 @@ class MockCredentialRepository implements CredentialRepository {
       issuanceDate: DateTime.now().subtract(const Duration(days: 120)),
       issuer: 'did:archethic:university_of_paris',
       subject: 'did:archethic:user123',
+      name: 'Diplôme universitaire',
+      description: 'Diplôme de Master en Informatique',
       credentialSubject: {
         'id': 'did:archethic:user123',
         'degree': {
@@ -78,22 +86,27 @@ class MockCredentialRepository implements CredentialRepository {
         'gpa': '3.8',
       },
       expirationDate: null, // Un diplôme n'expire pas
-      proof: CredentialProof(
-        type: 'ArchethicSignature2023',
-        created: DateTime.now().subtract(const Duration(days: 120)),
-        verificationMethod: 'did:archethic:university_of_paris#key-1',
-        proofPurpose: 'assertionMethod',
-        proofValue:
+      proof: {
+        'type': 'ArchethicSignature2023',
+        'created': DateTime.now()
+            .subtract(const Duration(days: 120))
+            .toIso8601String(),
+        'verificationMethod': 'did:archethic:university_of_paris#key-1',
+        'proofPurpose': 'assertionMethod',
+        'proofValue':
             'z4WYiRBZHZMqf7LuTpLsYU3jnvBVn6Dri6u2yQZV8HB1bU4edXyndjiCFrFvJNpqKTRxzsdJWzdZvnKXJ1rU5VH',
-      ),
-      status: CredentialStatus(
-        id: 'https://university.edu/status/24',
-        type: 'CredentialStatusList2021',
-      ),
-      credentialSchema: CredentialSchema(
-        id: 'https://university.edu/schemas/degree/1.0',
-        type: 'JsonSchema',
-      ),
+      },
+      status: {
+        'id': 'https://university.edu/status/24',
+        'type': 'CredentialStatusList2021',
+      },
+      credentialSchema: {
+        'id': 'https://university.edu/schemas/degree/1.0',
+        'type': 'JsonSchema',
+      },
+      statusListUrl: 'https://university.edu/status/24',
+      statusListIndex: 56,
+      supportsZkp: true,
     );
 
     final healthCredential = Credential(
@@ -106,6 +119,8 @@ class MockCredentialRepository implements CredentialRepository {
       issuanceDate: DateTime.now().subtract(const Duration(days: 60)),
       issuer: 'did:archethic:national_health_insurance',
       subject: 'did:archethic:user123',
+      name: 'Carte d\'assurance maladie',
+      description: 'Attestation d\'affiliation à l\'assurance maladie',
       credentialSubject: {
         'id': 'did:archethic:user123',
         'policyNumber': 'HEALTH123456789',
@@ -117,22 +132,25 @@ class MockCredentialRepository implements CredentialRepository {
         'insuranceProvider': 'National Health System',
       },
       expirationDate: DateTime.now().add(const Duration(days: 305)),
-      proof: CredentialProof(
-        type: 'ArchethicSignature2023',
-        created: DateTime.now().subtract(const Duration(days: 60)),
-        verificationMethod: 'did:archethic:national_health_insurance#key-1',
-        proofPurpose: 'assertionMethod',
-        proofValue:
+      proof: {
+        'type': 'ArchethicSignature2023',
+        'created':
+            DateTime.now().subtract(const Duration(days: 60)).toIso8601String(),
+        'verificationMethod': 'did:archethic:national_health_insurance#key-1',
+        'proofPurpose': 'assertionMethod',
+        'proofValue':
             'z2W6QkPQSnBnZNXHbKaA9tcXBmwXwCt8HJyXwQKTmZyQnD1UJMU4xYh6NaQjMEttHqbCGKqKrZmxwY5GBe3JQMd',
-      ),
-      status: CredentialStatus(
-        id: 'https://health.gov/status/24',
-        type: 'CredentialStatusList2021',
-      ),
-      credentialSchema: CredentialSchema(
-        id: 'https://health.gov/schemas/insurance/1.0',
-        type: 'JsonSchema',
-      ),
+      },
+      status: {
+        'id': 'https://health.gov/status/24',
+        'type': 'CredentialStatusList2021',
+      },
+      credentialSchema: {
+        'id': 'https://health.gov/schemas/insurance/1.0',
+        'type': 'JsonSchema',
+      },
+      statusListUrl: 'https://health.gov/status/24',
+      statusListIndex: 89,
     );
 
     _storage[identityCredential.id] = identityCredential;
@@ -199,44 +217,57 @@ class MockCredentialRepository implements CredentialRepository {
 
     final disclosedCredentials = <Credential>[];
 
+    // Créer une copie des attestations avec uniquement les attributs révélés
     for (final credential in credentials) {
-      // Crée une nouvelle version de l'attestation avec seulement les attributs demandés
-      final disclosedSubject = <String, dynamic>{
-        'id': credential.credentialSubject['id'],
-      };
+      final filteredSubject = <String, dynamic>{};
+      final disclosureAttributes = selectiveDisclosure[credential.id] ?? [];
 
-      final attributes = selectiveDisclosure[credential.id] ?? [];
-
-      for (final attr in attributes) {
-        if (credential.credentialSubject.containsKey(attr)) {
-          disclosedSubject[attr] = credential.credentialSubject[attr];
+      for (final key in disclosureAttributes) {
+        if (credential.credentialSubject.containsKey(key)) {
+          filteredSubject[key] = credential.credentialSubject[key];
         }
       }
 
-      final disclosedCredential = credential.copyWith(
-        credentialSubject: disclosedSubject,
+      // Ajout de l'identifiant du sujet dans tous les cas
+      if (credential.credentialSubject.containsKey('id')) {
+        filteredSubject['id'] = credential.credentialSubject['id'];
+      }
+
+      // Créer une copie avec les attributs filtrés
+      final disclosedCredential = Credential(
+        id: credential.id,
+        type: credential.type,
+        issuer: credential.issuer,
+        issuanceDate: credential.issuanceDate,
+        expirationDate: credential.expirationDate,
+        credentialSubject: filteredSubject,
+        proof: credential.proof,
+        context: credential.context,
       );
 
       disclosedCredentials.add(disclosedCredential);
     }
 
-    return CredentialPresentation(
+    // Créer la présentation
+    final presentation = CredentialPresentation(
       id: 'presentation-${DateTime.now().millisecondsSinceEpoch}',
-      context: ['https://www.w3.org/2018/credentials/v1'],
       type: ['VerifiablePresentation'],
       verifiableCredentials: disclosedCredentials,
-      holder: 'did:archethic:user123',
-      proof: CredentialProof(
-        type: 'ArchethicSignature2023',
-        created: DateTime.now(),
-        verificationMethod: 'did:archethic:user123#key-1',
-        proofPurpose: 'authentication',
-        proofValue:
-            'z${base64Encode(utf8.encode('mock_signature_for_presentation'))}',
-        challenge: challenge,
-        domain: domain,
-      ),
+      challenge: challenge,
+      domain: domain,
+      revealedAttributes: selectiveDisclosure,
+      created: DateTime.now(),
+      proof: {
+        'type': 'ArchethicSignature2023',
+        'created': DateTime.now().toIso8601String(),
+        'verificationMethod': 'did:archethic:user123#key-1',
+        'proofPurpose': 'authentication',
+        'proofValue':
+            'z5U8kqbJKhnRRsj4QDGJXXhwbSXzFsAQMRFJYPGQSaJBpQYx5JmkvdcyLJbm1qHTjH8akLTdKVcGWAvvcYkzSZt',
+      },
     );
+
+    return presentation;
   }
 
   @override
@@ -302,22 +333,23 @@ class MockCredentialRepository implements CredentialRepository {
         },
       },
       expirationDate: DateTime.now().add(const Duration(days: 365)),
-      proof: CredentialProof(
-        type: 'ArchethicSignature2023',
-        created: DateTime.now(),
-        verificationMethod: 'did:archethic:acme_corporation#key-1',
-        proofPurpose: 'assertionMethod',
-        proofValue:
+      proof: {
+        'type': 'ArchethicSignature2023',
+        'created': DateTime.now().toIso8601String(),
+        'verificationMethod': 'did:archethic:acme_corporation#key-1',
+        'proofPurpose': 'assertionMethod',
+        'proofValue':
             'z3JpoWrt9LhkTZMyBsQkQUqD8TPPoEAKmuRhRQbP4QpN7A4NGtbcLPDF9NT6ugMMwFKrVzrWDF5cNwxhXTbSx4XX',
-      ),
-      status: CredentialStatus(
-        id: 'https://acme.com/status/24',
-        type: 'CredentialStatusList2021',
-      ),
-      credentialSchema: CredentialSchema(
-        id: 'https://acme.com/schemas/employment/1.0',
-        type: 'JsonSchema',
-      ),
+      },
+      status: {
+        'id': 'https://acme.com/status/24',
+        'type': 'CredentialStatusList2021',
+        'revoked': false,
+      },
+      credentialSchema: {
+        'id': 'https://acme.com/schemas/employment/1.0',
+        'type': 'JsonSchema',
+      },
     );
 
     // Ajoute l'attestation reçue au stockage

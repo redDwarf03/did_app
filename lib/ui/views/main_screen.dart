@@ -4,6 +4,7 @@ import 'package:did_app/ui/views/document/document_list_screen.dart';
 import 'package:did_app/ui/views/identity/identity_screen.dart';
 import 'package:did_app/ui/views/verification/verification_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Écran principal avec une navigation par onglets
 class MainScreen extends StatefulWidget {
@@ -25,6 +26,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     return Scaffold(
       body: _screens[_selectedIndex],
       bottomNavigationBar: NavigationBar(
@@ -34,22 +36,22 @@ class _MainScreenState extends State<MainScreen> {
             _selectedIndex = index;
           });
         },
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.person),
-            label: 'Identité',
+            icon: const Icon(Icons.person),
+            label: l10n.identityBottomNavLabel,
           ),
           NavigationDestination(
-            icon: Icon(Icons.verified_user),
-            label: 'Vérification',
+            icon: const Icon(Icons.verified_user),
+            label: l10n.verificationBottomNavLabel,
           ),
           NavigationDestination(
-            icon: Icon(Icons.description),
-            label: 'Documents',
+            icon: const Icon(Icons.description),
+            label: l10n.documentsBottomNavLabel,
           ),
           NavigationDestination(
-            icon: Icon(Icons.badge),
-            label: 'Attestations',
+            icon: const Icon(Icons.badge),
+            label: l10n.credentialsBottomNavLabel,
           ),
         ],
       ),
@@ -57,13 +59,13 @@ class _MainScreenState extends State<MainScreen> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
+            DrawerHeader(
+              decoration: const BoxDecoration(
                 color: Colors.blue,
               ),
               child: Text(
-                'European Digital Identity Wallet',
-                style: TextStyle(
+                l10n.drawerHeaderTitle,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
                 ),
@@ -71,7 +73,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: const Text('Identité'),
+              title: Text(l10n.identityBottomNavLabel),
               onTap: () {
                 setState(() {
                   _selectedIndex = 0;
@@ -81,7 +83,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.verified_user),
-              title: const Text('Vérification'),
+              title: Text(l10n.verificationBottomNavLabel),
               onTap: () {
                 setState(() {
                   _selectedIndex = 1;
@@ -91,7 +93,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.description),
-              title: const Text('Documents'),
+              title: Text(l10n.documentsBottomNavLabel),
               onTap: () {
                 setState(() {
                   _selectedIndex = 2;
@@ -101,7 +103,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.badge),
-              title: const Text('Attestations'),
+              title: Text(l10n.credentialsBottomNavLabel),
               onTap: () {
                 setState(() {
                   _selectedIndex = 3;
@@ -112,7 +114,7 @@ class _MainScreenState extends State<MainScreen> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.euro),
-              title: const Text('eIDAS 2.0 & EUDI Wallet'),
+              title: Text(l10n.eidasInteropTitle),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -126,7 +128,7 @@ class _MainScreenState extends State<MainScreen> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Paramètres'),
+              title: Text(l10n.settingsDrawerLabel),
               onTap: () {
                 // TODO: Naviguer vers les paramètres
                 Navigator.pop(context);
@@ -134,7 +136,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.help),
-              title: const Text('Aide'),
+              title: Text(l10n.helpDrawerLabel),
               onTap: () {
                 // TODO: Naviguer vers la page d'aide
                 Navigator.pop(context);
@@ -144,7 +146,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       appBar: AppBar(
-        title: const Text('European Digital Identity Wallet'),
+        title: Text(l10n.drawerHeaderTitle),
       ),
     );
   }

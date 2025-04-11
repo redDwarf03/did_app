@@ -1,6 +1,7 @@
 import 'package:did_app/application/session/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Widget displaying the current wallet connection status
 class WalletConnectionStatus extends ConsumerWidget {
@@ -9,14 +10,15 @@ class WalletConnectionStatus extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(sessionNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     // If not connected, show a connect button
     if (!session.isConnected) {
       return TextButton(
         onPressed: ref.read(sessionNotifierProvider.notifier).connectWallet,
-        child: const Text(
-          'Connect Wallet',
-          style: TextStyle(
+        child: Text(
+          l10n.connectWalletStatusButton,
+          style: const TextStyle(
             fontSize: 16,
           ),
         ),
@@ -50,7 +52,7 @@ class WalletConnectionStatus extends ConsumerWidget {
           iconSize: 18,
           onPressed:
               ref.read(sessionNotifierProvider.notifier).cancelConnection,
-          tooltip: 'Disconnect',
+          tooltip: l10n.disconnectWalletTooltip,
         ),
       ],
     );

@@ -7,6 +7,7 @@ import 'package:did_app/domain/document/document.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen for adding new documents or editing existing ones
 class DocumentFormScreen extends ConsumerStatefulWidget {
@@ -100,16 +101,13 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Pick Document File'),
-        content: const Text(
-          'This feature is pending implementation. In a real app, '
-          'you would be able to select a file from your device or '
-          'take a picture of a document.',
-        ),
+        title: Text(AppLocalizations.of(context)!.pickDocumentFileDialogTitle),
+        content:
+            Text(AppLocalizations.of(context)!.pickDocumentFeatureNotAvailable),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(AppLocalizations.of(context)!.closeButton),
           ),
         ],
       ),
@@ -133,8 +131,9 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
 
     if (_fileBytes == null || _fileName == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a document file'),
+        SnackBar(
+          content:
+              Text(AppLocalizations.of(context)!.pleaseSelectDocumentFileError),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -144,8 +143,8 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
     final identity = ref.read(identityNotifierProvider).identity;
     if (identity == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('You need an identity to add documents'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.needIdentityToAddError),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -172,14 +171,15 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                   tags: _tags.isNotEmpty ? _tags : null,
                   isShareable: _isShareable,
                   eidasLevel: _eidasLevel,
-                  changeNote: 'Updated via app',
+                  changeNote: AppLocalizations.of(context)!.changeNoteAppUpdate,
                 );
 
         if (success != null) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Document updated successfully'),
+              SnackBar(
+                content:
+                    Text(AppLocalizations.of(context)!.updateDocumentSuccess),
                 behavior: SnackBarBehavior.floating,
               ),
             );
@@ -187,7 +187,8 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
           }
         } else {
           setState(() {
-            _errorMessage = 'Failed to update document';
+            _errorMessage =
+                AppLocalizations.of(context)!.failedToUpdateDocumentError;
           });
         }
       } else {
@@ -212,8 +213,8 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
         if (document != null) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Document added successfully'),
+              SnackBar(
+                content: Text(AppLocalizations.of(context)!.addDocumentSuccess),
                 behavior: SnackBarBehavior.floating,
               ),
             );
@@ -221,13 +222,15 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
           }
         } else {
           setState(() {
-            _errorMessage = 'Failed to add document';
+            _errorMessage =
+                AppLocalizations.of(context)!.failedToAddDocumentError;
           });
         }
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error: $e';
+        _errorMessage =
+            AppLocalizations.of(context)!.genericErrorMessage(e.toString());
       });
     } finally {
       setState(() {
@@ -269,16 +272,17 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
 
   void _showTagDialog() {
     final tagController = TextEditingController();
+    final l10n = AppLocalizations.of(context)!;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add Tag'),
+        title: Text(l10n.addTagDialogTitle),
         content: TextField(
           controller: tagController,
-          decoration: const InputDecoration(
-            labelText: 'Tag',
-            hintText: 'Enter tag text',
+          decoration: InputDecoration(
+            labelText: l10n.tagLabel,
+            hintText: l10n.tagHintText,
           ),
           autofocus: true,
           onSubmitted: (value) {
@@ -289,14 +293,14 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancelButton),
           ),
           TextButton(
             onPressed: () {
               _addTag(tagController.text);
               Navigator.of(context).pop();
             },
-            child: const Text('Add'),
+            child: Text(l10n.addTagButton),
           ),
         ],
       ),
@@ -304,41 +308,43 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
   }
 
   String _getDocumentTypeName(DocumentType type) {
+    final l10n = AppLocalizations.of(context)!;
     switch (type) {
       case DocumentType.nationalId:
-        return 'National ID';
+        return l10n.documentTypeNationalId;
       case DocumentType.passport:
-        return 'Passport';
+        return l10n.documentTypePassport;
       case DocumentType.drivingLicense:
-        return 'Driving License';
+        return l10n.documentTypeDrivingLicense;
       case DocumentType.diploma:
-        return 'Diploma';
+        return l10n.documentTypeDiploma;
       case DocumentType.certificate:
-        return 'Certificate';
+        return l10n.documentTypeCertificate;
       case DocumentType.addressProof:
-        return 'Address Proof';
+        return l10n.documentTypeAddressProof;
       case DocumentType.bankDocument:
-        return 'Bank Document';
+        return l10n.documentTypeBankDocument;
       case DocumentType.medicalRecord:
-        return 'Medical Record';
+        return l10n.documentTypeMedicalRecord;
       case DocumentType.corporateDocument:
-        return 'Corporate Document';
+        return l10n.documentTypeCorporateDocument;
       case DocumentType.other:
-        return 'Other';
+        return l10n.documentTypeOther;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.documentId != null;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Document' : 'Add Document'),
+        title: Text(isEditing ? l10n.editDocumentTitle : l10n.addDocumentTitle),
         actions: [
           TextButton(
             onPressed: _isLoading ? null : _saveDocument,
-            child: const Text('Save'),
+            child: Text(l10n.saveButton),
           ),
         ],
       ),
@@ -380,9 +386,9 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                   children: [
                                     const Icon(Icons.file_present),
                                     const SizedBox(width: 8),
-                                    const Text(
-                                      'Document File',
-                                      style: TextStyle(
+                                    Text(
+                                      l10n.documentFileSectionTitle,
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -391,7 +397,7 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                     ElevatedButton.icon(
                                       onPressed: _pickFile,
                                       icon: const Icon(Icons.upload_file),
-                                      label: const Text('Select File'),
+                                      label: Text(l10n.selectFileButton),
                                     ),
                                   ],
                                 ),
@@ -436,16 +442,17 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                               _fileBytes = null;
                                             });
                                           },
-                                          tooltip: 'Remove',
+                                          tooltip: l10n.removeFileTooltip,
                                         ),
                                       ],
                                     ),
                                   )
                                 else
-                                  const Center(
+                                  Center(
                                     child: Text(
-                                      'No file selected',
-                                      style: TextStyle(
+                                      AppLocalizations.of(context)!
+                                          .noFileSelected,
+                                      style: const TextStyle(
                                         color: Colors.grey,
                                         fontStyle: FontStyle.italic,
                                       ),
@@ -464,9 +471,10 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Basic Information',
-                                  style: TextStyle(
+                                Text(
+                                  AppLocalizations.of(context)!
+                                      .basicInfoSectionTitle,
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -476,14 +484,17 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                 // Document title
                                 TextFormField(
                                   controller: _titleController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Title',
-                                    hintText: 'Enter document title',
-                                    border: OutlineInputBorder(),
+                                  decoration: InputDecoration(
+                                    labelText: AppLocalizations.of(context)!
+                                        .titleLabel,
+                                    hintText: AppLocalizations.of(context)!
+                                        .titleHintText,
+                                    border: const OutlineInputBorder(),
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter a title';
+                                      return AppLocalizations.of(context)!
+                                          .titleValidationError;
                                     }
                                     return null;
                                   },
@@ -493,9 +504,10 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                 // Document type
                                 DropdownButtonFormField<DocumentType>(
                                   value: _documentType,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Document Type',
-                                    border: OutlineInputBorder(),
+                                  decoration: InputDecoration(
+                                    labelText: AppLocalizations.of(context)!
+                                        .documentTypeLabelForm,
+                                    border: const OutlineInputBorder(),
                                   ),
                                   items: DocumentType.values.map((type) {
                                     return DropdownMenuItem<DocumentType>(
@@ -516,10 +528,12 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                 // Description
                                 TextFormField(
                                   controller: _descriptionController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Description (optional)',
-                                    hintText: 'Enter a description',
-                                    border: OutlineInputBorder(),
+                                  decoration: InputDecoration(
+                                    labelText: AppLocalizations.of(context)!
+                                        .descriptionLabel,
+                                    hintText: AppLocalizations.of(context)!
+                                        .descriptionHintText,
+                                    border: const OutlineInputBorder(),
                                   ),
                                   maxLines: 3,
                                 ),
@@ -528,15 +542,17 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                 // Issuer
                                 TextFormField(
                                   controller: _issuerController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Issuer',
-                                    hintText:
-                                        'Enter issuing authority or organization',
-                                    border: OutlineInputBorder(),
+                                  decoration: InputDecoration(
+                                    labelText: AppLocalizations.of(context)!
+                                        .issuerLabelForm,
+                                    hintText: AppLocalizations.of(context)!
+                                        .issuerHintText,
+                                    border: const OutlineInputBorder(),
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter an issuer';
+                                      return AppLocalizations.of(context)!
+                                          .issuerValidationError;
                                     }
                                     return null;
                                   },
@@ -546,7 +562,8 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                 // Expiration date
                                 Row(
                                   children: [
-                                    const Text('Expiration Date (optional):'),
+                                    Text(AppLocalizations.of(context)!
+                                        .expirationDateLabelForm),
                                     const SizedBox(width: 16),
                                     Expanded(
                                       child: OutlinedButton(
@@ -555,7 +572,8 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                           _expirationDate != null
                                               ? DateFormat('dd/MM/yyyy')
                                                   .format(_expirationDate!)
-                                              : 'No expiration',
+                                              : AppLocalizations.of(context)!
+                                                  .noExpirationDateButton,
                                         ),
                                       ),
                                     ),
@@ -567,7 +585,8 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                             _expirationDate = null;
                                           });
                                         },
-                                        tooltip: 'Clear date',
+                                        tooltip: AppLocalizations.of(context)!
+                                            .clearDateTooltip,
                                       ),
                                   ],
                                 ),
@@ -584,9 +603,10 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Additional Options',
-                                  style: TextStyle(
+                                Text(
+                                  AppLocalizations.of(context)!
+                                      .additionalOptionsSectionTitle,
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -595,9 +615,11 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
 
                                 // Shareable switch
                                 SwitchListTile(
-                                  title: const Text('Document is shareable'),
-                                  subtitle: const Text(
-                                    'Allow this document to be shared with other entities or individuals',
+                                  title: Text(AppLocalizations.of(context)!
+                                      .documentIsShareableSwitch),
+                                  subtitle: Text(
+                                    AppLocalizations.of(context)!
+                                        .documentIsShareableSubtitle,
                                   ),
                                   value: _isShareable,
                                   onChanged: (value) {
@@ -609,21 +631,25 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                 const Divider(),
 
                                 // eIDAS level
-                                const Text('eIDAS Assurance Level:'),
+                                Text(AppLocalizations.of(context)!
+                                    .eidasLevelLabelForm),
                                 const SizedBox(height: 8),
                                 SegmentedButton<EidasLevel>(
-                                  segments: const [
+                                  segments: [
                                     ButtonSegment(
                                       value: EidasLevel.low,
-                                      label: Text('Low'),
+                                      label: Text(AppLocalizations.of(context)!
+                                          .eidasLevelLowLabel),
                                     ),
                                     ButtonSegment(
                                       value: EidasLevel.substantial,
-                                      label: Text('Substantial'),
+                                      label: Text(AppLocalizations.of(context)!
+                                          .eidasLevelSubstantialLabel),
                                     ),
                                     ButtonSegment(
                                       value: EidasLevel.high,
-                                      label: Text('High'),
+                                      label: Text(AppLocalizations.of(context)!
+                                          .eidasLevelHighLabel),
                                     ),
                                   ],
                                   selected: {_eidasLevel},
@@ -639,12 +665,14 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                 // Tags
                                 Row(
                                   children: [
-                                    const Text('Tags:'),
+                                    Text(AppLocalizations.of(context)!
+                                        .tagsLabelForm),
                                     const Spacer(),
                                     TextButton.icon(
                                       onPressed: _showTagDialog,
                                       icon: const Icon(Icons.add),
-                                      label: const Text('Add Tag'),
+                                      label: Text(AppLocalizations.of(context)!
+                                          .addTagButtonForm),
                                     ),
                                   ],
                                 ),
@@ -662,11 +690,11 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                   }).toList(),
                                 ),
                                 if (_tags.isEmpty)
-                                  const Padding(
-                                    padding: EdgeInsets.all(8),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8),
                                     child: Text(
-                                      'No tags added yet',
-                                      style: TextStyle(
+                                      AppLocalizations.of(context)!.noTagsAdded,
+                                      style: const TextStyle(
                                         color: Colors.grey,
                                         fontStyle: FontStyle.italic,
                                       ),

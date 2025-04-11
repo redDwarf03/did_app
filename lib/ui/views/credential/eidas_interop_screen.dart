@@ -4,8 +4,11 @@ import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/ui/common/app_card.dart';
 import 'package:did_app/ui/common/section_title.dart';
 import 'package:did_app/ui/views/credential/credential_detail_screen.dart';
+import 'package:did_app/ui/views/credential/eidas_verification_screen.dart';
+import 'package:did_app/ui/views/credential/eidas_trust_registry_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Écran pour gérer l'interopérabilité avec eIDAS et l'EUDI Wallet
 class EidasInteropScreen extends ConsumerStatefulWidget {
@@ -29,6 +32,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
   Widget build(BuildContext context) {
     final eidasState = ref.watch(eidasNotifierProvider);
     final credentialState = ref.watch(credentialNotifierProvider);
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
 
     // Liste des attestations compatibles eIDAS
     final eidasCompatibleCredentials = credentialState.credentials
@@ -46,7 +50,14 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('eIDAS 2.0 & EUDI Wallet'),
+        title: Text(l10n.eidasTrustRegistryTitle),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.verified_user),
+            tooltip: l10n.aboutRegistryTooltip,
+            onPressed: _openTrustRegistry,
+          ),
+        ],
       ),
       body: eidasState.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -55,42 +66,44 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildHeader(),
+                  _buildHeader(l10n),
                   const SizedBox(height: 24),
                   if (eidasState.errorMessage != null)
                     _buildErrorMessage(eidasState.errorMessage!),
                   const SizedBox(height: 16),
+                  _buildRegistryAndSyncSection(eidasState, l10n),
+                  const SizedBox(height: 16),
                   if (eidasState.isEudiWalletAvailable)
-                    _buildEudiWalletSection(eidasCompatibleCredentials),
+                    _buildEudiWalletSection(eidasCompatibleCredentials, l10n),
                   const SizedBox(height: 24),
                   _buildEidasCompatibleCredentialsSection(
-                      eidasCompatibleCredentials),
+                      eidasCompatibleCredentials, l10n),
                   const SizedBox(height: 24),
-                  _buildConvertibleCredentialsSection(convertibleCredentials),
+                  _buildConvertibleCredentialsSection(
+                      convertibleCredentials, l10n),
                   const SizedBox(height: 24),
-                  _buildImportExportSection(),
+                  _buildImportExportSection(l10n),
                 ],
               ),
             ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Interopérabilité eIDAS 2.0',
-          style: TextStyle(
+        Text(
+          l10n.eidasTitle,
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
-          'Cet écran permet d\'importer et d\'exporter des attestations au format eIDAS 2.0, '
-          'compatible avec la réglementation européenne sur l\'identité numérique.',
-          style: TextStyle(color: Colors.grey),
+        Text(
+          l10n.eidasDescription,
+          style: const TextStyle(color: Colors.grey),
         ),
       ],
     );
@@ -119,20 +132,70 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
     );
   }
 
-  Widget _buildEudiWalletSection(List<Credential> compatibleCredentials) {
+  Widget _buildRegistryAndSyncSection(
+      EidasState eidasState, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionTitle(title: 'EUDI Wallet'),
+        SectionTitle(title: l10n.eidasTrustRegistryTitle),
         AppCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const ListTile(
-                leading: Icon(Icons.wallet),
-                title: Text('European Digital Identity Wallet'),
+              ListTile(
+                leading: const Icon(Icons.verified_user),
+                title: Text(l10n.eidasTrustRegistryTitle),
                 subtitle: Text(
-                    'Partagez vos attestations avec l\'EUDI Wallet ou importez-en depuis celui-ci'),
+                  eidasState.lastSyncDate != null
+                      ? "${l10n.lastSynchronization}: ${_formatDate(eidasState.lastSyncDate!)}"
+                      : l10n.neverSynchronized,
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: _openTrustRegistry,
+              ),
+              const Divider(),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _synchronizeWithEidasInfrastructure,
+                        icon: const Icon(Icons.sync),
+                        label: Text(l10n.synchronizeWithEuRegistry),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12.0),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  }
+
+  Widget _buildEudiWalletSection(
+      List<Credential> compatibleCredentials, AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionTitle(title: l10n.eidasTitle),
+        AppCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.wallet),
+                title: Text(l10n.eidasTitle),
+                subtitle: Text(l10n.eidasDescription),
               ),
               const Divider(),
               Padding(
@@ -143,14 +206,14 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
                     ElevatedButton.icon(
                       onPressed: _importFromEudiWallet,
                       icon: const Icon(Icons.download),
-                      label: const Text('Importer depuis\nEUDI Wallet'),
+                      label: Text(l10n.importButton),
                     ),
                     if (_selectedCredential != null)
                       ElevatedButton.icon(
                         onPressed: () =>
                             _shareWithEudiWallet(_selectedCredential!),
                         icon: const Icon(Icons.upload),
-                        label: const Text('Partager avec\nEUDI Wallet'),
+                        label: Text(l10n.shareButton),
                       ),
                   ],
                 ),
@@ -163,61 +226,102 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
   }
 
   Widget _buildEidasCompatibleCredentialsSection(
-      List<Credential> compatibleCredentials) {
+      List<Credential> compatibleCredentials, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionTitle(title: 'Attestations compatibles eIDAS'),
+        SectionTitle(title: l10n.eidasTrustRegistryTitle),
         if (compatibleCredentials.isEmpty)
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Center(
               child: Text(
-                'Aucune attestation compatible eIDAS disponible',
-                style: TextStyle(fontStyle: FontStyle.italic),
+                l10n.credentialNotFound,
+                style: const TextStyle(fontStyle: FontStyle.italic),
               ),
             ),
           )
         else
           AppCard(
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: compatibleCredentials.length,
-              itemBuilder: (context, index) {
-                final credential = compatibleCredentials[index];
-                return ListTile(
-                  leading: Icon(
-                    Icons.verified,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  title: Text(credential.name ?? 'Attestation'),
-                  subtitle: Text(
-                    'Émise par ${credential.issuer}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: Radio<Credential>(
-                    value: credential,
-                    groupValue: _selectedCredential,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedCredential = value;
-                      });
-                    },
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CredentialDetailScreen(
-                          credentialId: credential.id,
+            child: Column(
+              children: [
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: compatibleCredentials.length,
+                  itemBuilder: (context, index) {
+                    final credential = compatibleCredentials[index];
+                    return Column(
+                      children: [
+                        ListTile(
+                          leading: Icon(
+                            Icons.verified,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          title: Text(
+                              credential.name ?? l10n.defaultCredentialName),
+                          subtitle: Text(
+                            l10n.issuedByPrefix + credential.issuer,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.verified_user),
+                                tooltip: l10n.verifyThisCredentialTooltip,
+                                onPressed: () =>
+                                    _openVerificationScreen(credential),
+                              ),
+                              Radio<Credential>(
+                                value: credential,
+                                groupValue: _selectedCredential,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedCredential = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CredentialDetailScreen(
+                                  credentialId: credential.id,
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      ),
+                        if (index < compatibleCredentials.length - 1)
+                          const Divider(height: 1),
+                      ],
                     );
                   },
-                );
-              },
+                ),
+                const Divider(),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: compatibleCredentials.isNotEmpty
+                            ? () {
+                                _verifyCredentialCompatibility(
+                                    compatibleCredentials.first);
+                              }
+                            : null,
+                        icon: const Icon(Icons.security),
+                        label: Text(l10n.verifyEidasCompatibilityButton),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
       ],
@@ -225,102 +329,105 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
   }
 
   Widget _buildConvertibleCredentialsSection(
-      List<Credential> convertibleCredentials) {
+      List<Credential> convertibleCredentials, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionTitle(title: 'Attestations convertibles'),
+        SectionTitle(title: l10n.eidasTitle),
         if (convertibleCredentials.isEmpty)
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Center(
               child: Text(
-                'Aucune attestation convertible disponible',
-                style: TextStyle(fontStyle: FontStyle.italic),
+                l10n.credentialNotFound,
+                style: const TextStyle(fontStyle: FontStyle.italic),
               ),
             ),
           )
         else
           AppCard(
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: convertibleCredentials.length,
-              itemBuilder: (context, index) {
-                final credential = convertibleCredentials[index];
-                return ListTile(
-                  leading: Icon(
-                    Icons.transform,
-                    color: Colors.orange,
-                  ),
-                  title: Text(credential.name ?? 'Attestation'),
-                  subtitle: Text(
-                    'Émise par ${credential.issuer}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: TextButton(
-                    onPressed: () => _convertToEidas(credential),
-                    child: const Text('Convertir'),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CredentialDetailScreen(
-                          credentialId: credential.id,
-                        ),
+            child: Column(
+              children: [
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: convertibleCredentials.length,
+                  itemBuilder: (context, index) {
+                    final credential = convertibleCredentials[index];
+                    return ListTile(
+                      title:
+                          Text(credential.name ?? l10n.defaultCredentialName),
+                      subtitle: Text(
+                        credential.issuer,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.euro),
+                        onPressed: () => _convertToEidas(credential),
+                        tooltip: l10n.convertToEidasTooltip,
+                      ),
+                      onTap: () => _selectCredential(credential),
                     );
                   },
-                );
-              },
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ElevatedButton.icon(
+                    onPressed: _selectedCredential != null
+                        ? () {
+                            _verifyCredentialCompatibility(
+                                _selectedCredential!);
+                          }
+                        : null,
+                    icon: const Icon(Icons.verified_user),
+                    label: Text(l10n.verifyStatusButton),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
       ],
     );
   }
 
-  Widget _buildImportExportSection() {
+  Widget _buildImportExportSection(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionTitle(title: 'Import / Export JSON'),
+        SectionTitle(title: l10n.actionsSection),
         AppCard(
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                TextField(
-                  controller: _jsonController,
-                  maxLines: 5,
-                  decoration: const InputDecoration(
-                    labelText: 'JSON eIDAS',
-                    hintText:
-                        'Collez ici le JSON d\'une attestation eIDAS ou exportez une attestation sélectionnée',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton.icon(
-                      onPressed: _jsonController.text.isNotEmpty
-                          ? _importFromJson
-                          : null,
+                      onPressed: _importCredential,
                       icon: const Icon(Icons.download),
-                      label: const Text('Importer'),
+                      label: Text(l10n.importButton),
                     ),
                     ElevatedButton.icon(
-                      onPressed: _selectedCredential != null
-                          ? () => _exportToJson(_selectedCredential!)
-                          : null,
+                      onPressed: _exportCredential,
                       icon: const Icon(Icons.upload),
-                      label: const Text('Exporter'),
+                      label: Text(l10n.exportButton),
                     ),
                   ],
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: _synchronizeWithEidasInfrastructure,
+                  icon: const Icon(Icons.sync),
+                  label: Text(l10n.synchronizeWithEuRegistry),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  ),
                 ),
               ],
             ),
@@ -330,46 +437,31 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
     );
   }
 
-  Future<void> _importFromJson() async {
-    if (_jsonController.text.isEmpty) return;
-
-    final credential = await ref
-        .read(eidasNotifierProvider.notifier)
-        .importFromJson(_jsonController.text);
-
-    if (credential != null) {
-      await ref
-          .read(credentialNotifierProvider.notifier)
-          .addCredential(credential);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Attestation importée avec succès'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        setState(() {
-          _jsonController.clear();
-        });
-      }
-    }
+  void _selectCredential(Credential credential) {
+    setState(() {
+      _selectedCredential = credential;
+    });
   }
 
-  Future<void> _exportToJson(Credential credential) async {
-    final json =
-        await ref.read(eidasNotifierProvider.notifier).exportToJson(credential);
-
-    if (json != null) {
-      setState(() {
-        _jsonController.text = json;
-      });
-
+  Future<void> _verifyCredentialCompatibility(Credential credential) async {
+    try {
       if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                EidasVerificationScreen(credential: credential),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        final l10n =
+            Localizations.of<AppLocalizations>(context, AppLocalizations)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Attestation exportée au format eIDAS 2.0'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: Text(l10n.errorPrefix(e.toString())),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -377,20 +469,110 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
   }
 
   Future<void> _convertToEidas(Credential credential) async {
-    final convertedCredential = await ref
-        .read(eidasNotifierProvider.notifier)
-        .makeEidasCompatible(credential);
+    try {
+      final eidasCredential = await ref
+          .read(eidasNotifierProvider.notifier)
+          .makeEidasCompatible(credential);
 
-    if (convertedCredential != null) {
-      await ref
-          .read(credentialNotifierProvider.notifier)
-          .addCredential(convertedCredential);
+      if (eidasCredential != null) {
+        final success = await ref
+            .read(credentialNotifierProvider.notifier)
+            .addCredential(eidasCredential);
 
+        if (mounted) {
+          final l10n =
+              Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.convertedToEidasMessage),
+              backgroundColor: Colors.green,
+            ),
+          );
+
+          // Refresh
+          ref.refresh(eidasNotifierProvider);
+          ref.refresh(credentialNotifierProvider);
+        }
+      }
+    } catch (e) {
       if (mounted) {
+        final l10n =
+            Localizations.of<AppLocalizations>(context, AppLocalizations)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Attestation convertie au format eIDAS 2.0'),
+          SnackBar(
+            content: Text(l10n.errorPrefix(e.toString())),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _importCredential() async {
+    try {
+      final success =
+          await ref.read(eidasNotifierProvider.notifier).importFromEudiWallet();
+      if (success != null && mounted) {
+        final l10n =
+            Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.credentialImportedSuccessfully),
             backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        final l10n =
+            Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.errorPrefix(e.toString())),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _exportCredential() async {
+    if (_selectedCredential == null) {
+      if (mounted) {
+        final l10n =
+            Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.credentialNotFound),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return;
+    }
+
+    try {
+      final success = await ref
+          .read(eidasNotifierProvider.notifier)
+          .exportToJson(_selectedCredential!);
+      if (success != null && mounted) {
+        final l10n =
+            Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.credentialExportedToEidas),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        final l10n =
+            Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.errorPrefix(e.toString())),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -398,40 +580,108 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
   }
 
   Future<void> _shareWithEudiWallet(Credential credential) async {
-    final success = await ref
-        .read(eidasNotifierProvider.notifier)
-        .shareWithEudiWallet(credential);
-
-    if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Attestation partagée avec l\'EUDI Wallet'),
-          backgroundColor: Colors.green,
-        ),
-      );
+    try {
+      final success = await ref
+          .read(eidasNotifierProvider.notifier)
+          .shareWithEudiWallet(credential);
+      if (success && mounted) {
+        final l10n =
+            Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.shareFunctionalityMessage),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        final l10n =
+            Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.errorPrefix(e.toString())),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
   Future<void> _importFromEudiWallet() async {
-    final credential =
-        await ref.read(eidasNotifierProvider.notifier).importFromEudiWallet();
-
-    if (credential != null) {
-      await ref
-          .read(credentialNotifierProvider.notifier)
-          .addCredential(credential);
-
-      if (mounted) {
+    try {
+      final success =
+          await ref.read(eidasNotifierProvider.notifier).importFromEudiWallet();
+      if (success != null && mounted) {
+        final l10n =
+            Localizations.of<AppLocalizations>(context, AppLocalizations)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Attestation importée depuis l\'EUDI Wallet'),
+          SnackBar(
+            content: Text(l10n.credentialImportedSuccessfully),
             backgroundColor: Colors.green,
           ),
         );
-        setState(() {
-          _selectedCredential = credential;
-        });
+      }
+    } catch (e) {
+      if (mounted) {
+        final l10n =
+            Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.errorPrefix(e.toString())),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
+  }
+
+  Future<void> _synchronizeWithEidasInfrastructure() async {
+    try {
+      final success = await ref
+          .read(eidasNotifierProvider.notifier)
+          .synchronizeWithEidasInfrastructure();
+      if (success && mounted) {
+        final l10n =
+            Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.synchronizeWithEuRegistry),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        final l10n =
+            Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.errorPrefix(e.toString())),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _openVerificationScreen(Credential credential) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EidasVerificationScreen(
+          credential: credential,
+        ),
+      ),
+    );
+  }
+
+  void _openTrustRegistry() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EidasTrustRegistryScreen(),
+      ),
+    );
   }
 }

@@ -83,6 +83,20 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
 
   final Ref ref;
 
+  /// Récupérer les attestations
+  Future<List<Credential>> getCredentials() async {
+    if (state.credentials.isEmpty) {
+      await loadCredentials();
+    }
+    return state.credentials;
+  }
+
+  /// Récupérer toutes les attestations pour la synchronisation
+  Future<List<Credential>> getAllCredentials() async {
+    await loadCredentials(); // Forcer un rechargement complet
+    return state.credentials;
+  }
+
   /// Charger les attestations de l'utilisateur
   Future<void> loadCredentials() async {
     state = state.copyWith(isLoading: true);
@@ -166,26 +180,8 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
 
       final isValid = await repository.verifyCredential(credential);
 
-      // Mettre à jour le statut de vérification si nécessaire
-      if (isValid) {
-        final index = state.credentials.indexWhere((c) => c.id == credentialId);
-        if (index >= 0) {
-          final credential = state.credentials[index];
-          if (credential.verificationStatus != VerificationStatus.verified) {
-            final updatedCredential = credential.copyWith(
-              verificationStatus: VerificationStatus.verified,
-            );
-
-            final updatedCredentials = [...state.credentials];
-            updatedCredentials[index] = updatedCredential;
-
-            state = state.copyWith(
-              credentials: updatedCredentials,
-            );
-          }
-        }
-      }
-
+      // Nous ne modifions plus le credential directement puisque le modèle
+      // Credential n'a pas de propriété verificationStatus
       state = state.copyWith(isLoading: false);
       return isValid;
     } catch (e) {
@@ -340,3 +336,14 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
     }
   }
 }
+
+/// Provider pour récupérer la liste des attestations
+final credentialsProvider = FutureProvider<List<Credential>>((ref) async {
+  final repository = ref.watch(credentialRepositoryProvider);
+
+  try {
+    return await repository.getCredentials();
+  } catch (e) {
+    throw Exception('Erreur lors de la récupération des attestations: $e');
+  }
+});

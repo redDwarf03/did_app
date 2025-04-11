@@ -3,6 +3,7 @@ import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen to renew an expired or expiring certificate
 class CertificateRenewalScreen extends ConsumerStatefulWidget {
@@ -27,19 +28,20 @@ class _CertificateRenewalScreenState
   Widget build(BuildContext context) {
     final isExpired = widget.certificate != null &&
         widget.certificate!.expiresAt.isBefore(DateTime.now());
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Certificate Renewal'),
+        title: Text("Certificate Renewal"),
       ),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Initializing renewal process...'),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text("Initializing renewal process..."),
                 ],
               ),
             )
@@ -53,15 +55,16 @@ class _CertificateRenewalScreenState
                     _buildCertificateInfoCard(
                       widget.certificate!,
                       isExpired,
+                      l10n,
                     ),
                   if (widget.certificate != null) const SizedBox(height: 24),
 
                   // Renewal explanation
-                  _buildRenewalInfo(isExpired),
+                  _buildRenewalInfo(isExpired, l10n),
                   const SizedBox(height: 24),
 
                   // Renewal process steps
-                  _buildRenewalSteps(),
+                  _buildRenewalSteps(l10n),
                   const SizedBox(height: 24),
 
                   // Terms checkbox
@@ -74,8 +77,8 @@ class _CertificateRenewalScreenState
                         });
                       }
                     },
-                    title: const Text(
-                      'I understand that this will initiate a new verification process',
+                    title: Text(
+                      "I understand the renewal process and agree to the terms",
                     ),
                     controlAffinity: ListTileControlAffinity.leading,
                     contentPadding: EdgeInsets.zero,
@@ -86,11 +89,13 @@ class _CertificateRenewalScreenState
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _acceptTerms ? _startRenewalProcess : null,
+                      onPressed: _acceptTerms
+                          ? () => _startRenewalProcess(l10n)
+                          : null,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: const Text('Start Renewal Process'),
+                      child: Text("Start Renewal"),
                     ),
                   ),
                 ],
@@ -103,18 +108,19 @@ class _CertificateRenewalScreenState
   Widget _buildCertificateInfoCard(
     VerificationCertificate certificate,
     bool isExpired,
+    AppLocalizations l10n,
   ) {
     return Card(
       elevation: 2,
       color: isExpired
-          ? Colors.red.withValues(alpha: 0.1)
-          : Colors.orange.withValues(alpha: 0.1),
+          ? Colors.red.withOpacity(0.1)
+          : Colors.orange.withOpacity(0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
           color: isExpired
-              ? Colors.red.withValues(alpha: 0.3)
-              : Colors.orange.withValues(alpha: 0.3),
+              ? Colors.red.withOpacity(0.3)
+              : Colors.orange.withOpacity(0.3),
         ),
       ),
       child: Padding(
@@ -131,9 +137,7 @@ class _CertificateRenewalScreenState
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    isExpired
-                        ? 'Expired Certificate'
-                        : 'Certificate Expiring Soon',
+                    isExpired ? l10n.expiredStatus : l10n.expirationDateTitle,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: isExpired ? Colors.red : Colors.orange,
@@ -143,18 +147,18 @@ class _CertificateRenewalScreenState
               ],
             ),
             const SizedBox(height: 16),
-            _buildInfoRow('Certificate ID', _truncateId(certificate.id)),
+            _buildInfoRow(l10n.identifierLabel, _truncateId(certificate.id)),
             _buildInfoRow(
-              'Issued Date',
+              l10n.issuanceDateLabel,
               _formatDate(certificate.issuedAt),
             ),
             _buildInfoRow(
-              'Expiry Date',
+              l10n.expirationDateLabel,
               _formatDate(certificate.expiresAt),
             ),
             _buildInfoRow(
-              'eIDAS Level',
-              _getEidasLevelText(certificate.eidasLevel),
+              l10n.eidasAssuranceLevelTitle,
+              _getEidasLevelText(certificate.eidasLevel, l10n),
             ),
           ],
         ),
@@ -163,14 +167,12 @@ class _CertificateRenewalScreenState
   }
 
   // Renewal explanation
-  Widget _buildRenewalInfo(bool isExpired) {
+  Widget _buildRenewalInfo(bool isExpired, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          isExpired
-              ? 'Your Certificate Has Expired'
-              : 'Renew Your Certificate Before It Expires',
+          isExpired ? l10n.expiredStatus : l10n.expirationDateTitle,
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -178,18 +180,16 @@ class _CertificateRenewalScreenState
         ),
         const SizedBox(height: 16),
         Text(
-          isExpired
-              ? 'Your identity verification certificate has expired. To continue using your digital identity for services that require verification, you need to renew your certificate.'
-              : 'Renewing your certificate before it expires ensures continuous access to services that require identity verification.',
+          isExpired ? l10n.expirationDateContent : l10n.expirationDateContent,
           style: const TextStyle(fontSize: 16),
         ),
         const SizedBox(height: 16),
         Card(
           elevation: 0,
-          color: Colors.blue.withValues(alpha: 0.1),
+          color: Colors.blue.withOpacity(0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: Colors.blue.withValues(alpha: 0.3)),
+            side: BorderSide(color: Colors.blue.withOpacity(0.3)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -200,10 +200,9 @@ class _CertificateRenewalScreenState
                   color: Colors.blue.shade300,
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'The renewal process is streamlined for existing users. '
-                    "Some of your information may be pre-filled, but you'll still need to verify your identity.",
+                    l10n.eidasAssuranceLevelContent,
                   ),
                 ),
               ],
@@ -215,21 +214,20 @@ class _CertificateRenewalScreenState
   }
 
   // Renewal process steps
-  Widget _buildRenewalSteps() {
+  Widget _buildRenewalSteps(AppLocalizations l10n) {
     final steps = [
-      'Start the renewal process',
-      'Verify your identity',
-      'Submit required documents (if needed)',
-      'Wait for verification approval',
-      'Receive your renewed certificate',
+      l10n.requestProcessStep1,
+      l10n.requestProcessStep2,
+      l10n.requestProcessStep3,
+      l10n.requestProcessStep4,
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Renewal Process',
-          style: TextStyle(
+        Text(
+          l10n.requestProcessTitle,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -305,51 +303,68 @@ class _CertificateRenewalScreenState
   }
 
   String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year;
+
+    return '$day/$month/$year';
   }
 
-  String _getEidasLevelText(EidasLevel level) {
+  String _getEidasLevelText(EidasLevel level, AppLocalizations l10n) {
     switch (level) {
       case EidasLevel.low:
-        return 'Low Assurance';
+        return "Low Assurance Level";
       case EidasLevel.substantial:
-        return 'Substantial Assurance';
+        return "Substantial Assurance Level";
       case EidasLevel.high:
-        return 'High Assurance';
+        return "High Assurance Level";
     }
   }
 
   // Start the renewal process
-  Future<void> _startRenewalProcess() async {
+  Future<void> _startRenewalProcess(AppLocalizations l10n) async {
     setState(() {
       _isLoading = true;
     });
 
     try {
       // Call the verification provider to start a renewal
-      // In a real app, this would send the previous certificate ID to the backend
       await ref.read(verificationNotifierProvider.notifier).startRenewal(
             previousCertificateId: widget.certificate?.id,
           );
 
+      // Get the verification process
+      final verificationProcess =
+          ref.read(verificationNotifierProvider).verificationProcess;
+
+      if (verificationProcess == null) {
+        throw Exception("Failed to initialize verification process");
+      }
+
       // Navigate to the verification process screen
       if (mounted) {
+        final Map<String, String> queryParams = {};
+
+        // Convert complex object to simple string parameters
+        final processJson = verificationProcess.toJson();
+        processJson.forEach((key, value) {
+          if (value != null) {
+            queryParams[key] = value.toString();
+          }
+        });
+
         await context.pushNamed(
           'verificationProcess',
           pathParameters: {'processIdentifier': 'renewal'},
-          queryParameters: ref
-                  .read(verificationNotifierProvider)
-                  .verificationProcess
-                  ?.toJson() ??
-              {},
+          queryParameters: queryParams,
         );
       }
     } catch (e) {
-      // Show error
+      // Show error with more descriptive message
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to start renewal: $e'),
+            content: Text("Failed to start renewal: ${e.toString()}"),
             backgroundColor: Colors.red,
           ),
         );

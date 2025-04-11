@@ -59,11 +59,11 @@ class EidasCredential {
       subject: credentialSubject['id'] as String? ?? '',
       credentialSubject: credentialSubject,
       expirationDate: expirationDate,
-      proof: proof?.toCredentialProof(),
-      status: credentialStatus?.toCredentialStatus(),
-      credentialSchema: credentialSchema?.toCredentialSchema(),
+      proof: proof != null ? proof!.toJson() : {},
+      status: credentialStatus != null ? credentialStatus!.toJson() : null,
+      credentialSchema:
+          credentialSchema != null ? credentialSchema!.toJson() : null,
       name: _getReadableName(),
-      claims: credentialSubject,
       supportsZkp:
           true, // Les attestations eIDAS 2.0 supportent nativement les ZKP
     );
@@ -83,14 +83,13 @@ class EidasCredential {
       expirationDate: credential.expirationDate,
       credentialSubject: credential.credentialSubject,
       credentialSchema: credential.credentialSchema != null
-          ? EidasCredentialSchema.fromCredentialSchema(
-              credential.credentialSchema!)
+          ? EidasCredentialSchema.fromJson(credential.credentialSchema!)
           : null,
       credentialStatus: credential.status != null
-          ? EidasCredentialStatus.fromCredentialStatus(credential.status!)
+          ? EidasCredentialStatus.fromJson(credential.status!)
           : null,
       proof: credential.proof != null
-          ? EidasProof.fromCredentialProof(credential.proof!)
+          ? EidasProof.fromJson(credential.proof!)
           : null,
     );
   }

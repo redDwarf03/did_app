@@ -7,6 +7,7 @@ import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Email verification step component for verification process
 class EmailVerificationStep extends ConsumerStatefulWidget {
@@ -59,23 +60,24 @@ class _EmailVerificationStepState extends ConsumerState<EmailVerificationStep> {
   Widget build(BuildContext context) {
     final identityState = ref.watch(identityNotifierProvider);
     final email = identityState.identity?.personalInfo.email ?? 'your email';
+    final l10n = AppLocalizations.of(context)!;
 
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Email Verification',
-            style: TextStyle(
+          Text(
+            l10n.emailVerificationTitle,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'We need to verify your email address to proceed with the identity verification process.',
-            style: TextStyle(fontSize: 16),
+          Text(
+            l10n.emailVerificationDescription,
+            style: const TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 24),
 
@@ -98,9 +100,9 @@ class _EmailVerificationStepState extends ConsumerState<EmailVerificationStep> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Email to verify',
-                        style: TextStyle(
+                      Text(
+                        l10n.emailToVerifyLabel,
+                        style: const TextStyle(
                           fontSize: 14,
                           color: Colors.grey,
                         ),
@@ -135,8 +137,8 @@ class _EmailVerificationStepState extends ConsumerState<EmailVerificationStep> {
                     : const Icon(Icons.send),
                 label: Text(
                   _isResending
-                      ? 'Sending verification code...'
-                      : 'Send verification code',
+                      ? l10n.sendingVerificationCodeButton
+                      : l10n.sendVerificationCodeButton,
                 ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -146,7 +148,7 @@ class _EmailVerificationStepState extends ConsumerState<EmailVerificationStep> {
           ] else ...[
             // Code verification form
             Text(
-              'Enter the 6-digit verification code sent to $email',
+              l10n.enterVerificationCodePrompt(email),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -171,7 +173,7 @@ class _EmailVerificationStepState extends ConsumerState<EmailVerificationStep> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Demo: Your verification code is $_mockVerificationCode',
+                        l10n.demoVerificationCodeMessage(_mockVerificationCode),
                         style: const TextStyle(
                           fontStyle: FontStyle.italic,
                           fontSize: 14,
@@ -185,10 +187,10 @@ class _EmailVerificationStepState extends ConsumerState<EmailVerificationStep> {
             // Code entry field
             TextFormField(
               controller: _codeController,
-              decoration: const InputDecoration(
-                labelText: 'Verification Code',
-                hintText: '6-digit code',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.verificationCodeLabel,
+                hintText: l10n.verificationCodeHint,
+                border: const OutlineInputBorder(),
               ),
               keyboardType: TextInputType.number,
               inputFormatters: [
@@ -197,10 +199,7 @@ class _EmailVerificationStepState extends ConsumerState<EmailVerificationStep> {
               ],
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter the verification code';
-                }
-                if (value.length < 6) {
-                  return 'Please enter all 6 digits';
+                  return l10n.verificationCodeRequired;
                 }
                 return null;
               },

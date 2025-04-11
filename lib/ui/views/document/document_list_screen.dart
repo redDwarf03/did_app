@@ -10,6 +10,7 @@ import 'package:did_app/ui/views/document/document_form_screen.dart';
 import 'package:did_app/ui/views/document/shared_documents_screen.dart';
 import 'package:did_app/ui/views/document/widgets/document_share_dialog.dart';
 import 'package:did_app/ui/views/document/widgets/document_card.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen displaying the user's document list
 class DocumentListScreen extends ConsumerStatefulWidget {
@@ -40,11 +41,12 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
   Widget build(BuildContext context) {
     final documentState = ref.watch(documentNotifierProvider);
     final identityState = ref.watch(identityNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     if (identityState.identity == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('My Documents'),
+          title: Text(l10n.documentListTitle),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.of(context).pop(),
@@ -60,25 +62,25 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
                 color: Colors.grey,
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Identity Required',
-                style: TextStyle(
+              Text(
+                l10n.identityRequiredTitle,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'You must create a digital identity to access your documents',
+              Text(
+                l10n.identityRequiredContent,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
+                style: const TextStyle(color: Colors.grey),
                 softWrap: true,
                 maxLines: 3,
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () => context.pushNamed('createIdentity'),
-                child: const Text('Create an Identity'),
+                child: Text(l10n.createIdentityButtonList),
               ),
             ],
           ),
@@ -88,13 +90,13 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Documents'),
+        title: Text(l10n.documentListTitle),
         actions: [
           // Button to refresh the list
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: documentState.isLoading ? null : _loadDocuments,
-            tooltip: 'Refresh',
+            tooltip: l10n.refreshListAction,
           ),
           // Button to display documents shared with me
           IconButton(
@@ -102,7 +104,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
             onPressed: documentState.isLoading
                 ? null
                 : () => _showSharedWithMe(context),
-            tooltip: 'Documents shared with me',
+            tooltip: l10n.sharedWithMeAction,
           ),
         ],
       ),
@@ -113,13 +115,14 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
       // Document add button
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDocumentDialog(context),
-        tooltip: 'Add document',
+        tooltip: l10n.addDocumentTooltip,
         child: const Icon(Icons.add),
       ),
     );
   }
 
   Widget _buildDocumentList(BuildContext context, DocumentState state) {
+    final l10n = AppLocalizations.of(context)!;
     if (state.documents.isEmpty) {
       return Center(
         child: Column(
@@ -131,24 +134,24 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
               color: Colors.grey,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'No document',
-              style: TextStyle(
+            Text(
+              l10n.noDocumentsTitle,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Add documents to store and share securely',
+            Text(
+              l10n.noDocumentsContent,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
+              style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () => _showAddDocumentDialog(context),
               icon: const Icon(Icons.add),
-              label: const Text('Add document'),
+              label: Text(l10n.addDocumentButtonList),
             ),
           ],
         ),
@@ -203,6 +206,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
     BuildContext context,
     Document document,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     // For a complete implementation, this would download the document
     // final content = await ref.read(documentNotifierProvider.notifier).getDocumentContent(document.id);
 
@@ -210,14 +214,12 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Download document'),
-        content: const Text(
-          'The document download feature will be implemented soon.',
-        ),
+        title: Text(l10n.downloadDialogTitle),
+        content: Text(l10n.downloadFeatureNotAvailable),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.closeButton),
           ),
         ],
       ),
@@ -226,10 +228,11 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
 
   // Show document share dialog
   Future<void> _showShareDialog(BuildContext context, Document document) async {
+    final l10n = AppLocalizations.of(context)!;
     if (!document.isShareable) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('This document is not shareable'),
+        SnackBar(
+          content: Text(l10n.documentNotShareable),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -244,16 +247,17 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
 
   // Verify document authenticity
   Future<void> _verifyDocument(BuildContext context, Document document) async {
+    final l10n = AppLocalizations.of(context)!;
     // Show loading indicator
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
+      builder: (context) => AlertDialog(
         content: Row(
           children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 16),
-            Text('Verification in progress...'),
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Text(l10n.verificationInProgressDialog),
           ],
         ),
       ),
@@ -275,16 +279,17 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Verification result'),
+            title: Text(l10n.verificationResultDialogTitle),
             content: Text(
               status != null
-                  ? 'Status: ${_getVerificationStatusText(status)}'
-                  : 'Verification failed. Please try again.',
+                  ? l10n.verificationStatusResult(
+                      _getVerificationStatusText(status))
+                  : l10n.verificationFailedError,
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
+                child: Text(l10n.closeButton),
               ),
             ],
           ),
@@ -301,12 +306,12 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: Text('An error occurred: $e'),
+            title: Text(l10n.errorDialogTitle),
+            content: Text(l10n.genericErrorMessage(e.toString())),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
+                child: Text(l10n.closeButton),
               ),
             ],
           ),
@@ -357,18 +362,17 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
 
   // Show document versions history
   void _showVersions(BuildContext context, Document document) {
+    final l10n = AppLocalizations.of(context)!;
     // For a complete implementation, this would display document versions history
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Document versions history'),
-        content: const Text(
-          'The document versions history feature will be implemented soon.',
-        ),
+        title: Text(l10n.documentVersionsHistoryDialogTitle),
+        content: Text(l10n.documentVersionsHistoryFeatureNotAvailable),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.closeButton),
           ),
         ],
       ),
@@ -378,18 +382,19 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
   // Sign document
   Future<void> _signDocument(BuildContext context, Document document) async {
     final identity = ref.read(identityNotifierProvider).identity;
+    final l10n = AppLocalizations.of(context)!;
     if (identity == null) return;
 
     // Show loading indicator
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
+      builder: (context) => AlertDialog(
         content: Row(
           children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 16),
-            Text('Signing in progress...'),
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Text(l10n.signingInProgressDialog),
           ],
         ),
       ),
@@ -413,16 +418,16 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Document signed'),
+            title: Text(l10n.documentSignedDialogTitle),
             content: Text(
               signedDocument != null
-                  ? 'The document was signed successfully.'
-                  : 'Signing failed. Please try again.',
+                  ? l10n.documentSignedSuccess
+                  : l10n.documentSigningFailed,
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
+                child: Text(l10n.closeButton),
               ),
             ],
           ),
@@ -439,12 +444,12 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: Text('An error occurred: $e'),
+            title: Text(l10n.errorDialogTitle),
+            content: Text(l10n.genericErrorMessage(e.toString())),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
+                child: Text(l10n.closeButton),
               ),
             ],
           ),
@@ -455,15 +460,16 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
 
   // Confirm document deletion
   void _confirmDeleteDocument(BuildContext context, Document document) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirm deletion'),
-        content: Text('Are you sure you want to delete "${document.title}" ?'),
+        title: Text(l10n.confirmDeletionDialogTitle),
+        content: Text(l10n.confirmDeletionDialogContent(document.title)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancelButton),
           ),
           TextButton(
             onPressed: () {

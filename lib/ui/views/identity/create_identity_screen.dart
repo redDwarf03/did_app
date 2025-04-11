@@ -1,6 +1,7 @@
 import 'package:did_app/application/identity/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen for creating a new digital identity
 class CreateIdentityScreen extends ConsumerStatefulWidget {
@@ -28,6 +29,7 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
   Widget build(BuildContext context) {
     // Watch identity state to get loading status and errors
     final identityState = ref.watch(identityNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     // If identity was created successfully, show success dialog and return
     if (!_isSubmitting && identityState.identity != null) {
@@ -37,17 +39,15 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
-            title: const Text('Identity Created'),
-            content: const Text(
-              'Your digital identity has been successfully created on the Archethic blockchain.',
-            ),
+            title: Text(l10n.identityCreatedDialogTitle),
+            content: Text(l10n.identityCreatedDialogContent),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop(); // Close dialog
                   Navigator.of(context).pop(); // Return to previous screen
                 },
-                child: const Text('OK'),
+                child: Text(l10n.okButton),
               ),
             ],
           ),
@@ -64,7 +64,8 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${identityState.errorMessage}'),
+            content:
+                Text(l10n.genericErrorMessage(identityState.errorMessage!)),
             backgroundColor: Colors.redAccent,
           ),
         );
@@ -73,7 +74,7 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Digital Identity'),
+        title: Text(l10n.createIdentityScreenTitle),
       ),
       body: Form(
         key: _formKey,
@@ -82,9 +83,9 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Basic Information',
-                style: TextStyle(
+              Text(
+                l10n.basicInfoTitleForm,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -93,14 +94,14 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
 
               // Display name field
               TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Display Name',
-                  helperText: 'Public name for your identity',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.displayNameLabel,
+                  helperText: l10n.displayNameHelperText,
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a display name';
+                    return l10n.displayNameValidationError;
                   }
                   return null;
                 },
@@ -110,14 +111,14 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
 
               // Full name field
               TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Full Legal Name',
-                  helperText: 'As it appears on your official documents',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.fullNameLabel,
+                  helperText: l10n.fullNameHelperText,
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your full name';
+                    return l10n.fullNameValidationError;
                   }
                   return null;
                 },
@@ -127,20 +128,20 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
 
               // Email field
               TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Email Address',
-                  helperText: 'Required for verification',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.emailLabel,
+                  helperText: l10n.emailHelperText,
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
+                    return l10n.emailValidationErrorRequired;
                   }
 
                   // Simple email validation
                   if (!value.contains('@') || !value.contains('.')) {
-                    return 'Please enter a valid email address';
+                    return l10n.emailValidationErrorInvalid;
                   }
 
                   return null;
@@ -151,10 +152,10 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
 
               // Phone number field (optional)
               TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Phone Number (Optional)',
-                  helperText: 'Include country code',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.phoneLabel,
+                  helperText: l10n.phoneHelperText,
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.phone,
                 onSaved: (value) => _phoneNumber = value,
@@ -164,9 +165,9 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
               const Divider(),
               const SizedBox(height: 24),
 
-              const Text(
-                'Additional Information (Optional)',
-                style: TextStyle(
+              Text(
+                l10n.additionalInfoTitleForm,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -178,11 +179,11 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
                 onTap: () => _selectDateOfBirth(context),
                 child: AbsorbPointer(
                   child: TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Date of Birth',
-                      helperText: 'Optional',
-                      border: OutlineInputBorder(),
-                      suffixIcon: Icon(Icons.calendar_today),
+                    decoration: InputDecoration(
+                      labelText: l10n.dobLabel,
+                      helperText: l10n.dobHelperText,
+                      border: const OutlineInputBorder(),
+                      suffixIcon: const Icon(Icons.calendar_today),
                     ),
                     controller: TextEditingController(
                       text: _dateOfBirth != null
@@ -196,9 +197,9 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
 
               // Nationality field (optional)
               TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Nationality (Optional)',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.nationalityLabel,
+                  border: const OutlineInputBorder(),
                 ),
                 onSaved: (value) => _nationality = value,
               ),
@@ -214,19 +215,18 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
                   ),
                   child: identityState.isLoading
                       ? const CircularProgressIndicator()
-                      : const Text(
-                          'Create Digital Identity',
-                          style: TextStyle(fontSize: 16),
+                      : Text(
+                          l10n.createIdentityButtonForm,
+                          style: const TextStyle(fontSize: 16),
                         ),
                 ),
               ),
               const SizedBox(height: 16),
 
               // Privacy notice
-              const Text(
-                'Your information will be encrypted and stored securely on the '
-                'Archethic blockchain. You maintain complete control over who can access your data.',
-                style: TextStyle(
+              Text(
+                l10n.privacyNotice,
+                style: const TextStyle(
                   fontSize: 12,
                   color: Colors.grey,
                 ),

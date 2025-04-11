@@ -3,6 +3,7 @@ import 'package:did_app/domain/identity/digital_identity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen that displays the user's digital identity or options to create one
 class IdentityScreen extends ConsumerWidget {
@@ -11,28 +12,31 @@ class IdentityScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final identityState = ref.watch(identityNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     // This is a tab in the main navigation, don't show the back button
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Digital Identity'),
+        title: Text(l10n.identityScreenTitle),
         automaticallyImplyLeading: false,
       ),
       body: identityState.isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _buildContent(context, identityState),
+          : _buildContent(context, identityState, l10n),
     );
   }
 
-  Widget _buildContent(BuildContext context, IdentityState state) {
+  Widget _buildContent(
+      BuildContext context, IdentityState state, AppLocalizations l10n) {
     if (state.identity != null) {
-      return _buildIdentityView(context, state.identity!);
+      return _buildIdentityView(context, state.identity!, l10n);
     } else {
-      return _buildNoIdentityView(context);
+      return _buildNoIdentityView(context, l10n);
     }
   }
 
-  Widget _buildIdentityView(BuildContext context, DigitalIdentity identity) {
+  Widget _buildIdentityView(
+      BuildContext context, DigitalIdentity identity, AppLocalizations l10n) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -85,7 +89,8 @@ class IdentityScreen extends ConsumerWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          _getVerificationLabel(identity.verificationStatus),
+                          _getVerificationLabel(
+                              identity.verificationStatus, l10n),
                           style: TextStyle(
                             color: _getVerificationColor(
                               identity.verificationStatus,
@@ -108,7 +113,7 @@ class IdentityScreen extends ConsumerWidget {
                       );
                     },
                     icon: const Icon(Icons.info_outline),
-                    label: const Text('View Identity Details'),
+                    label: Text(l10n.viewIdentityDetailsButton),
                   ),
                 ],
               ),
@@ -117,9 +122,9 @@ class IdentityScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // Quick actions
-          const Text(
-            'Quick Actions',
-            style: TextStyle(
+          Text(
+            l10n.quickActionsTitle,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -128,8 +133,8 @@ class IdentityScreen extends ConsumerWidget {
           _buildQuickActionCard(
             context,
             Icons.verified_user_outlined,
-            'Verify Identity',
-            'Complete verification to access more features',
+            l10n.verifyIdentityActionTitle,
+            l10n.verifyIdentityActionDesc,
             () => context.pushNamed('verificationStart'),
             identity.verificationStatus ==
                     IdentityVerificationStatus.unverified ||
@@ -140,8 +145,8 @@ class IdentityScreen extends ConsumerWidget {
           _buildQuickActionCard(
             context,
             Icons.folder_outlined,
-            'Manage Documents',
-            'Store and share your documents securely',
+            l10n.manageDocumentsActionTitle,
+            l10n.manageDocumentsActionDesc,
             () => context.pushNamed('documents'),
             true,
           ),
@@ -149,13 +154,13 @@ class IdentityScreen extends ConsumerWidget {
           _buildQuickActionCard(
             context,
             Icons.edit_outlined,
-            'Edit Identity',
-            'Update your personal information',
+            l10n.editIdentityActionTitle,
+            l10n.editIdentityActionDesc,
             () {
               // To be implemented
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Edit identity feature coming soon'),
+                SnackBar(
+                  content: Text(l10n.editIdentityFeatureComingSoon),
                 ),
               );
             },
@@ -166,7 +171,7 @@ class IdentityScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNoIdentityView(BuildContext context) {
+  Widget _buildNoIdentityView(BuildContext context, AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -179,18 +184,18 @@ class IdentityScreen extends ConsumerWidget {
               color: Colors.blueGrey,
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Create Your Digital Identity',
-              style: TextStyle(
+            Text(
+              l10n.createIdentityPromptTitle,
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            const Text(
-              "You don't have a digital identity yet. Create one to access all features of this application.",
-              style: TextStyle(fontSize: 16),
+            Text(
+              l10n.createIdentityPromptDesc,
+              style: const TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
@@ -200,7 +205,7 @@ class IdentityScreen extends ConsumerWidget {
                 context.pushNamed('createIdentity');
               },
               icon: const Icon(Icons.add),
-              label: const Text('Create Identity'),
+              label: Text(l10n.createIdentityButtonPrompt),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
@@ -292,18 +297,19 @@ class IdentityScreen extends ConsumerWidget {
     }
   }
 
-  String _getVerificationLabel(IdentityVerificationStatus status) {
+  String _getVerificationLabel(
+      IdentityVerificationStatus status, AppLocalizations l10n) {
     switch (status) {
       case IdentityVerificationStatus.unverified:
-        return 'Not Verified';
+        return l10n.identityVerificationStatusNotVerified;
       case IdentityVerificationStatus.basicVerified:
-        return 'Basic Verification';
+        return l10n.identityVerificationStatusBasicVerified;
       case IdentityVerificationStatus.fullyVerified:
-        return 'Fully Verified';
+        return l10n.identityVerificationStatusFullyVerified;
       case IdentityVerificationStatus.pending:
-        return 'Verification Pending';
+        return l10n.identityVerificationStatusPending;
       case IdentityVerificationStatus.rejected:
-        return 'Verification Rejected';
+        return l10n.identityVerificationStatusRejected;
     }
   }
 

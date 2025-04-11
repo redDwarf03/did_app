@@ -178,4 +178,160 @@ class EidasCredentialService {
     }
     ''';
   }
+
+  /// Vérifie la signature cryptographique d'une attestation eIDAS
+  Future<VerificationResult> verifyEidasCredential(
+      EidasCredential credential) async {
+    try {
+      // Vérifier que le document contient une preuve
+      if (credential.proof == null) {
+        return VerificationResult(
+          isValid: false,
+          message: 'L\'attestation ne contient pas de preuve cryptographique',
+        );
+      }
+
+      // Vérifier la date d'expiration
+      final now = DateTime.now();
+      if (credential.expirationDate != null &&
+          credential.expirationDate!.isBefore(now)) {
+        return VerificationResult(
+          isValid: false,
+          message:
+              'L\'attestation a expiré le ${_formatDate(credential.expirationDate!)}',
+        );
+      }
+
+      // Dans une implémentation réelle, cette fonction :
+      // 1. Extrairait la clé publique de l'émetteur à partir de son DID
+      // 2. Vérifierait la signature numérique avec cette clé
+      // 3. Validerait le statut de révocation de l'attestation
+
+      // Pour cette démo, on simule une vérification réussie
+      await Future.delayed(
+          const Duration(seconds: 1)); // Simuler le temps de vérification
+
+      return VerificationResult(
+        isValid: true,
+        message: 'Attestation vérifiée avec succès',
+        details: {
+          'issuer': credential.issuer.id,
+          'issuanceDate': _formatDate(credential.issuanceDate),
+          'verificationMethod': credential.proof?.verificationMethod,
+          'proofType': credential.proof?.type,
+        },
+      );
+    } catch (e) {
+      return VerificationResult(
+        isValid: false,
+        message: 'Erreur lors de la vérification: $e',
+      );
+    }
+  }
+
+  /// Vérifie le statut de révocation d'une attestation eIDAS
+  Future<RevocationStatus> checkRevocationStatus(
+      EidasCredential credential) async {
+    try {
+      // Vérifier que le document contient un statut
+      if (credential.credentialStatus == null) {
+        return RevocationStatus(
+          isRevoked: false,
+          message: 'Aucune information de statut disponible',
+          lastChecked: DateTime.now(),
+        );
+      }
+
+      // Dans une implémentation réelle, cette fonction :
+      // 1. Extrairait l'URL du service de statut
+      // 2. Interrogerait ce service pour vérifier si l'attestation a été révoquée
+      // 3. Analyserait la réponse pour déterminer le statut
+
+      // Pour cette démo, on simule une vérification réussie (non révoquée)
+      await Future.delayed(const Duration(
+          milliseconds: 800)); // Simuler le temps de vérification
+
+      return RevocationStatus(
+        isRevoked: false,
+        message: 'Attestation non révoquée',
+        lastChecked: DateTime.now(),
+        details: {
+          'statusType': credential.credentialStatus?.type,
+          'statusId': credential.credentialStatus?.id,
+        },
+      );
+    } catch (e) {
+      return RevocationStatus(
+        isRevoked: true,
+        message: 'Erreur lors de la vérification du statut: $e',
+        lastChecked: DateTime.now(),
+      );
+    }
+  }
+
+  /// Génère une signature eIDAS pour une attestation
+  Future<EidasProof> generateEidasSignature(
+      Map<String, dynamic> credentialData) async {
+    // Dans une implémentation réelle, on utiliserait une cryptographie conforme à eIDAS
+    // comme Ed25519Signature2020 ou EcdsaSecp256k1Signature2019
+
+    final now = DateTime.now();
+
+    return EidasProof(
+      type: 'Ed25519Signature2020',
+      created: now,
+      verificationMethod: 'did:example:app-wallet#key-1',
+      proofPurpose: 'assertionMethod',
+      proofValue: 'z${_generateRandomSignature(64)}',
+    );
+  }
+
+  /// Génère une valeur aléatoire simulant une signature (pour la démo)
+  String _generateRandomSignature(int length) {
+    const chars =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final random = DateTime.now().millisecondsSinceEpoch;
+    final buffer = StringBuffer();
+
+    for (var i = 0; i < length; i++) {
+      final index = (random + i) % chars.length;
+      buffer.write(chars[index]);
+    }
+
+    return buffer.toString();
+  }
+
+  /// Formate une date pour l'affichage
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'Non spécifiée';
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+}
+
+/// Modèle de résultat de vérification
+class VerificationResult {
+  final bool isValid;
+  final String message;
+  final Map<String, dynamic>? details;
+
+  VerificationResult({
+    required this.isValid,
+    required this.message,
+    this.details,
+  });
+}
+
+/// Modèle de statut de révocation
+class RevocationStatus {
+  final bool isRevoked;
+  final String message;
+  final DateTime lastChecked;
+  final Map<String, dynamic>? details;
+
+  RevocationStatus({
+    required this.isRevoked,
+    required this.message,
+    required this.lastChecked,
+    this.details,
+  });
 }

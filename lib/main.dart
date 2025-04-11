@@ -35,10 +35,27 @@ import 'package:did_app/ui/views/credential/credential_detail_screen.dart'
     as credential_detail;
 import 'package:did_app/ui/views/credential/eidas_interop_screen.dart';
 import 'package:did_app/ui/views/splash_screen.dart';
+import 'package:did_app/ui/views/auth/login_screen.dart';
+import 'package:did_app/ui/views/auth/secure_auth_screen.dart';
+import 'package:did_app/ui/views/home_screen.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:did_app/ui/views/credential/status_list_dashboard_screen.dart';
+import 'package:did_app/ui/views/credential/credential_status_verification_screen.dart';
+import 'package:did_app/ui/views/credential/status_list_info_screen.dart';
 
 void main() async {
+  // Initialize app-wide services
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize Hive for local storage
+  await Hive.initFlutter();
+
+  // Open Hive boxes
+  await Hive.openBox<Map<dynamic, dynamic>>('revocation_history');
+  await Hive.openBox<Map<dynamic, dynamic>>('status_list_cache');
+
+  // Run the app
   runApp(
     ProviderScope(
       child: MainApp(),
@@ -90,6 +107,32 @@ class MainApp extends ConsumerWidget {
           GoRoute(
             path: '/welcome',
             builder: (context, state) => const WelcomeScreen(),
+          ),
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
+            path: '/login',
+            builder: (context, state) => const LoginScreen(),
+          ),
+          GoRoute(
+            path: '/secure_auth',
+            builder: (context, state) => const SecureAuthScreen(),
+          ),
+          GoRoute(
+            path: '/status_list/dashboard',
+            builder: (context, state) => const StatusListDashboardScreen(),
+          ),
+          GoRoute(
+            path: '/status_list/info',
+            builder: (context, state) => const StatusList2021InfoScreen(),
+          ),
+          GoRoute(
+            path: '/credential/verify/:credentialId',
+            builder: (context, state) => CredentialStatusVerificationScreen(
+              credentialId: state.pathParameters['credentialId']!,
+            ),
           ),
           ShellRoute(
             builder: (context, state, child) {
@@ -251,6 +294,25 @@ class MainApp extends ConsumerWidget {
                   GoRoute(
                     path: 'eidas',
                     builder: (context, state) => const EidasInteropScreen(),
+                  ),
+                  GoRoute(
+                    path: 'status/verify/:credentialId',
+                    builder: (context, state) {
+                      final id = state.pathParameters['credentialId']!;
+                      return CredentialStatusVerificationScreen(
+                        credentialId: id,
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: 'status/dashboard',
+                    builder: (context, state) =>
+                        const StatusListDashboardScreen(),
+                  ),
+                  GoRoute(
+                    path: 'status/info',
+                    builder: (context, state) =>
+                        const StatusList2021InfoScreen(),
                   ),
                 ],
               ),

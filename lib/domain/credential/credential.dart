@@ -1,140 +1,244 @@
 import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:did_app/domain/credential/status_list_2021.dart';
 
-/// Représente une attestation vérifiable (Verifiable Credential)
-class Credential {
-  Credential({
-    required this.id,
-    required this.context,
-    required this.type,
-    required this.issuanceDate,
-    required this.issuer,
-    required this.subject,
-    required this.credentialSubject,
-    this.expirationDate,
-    this.proof,
-    this.status,
-    this.credentialSchema,
-    this.name,
-    this.description,
-    this.claims,
-    this.verificationStatus = VerificationStatus.unverified,
-    this.supportsZkp = false,
-  });
+part 'credential.freezed.dart';
+part 'credential.g.dart';
 
-  /// Identifiant unique de l'attestation
-  final String id;
+/// Statut de vérification d'une attestation
+enum VerificationStatus {
+  /// Statut de vérification non déterminé
+  unverified,
 
-  /// Contexte de l'attestation (URI définissant les termes)
-  final List<String> context;
+  /// Attestation vérifiée avec succès
+  verified,
 
-  /// Type de l'attestation
-  final List<String> type;
+  /// Échec de la vérification
+  invalid,
 
-  /// Date d'émission de l'attestation
-  final DateTime issuanceDate;
+  /// Attestation expirée
+  expired,
 
-  /// Date d'expiration de l'attestation (facultatif)
-  final DateTime? expirationDate;
+  /// Attestation révoquée
+  revoked,
+}
 
-  /// Identifiant de l'émetteur de l'attestation
-  final String issuer;
+/// Types d'attestations pris en charge
+enum CredentialType {
+  /// Diplôme
+  diploma,
 
-  /// Identifiant du sujet de l'attestation
-  final String subject;
+  /// Identité
+  identity,
 
-  /// Contenu de l'attestation
-  final Map<String, dynamic> credentialSubject;
+  /// Permis de conduire
+  drivingLicense,
 
-  /// Preuve cryptographique de l'attestation (facultatif)
-  final CredentialProof? proof;
+  /// Attestation médicale
+  medicalCertificate,
 
-  /// État de l'attestation (facultatif)
-  final CredentialStatus? status;
+  /// Badge professionnel
+  professionalBadge,
 
-  /// Schéma de l'attestation (facultatif)
-  final CredentialSchema? credentialSchema;
+  /// Attestation de santé
+  healthInsurance,
 
-  /// Nom de l'attestation (lisible par l'utilisateur)
-  final String? name;
+  /// Preuve d'emploi
+  employmentProof,
 
-  /// Description de l'attestation
-  final String? description;
+  /// Vérification d'âge
+  ageVerification,
 
-  /// Attributs de l'attestation (forme simplifiée du credentialSubject)
-  final Map<String, dynamic>? claims;
+  /// Preuve d'adresse
+  addressProof,
 
-  /// Statut de vérification de l'attestation
-  final VerificationStatus verificationStatus;
+  /// Carte de membre
+  membershipCard,
 
-  /// Indique si l'attestation supporte les preuves à divulgation nulle (ZKP)
-  final bool supportsZkp;
+  /// Autre
+  other,
+}
+
+/// Modèle représentant une attestation
+@freezed
+class Credential with _$Credential {
+  const Credential._(); // Ajout d'un constructeur privé pour les getters
+
+  const factory Credential({
+    /// Identifiant unique de l'attestation
+    required String id,
+
+    /// Type de l'attestation
+    required List<String> type,
+
+    /// Émetteur de l'attestation
+    required String issuer,
+
+    /// Nom de l'attestation
+    String? name,
+
+    /// Description de l'attestation
+    String? description,
+
+    /// Sujet de l'attestation (pour la comptabilité avec les URIs DID)
+    String? subject,
+
+    /// Date d'émission
+    required DateTime issuanceDate,
+
+    /// Date d'expiration
+    DateTime? expirationDate,
+
+    /// URL de la liste de statut
+    String? statusListUrl,
+
+    /// Index dans la liste de statut
+    int? statusListIndex,
+
+    /// Statut de l'attestation
+    @Default(VerificationStatus.unverified)
+    VerificationStatus verificationStatus,
+
+    /// Schéma de l'attestation
+    Map<String, dynamic>? credentialSchema,
+
+    /// Statut de l'attestation
+    Map<String, dynamic>? status,
+
+    /// Indique si l'attestation supporte les preuves à divulgation nulle
+    @Default(false) bool supportsZkp,
+
+    /// Sujet de l'attestation (claims)
+    required Map<String, dynamic> credentialSubject,
+
+    /// Contexte JSON-LD
+    @Default([]) @JsonKey(name: '@context') List<String> context,
+
+    /// Preuve cryptographique
+    required Map<String, dynamic> proof,
+  }) = _Credential;
+
+  factory Credential.fromJson(Map<String, dynamic> json) =>
+      _$CredentialFromJson(json);
 
   /// Alias pour issuanceDate
-  DateTime get issuedAt => issuanceDate;
+  DateTime? get issuedAt => issuanceDate;
 
   /// Alias pour expirationDate
   DateTime? get expiresAt => expirationDate;
 
-  /// Retourne une nouvelle instance avec les valeurs modifiées
-  Credential copyWith({
-    String? id,
-    List<String>? context,
-    List<String>? type,
-    DateTime? issuanceDate,
-    DateTime? expirationDate,
-    ValueGetter<DateTime?>? clearExpirationDate,
-    String? issuer,
-    String? subject,
-    Map<String, dynamic>? credentialSubject,
-    CredentialProof? proof,
-    ValueGetter<CredentialProof?>? clearProof,
-    CredentialStatus? status,
-    ValueGetter<CredentialStatus?>? clearStatus,
-    CredentialSchema? credentialSchema,
-    ValueGetter<CredentialSchema?>? clearCredentialSchema,
-    String? name,
-    String? description,
-    Map<String, dynamic>? claims,
-    VerificationStatus? verificationStatus,
-    bool? supportsZkp,
-  }) {
-    return Credential(
-      id: id ?? this.id,
-      context: context ?? this.context,
-      type: type ?? this.type,
-      issuanceDate: issuanceDate ?? this.issuanceDate,
-      expirationDate: clearExpirationDate != null
-          ? clearExpirationDate()
-          : expirationDate ?? this.expirationDate,
-      issuer: issuer ?? this.issuer,
-      subject: subject ?? this.subject,
-      credentialSubject: credentialSubject ?? this.credentialSubject,
-      proof: clearProof != null ? clearProof() : proof ?? this.proof,
-      status: clearStatus != null ? clearStatus() : status ?? this.status,
-      credentialSchema: clearCredentialSchema != null
-          ? clearCredentialSchema()
-          : credentialSchema ?? this.credentialSchema,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      claims: claims ?? this.claims,
-      verificationStatus: verificationStatus ?? this.verificationStatus,
-      supportsZkp: supportsZkp ?? this.supportsZkp,
-    );
-  }
+  /// Alias pour credentialSubject
+  Map<String, dynamic>? get claims => credentialSubject;
 
   /// Vérifie si l'attestation est valide (non expirée)
-  bool get isValid {
-    if (expirationDate == null) {
-      return true;
-    }
-    return DateTime.now().isBefore(expirationDate!);
-  }
-
-  /// Vérifie si l'attestation est vérifiée (a une preuve)
-  bool get isVerified => proof != null;
+  bool get isValid =>
+      expirationDate == null || expirationDate!.isAfter(DateTime.now());
 
   /// Vérifie si l'attestation est révoquée
-  bool get isRevoked => status?.revoked ?? false;
+  bool get isRevoked => false; // À implémenter avec les données de révocation
+
+  /// Extrait les informations de statut Status List 2021 de l'attestation
+  StatusList2021Entry? getStatusList2021Entry() {
+    if (status == null ||
+        !status!.containsKey('type') ||
+        status!['type'] != 'StatusList2021Entry') {
+      return null;
+    }
+
+    try {
+      return StatusList2021Entry(
+        id: status!['id'] as String? ?? '$id#status',
+        statusListCredential: status!['statusListCredential'] as String,
+        statusPurpose: StatusPurpose.values.firstWhere(
+          (p) => p.toString().split('.').last == status!['statusPurpose'],
+          orElse: () => StatusPurpose.revocation,
+        ),
+        statusListIndex: status!['statusListIndex'] as int,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+}
+
+/// Modèle représentant une présentation d'attestation
+@freezed
+class CredentialPresentation with _$CredentialPresentation {
+  const factory CredentialPresentation({
+    /// Identifiant unique de la présentation
+    required String id,
+
+    /// Type de la présentation
+    required List<String> type,
+
+    /// Liste des attestations incluses
+    required List<Credential> verifiableCredentials,
+
+    /// Challenge utilisé pour la vérification
+    String? challenge,
+
+    /// Domaine pour lequel la présentation est générée
+    String? domain,
+
+    /// Attributs révélés par attestation
+    required Map<String, List<String>> revealedAttributes,
+
+    /// Preuve de la présentation
+    required Map<String, dynamic> proof,
+
+    /// Date de création
+    required DateTime created,
+  }) = _CredentialPresentation;
+
+  factory CredentialPresentation.fromJson(Map<String, dynamic> json) =>
+      _$CredentialPresentationFromJson(json);
+}
+
+/// Modèle représentant un prédicat pour les preuves à divulgation nulle
+@freezed
+class CredentialPredicate with _$CredentialPredicate {
+  const factory CredentialPredicate({
+    /// Identifiant de l'attestation
+    required String credentialId,
+
+    /// Attribut sur lequel appliquer le prédicat
+    required String attribute,
+
+    /// Nom de l'attribut (pour l'affichage)
+    required String attributeName,
+
+    /// Prédicat (>=, <=, ==, etc.)
+    required String predicate,
+
+    /// Type de prédicat
+    required PredicateType predicateType,
+
+    /// Valeur à comparer
+    required dynamic value,
+  }) = _CredentialPredicate;
+
+  factory CredentialPredicate.fromJson(Map<String, dynamic> json) =>
+      _$CredentialPredicateFromJson(json);
+}
+
+/// Modèle représentant une preuve d'attestation
+@freezed
+class Proof with _$Proof {
+  const factory Proof({
+    /// Type de preuve
+    required String type,
+
+    /// Date de création
+    required DateTime created,
+
+    /// Méthode de vérification
+    required String verificationMethod,
+
+    /// Signature de la preuve
+    required String proofValue,
+  }) = _Proof;
+
+  factory Proof.fromJson(Map<String, dynamic> json) => _$ProofFromJson(json);
 }
 
 /// Représente une preuve cryptographique pour une attestation
@@ -203,99 +307,6 @@ class CredentialSchema {
   final String type;
 }
 
-/// Représente une présentation d'attestation (Verifiable Presentation)
-class CredentialPresentation {
-  CredentialPresentation({
-    required this.id,
-    required this.context,
-    required this.type,
-    required this.verifiableCredentials,
-    this.proof,
-    this.holder,
-    this.revealedAttributes,
-    this.predicates,
-    this.created,
-  });
-
-  /// Identifiant unique de la présentation
-  final String id;
-
-  /// Contexte de la présentation
-  final List<String> context;
-
-  /// Type de la présentation
-  final List<String> type;
-
-  /// Adresse du détenteur de la présentation
-  final String? holder;
-
-  /// Attestations incluses dans la présentation
-  final List<Credential> verifiableCredentials;
-
-  /// Preuve cryptographique de la présentation
-  final CredentialProof? proof;
-
-  /// Attributs révélés par attestation
-  final Map<String, List<String>>? revealedAttributes;
-
-  /// Prédicats pour les preuves à divulgation nulle
-  final List<CredentialPredicate>? predicates;
-
-  /// Date de création de la présentation
-  final DateTime? created;
-
-  /// Vérifie si la présentation est vérifiée (a une preuve)
-  bool get isVerified => proof != null;
-}
-
-/// Types d'attestations pris en charge
-enum CredentialType {
-  /// Attestation d'identité
-  identity,
-
-  /// Diplôme ou certification
-  diploma,
-
-  /// Permis de conduire
-  drivingLicense,
-
-  /// Vérification d'âge
-  ageVerification,
-
-  /// Preuve d'adresse
-  addressProof,
-
-  /// Preuve d'emploi
-  employmentProof,
-
-  /// Carte de membre
-  membershipCard,
-
-  /// Assurance maladie
-  healthInsurance,
-
-  /// Autre type d'attestation
-  other,
-}
-
-/// Statut de vérification
-enum VerificationStatus {
-  /// Non vérifié
-  unverified,
-
-  /// Vérifié avec succès
-  verified,
-
-  /// Vérification échouée
-  invalid,
-
-  /// Expiré
-  expired,
-
-  /// Révoqué
-  revoked,
-}
-
 /// Statut de révocation
 enum RevocationStatus {
   /// Non révoqué
@@ -343,8 +354,8 @@ enum PredicateType {
 }
 
 /// Prédicat pour une preuve à divulgation nulle
-class CredentialPredicate {
-  CredentialPredicate({
+class CredentialPredicateValue {
+  CredentialPredicateValue({
     required this.attributeName,
     required this.predicateType,
     required this.value,

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:did_app/ui/views/document/document_detail_screen.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen displaying documents shared with the user
 class SharedDocumentsScreen extends ConsumerStatefulWidget {
@@ -35,7 +36,7 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
       final identity = ref.read(identityNotifierProvider).identity;
       if (identity == null) {
         setState(() {
-          _errorMessage = 'Identity required to view shared documents';
+          _errorMessage = AppLocalizations.of(context)!.identityRequiredShared;
         });
         return;
       }
@@ -45,7 +46,8 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
           .loadSharedWithMe(identity.identityAddress);
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error loading shared documents: $e';
+        _errorMessage =
+            AppLocalizations.of(context)!.errorLoadingSharedDocs(e.toString());
       });
     } finally {
       setState(() {
@@ -69,12 +71,12 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
+      builder: (context) => AlertDialog(
         content: Row(
           children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 16),
-            Text('Accessing shared document...'),
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Text(AppLocalizations.of(context)!.accessingSharedDocumentDialog),
           ],
         ),
       ),
@@ -99,8 +101,9 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
         );
       } else if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to access shared document'),
+          SnackBar(
+            content: Text(
+                AppLocalizations.of(context)!.failedToAccessSharedDocument),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -115,7 +118,8 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(AppLocalizations.of(context)!
+                .genericErrorMessage(e.toString())),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.red,
           ),
@@ -126,23 +130,24 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
 
   Future<String?> _promptForAccessCode(BuildContext context) async {
     final codeController = TextEditingController();
+    final l10n = AppLocalizations.of(context)!;
     return showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Access Code Required'),
+        title: Text(l10n.accessCodeRequiredDialogTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'This document requires an access code to view.',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              l10n.accessCodeRequiredDialogContent,
+              style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: codeController,
-              decoration: const InputDecoration(
-                labelText: 'Access Code',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.accessCodeLabel,
+                border: const OutlineInputBorder(),
               ),
               keyboardType: TextInputType.number,
               obscureText: true,
@@ -154,11 +159,11 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancelButton),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(codeController.text),
-            child: const Text('Submit'),
+            child: Text(l10n.submitButton),
           ),
         ],
       ),
@@ -169,15 +174,16 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(documentNotifierProvider);
     final sharedDocuments = state.sharedWithMe;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Shared With Me'),
+        title: Text(l10n.sharedDocumentsTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _isLoading ? null : _loadSharedDocuments,
-            tooltip: 'Refresh',
+            tooltip: l10n.refreshAction,
           ),
         ],
       ),
@@ -207,6 +213,7 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
 
   Widget _buildSharedDocumentsList(
       BuildContext context, List<DocumentShare> shares) {
+    final l10n = AppLocalizations.of(context)!;
     if (shares.isEmpty) {
       return Center(
         child: Column(
@@ -218,24 +225,24 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
               color: Colors.grey,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'No shared documents',
-              style: TextStyle(
+            Text(
+              l10n.noSharedDocumentsTitle,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Documents shared with you will appear here',
+            Text(
+              l10n.noSharedDocumentsContent,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
+              style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: _loadSharedDocuments,
               icon: const Icon(Icons.refresh),
-              label: const Text('Refresh'),
+              label: Text(l10n.refreshAction),
             ),
           ],
         ),
@@ -253,7 +260,8 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
   }
 
   Widget _buildSharedDocumentCard(BuildContext context, DocumentShare share) {
-    final dateFormat = DateFormat('dd/MM/yyyy');
+    final dateFormat = DateFormat('dd MMM yyyy');
+    final l10n = AppLocalizations.of(context)!;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -295,7 +303,7 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      'Shared by: ${share.recipientDescription}',
+                      '${l10n.sharedByLabel}: ${share.recipientDescription}',
                       style: const TextStyle(fontSize: 14),
                     ),
                   ),
@@ -308,19 +316,7 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
                   const Icon(Icons.date_range, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
                   Text(
-                    'Shared on: ${dateFormat.format(share.createdAt)}',
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-
-              Row(
-                children: [
-                  const Icon(Icons.event_busy, size: 16, color: Colors.grey),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Expires on: ${dateFormat.format(share.expiresAt)}',
+                    '${l10n.expiresShareLabel}: ${dateFormat.format(share.expiresAt)}',
                     style: const TextStyle(fontSize: 14),
                   ),
                 ],
@@ -364,7 +360,7 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
                 child: ElevatedButton.icon(
                   onPressed: () => _accessSharedDocument(share),
                   icon: const Icon(Icons.visibility),
-                  label: const Text('Access Document'),
+                  label: Text(l10n.accessDocumentButton),
                 ),
               ),
             ],

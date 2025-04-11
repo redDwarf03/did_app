@@ -2,6 +2,7 @@ import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart'; // Import l10n
 
 /// Screen to display detailed information about a verification certificate
 class CertificateDetailsScreen extends ConsumerWidget {
@@ -19,14 +20,15 @@ class CertificateDetailsScreen extends ConsumerWidget {
     final daysRemaining =
         certificate.expiresAt.difference(DateTime.now()).inDays;
     final isExpiringSoon = !isExpired && daysRemaining < 30;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Certificate Details'),
+        title: Text(l10n.credentialDetailTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.share),
-            tooltip: 'Share Certificate',
+            tooltip: l10n.shareButtonLabel,
             onPressed: () => _shareCertificate(context),
           ),
         ],
@@ -37,13 +39,18 @@ class CertificateDetailsScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Status Card
-            _buildStatusCard(context, isExpired, isExpiringSoon, daysRemaining),
+            _buildStatusCard(
+              context,
+              isExpired,
+              isExpiringSoon,
+              daysRemaining,
+            ),
             const SizedBox(height: 24),
 
             // Certificate details
-            const Text(
-              'Certificate Information',
-              style: TextStyle(
+            Text(
+              l10n.credentialDataSection,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -55,29 +62,38 @@ class CertificateDetailsScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    _buildDetailRow('Certificate ID', certificate.id, true),
+                    _buildDetailRow(
+                      context,
+                      l10n.identifierLabel,
+                      certificate.id,
+                      true,
+                    ),
                     const Divider(),
                     _buildDetailRow(
-                      'Issued Date',
+                      context,
+                      l10n.issuanceDateLabel,
                       _formatDate(certificate.issuedAt),
                       false,
                     ),
                     const Divider(),
                     _buildDetailRow(
-                      'Expiry Date',
+                      context,
+                      l10n.expirationDateLabel,
                       _formatDate(certificate.expiresAt),
                       false,
                     ),
                     const Divider(),
                     _buildDetailRow(
-                      'Issuing Authority',
+                      context,
+                      l10n.issuerLabel,
                       certificate.issuer,
                       false,
                     ),
                     const Divider(),
                     _buildDetailRow(
-                      'eIDAS Level',
-                      _getEidasLevelText(certificate.eidasLevel),
+                      context,
+                      l10n.eidasAssuranceLevelTitle,
+                      _getEidasLevelText(certificate.eidasLevel, context),
                       false,
                     ),
                   ],
@@ -87,9 +103,9 @@ class CertificateDetailsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Signature section
-            const Text(
-              'Digital Signature',
-              style: TextStyle(
+            Text(
+              l10n.proofSignatureLabel,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -102,9 +118,9 @@ class CertificateDetailsScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'This certificate is cryptographically signed by the issuing authority, ensuring its authenticity and integrity.',
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    Text(
+                      l10n.containedInformationContent,
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -123,9 +139,10 @@ class CertificateDetailsScreen extends ConsumerWidget {
                           onPressed: () => _copyToClipboard(
                             context,
                             certificate.signature,
-                            'Signature copied to clipboard',
+                            l10n.proofSignatureLabel,
                           ),
-                          tooltip: 'Copy signature',
+                          tooltip:
+                              l10n.copySignatureTooltip ?? "Copy Signature",
                           constraints: const BoxConstraints(),
                           padding: EdgeInsets.zero,
                         ),
@@ -138,9 +155,9 @@ class CertificateDetailsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Verification status
-            const Text(
-              'Blockchain Verification',
-              style: TextStyle(
+            Text(
+              l10n.verificationSectionTitle,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -157,7 +174,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.green.withValues(alpha: 0.1),
+                            color: Colors.green.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -166,20 +183,20 @@ class CertificateDetailsScreen extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Verified on Archethic Blockchain',
-                                style: TextStyle(
+                                l10n.verifiedStatus,
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               Text(
-                                'This certificate has been verified on the Archethic blockchain and is cryptographically secure.',
-                                style: TextStyle(
+                                l10n.credentialValidMessage,
+                                style: const TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey,
                                 ),
@@ -193,7 +210,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
                     OutlinedButton.icon(
                       onPressed: () => _viewOnBlockchain(context),
                       icon: const Icon(Icons.open_in_new, size: 18),
-                      label: const Text('View on Blockchain Explorer'),
+                      label: Text(l10n.blockchainTxLabel),
                     ),
                   ],
                 ),
@@ -209,9 +226,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
                   onPressed: () => _renewCertificate(context),
                   icon: const Icon(Icons.refresh),
                   label: Text(
-                    isExpired
-                        ? 'Renew Expired Certificate'
-                        : 'Renew Certificate',
+                    isExpired ? l10n.requestButton : l10n.requestButton,
                   ),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -231,6 +246,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
     bool isExpiringSoon,
     int daysRemaining,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     Color statusColor;
     String statusText;
     String statusDescription;
@@ -238,30 +254,27 @@ class CertificateDetailsScreen extends ConsumerWidget {
 
     if (isExpired) {
       statusColor = Colors.red;
-      statusText = 'Certificate Expired';
-      statusDescription =
-          'This certificate has expired and is no longer valid. Please renew it.';
+      statusText = l10n.expiredStatus;
+      statusDescription = l10n.expirationDateContent;
       statusIcon = Icons.warning_rounded;
     } else if (isExpiringSoon) {
       statusColor = Colors.orange;
-      statusText = 'Expiring Soon';
-      statusDescription =
-          'This certificate will expire in $daysRemaining days. Consider renewing it.';
+      statusText = l10n.notVerifiedStatus;
+      statusDescription = "Expires in $daysRemaining days";
       statusIcon = Icons.access_time;
     } else {
       statusColor = Colors.green;
-      statusText = 'Valid Certificate';
-      statusDescription =
-          'This certificate is valid and will expire in $daysRemaining days.';
+      statusText = l10n.verifiedStatus;
+      statusDescription = "Valid for $daysRemaining days";
       statusIcon = Icons.check_circle;
     }
 
     return Card(
       elevation: 3,
-      color: statusColor.withValues(alpha: 0.1),
+      color: statusColor.withOpacity(0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: statusColor.withValues(alpha: 0.3)),
+        side: BorderSide(color: statusColor.withOpacity(0.3)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -302,7 +315,13 @@ class CertificateDetailsScreen extends ConsumerWidget {
   }
 
   // Detail row with copy option if needed
-  Widget _buildDetailRow(String label, String value, bool copyable) {
+  Widget _buildDetailRow(
+    BuildContext context,
+    String label,
+    String value,
+    bool copyable,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -325,11 +344,11 @@ class CertificateDetailsScreen extends ConsumerWidget {
             IconButton(
               icon: const Icon(Icons.copy, size: 18),
               onPressed: () => _copyToClipboard(
-                null,
+                context,
                 value,
-                'ID copied to clipboard',
+                l10n.identifierLabel,
               ),
-              tooltip: 'Copy to clipboard',
+              tooltip: "Copy ID",
               constraints: const BoxConstraints(),
               padding: EdgeInsets.zero,
             ),
@@ -340,17 +359,22 @@ class CertificateDetailsScreen extends ConsumerWidget {
 
   // Helper methods
   String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year;
+
+    return '$day/$month/$year';
   }
 
-  String _getEidasLevelText(EidasLevel level) {
+  String _getEidasLevelText(EidasLevel level, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (level) {
       case EidasLevel.low:
-        return 'Low Assurance (eIDAS Low)';
+        return l10n.eidasLevelLow;
       case EidasLevel.substantial:
-        return 'Substantial Assurance (eIDAS Substantial)';
+        return l10n.eidasLevelSubstantial;
       case EidasLevel.high:
-        return 'High Assurance (eIDAS High)';
+        return l10n.eidasLevelHigh;
     }
   }
 
@@ -360,17 +384,15 @@ class CertificateDetailsScreen extends ConsumerWidget {
   }
 
   // Action methods
-  void _copyToClipboard(BuildContext? context, String text, String message) {
+  void _copyToClipboard(BuildContext context, String text, String message) {
     Clipboard.setData(ClipboardData(text: text));
-    if (context != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("$message copied to clipboard")),
+    );
   }
 
   void _shareCertificate(BuildContext context) {
-    // Show share options
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       builder: (context) => Padding(
@@ -378,9 +400,9 @@ class CertificateDetailsScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Share Certificate',
-              style: TextStyle(
+            Text(
+              l10n.shareButtonLabel,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -388,7 +410,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.qr_code),
-              title: const Text('Show QR Code'),
+              title: Text(l10n.scanQrCodeTooltip),
               onTap: () {
                 Navigator.pop(context);
                 _showQRCode(context);
@@ -396,7 +418,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.file_download),
-              title: const Text('Export as PDF'),
+              title: Text("Export as PDF"),
               onTap: () {
                 Navigator.pop(context);
                 // TODO: Export as PDF
@@ -404,7 +426,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.link),
-              title: const Text('Generate Verifiable Link'),
+              title: Text("Generate Link"),
               onTap: () {
                 Navigator.pop(context);
                 // TODO: Generate and copy link
@@ -417,19 +439,18 @@ class CertificateDetailsScreen extends ConsumerWidget {
   }
 
   void _viewOnBlockchain(BuildContext context) {
-    // Mock function to open blockchain explorer
-    // In a real app, this would open a URL to the blockchain explorer
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('View on Blockchain'),
-        content: const Text(
-          'This would open the Archethic blockchain explorer to show the certificate transaction.',
+        title: Text(l10n.verificationResultTitle),
+        content: Text(
+          l10n.credentialValidMessage,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(l10n.closeButton),
           ),
         ],
       ),
@@ -437,16 +458,15 @@ class CertificateDetailsScreen extends ConsumerWidget {
   }
 
   void _renewCertificate(BuildContext context) {
-    // Navigate to renewal screen
     Navigator.of(context).pushNamed('/verification/renew');
   }
 
   void _showQRCode(BuildContext context) {
-    // Show QR code dialog
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Certificate QR Code'),
+        title: Text(l10n.scanQrCodeTooltip),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -457,16 +477,16 @@ class CertificateDetailsScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
               ),
-              child: const Center(
+              child: Center(
                 child: Text(
-                  'QR Code Placeholder',
+                  "QR Code Placeholder",
                   textAlign: TextAlign.center,
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Scan this QR code to verify the certificate.',
+            Text(
+              l10n.scanQrCodeTooltip,
               textAlign: TextAlign.center,
             ),
           ],
@@ -474,7 +494,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(l10n.closeButton),
           ),
         ],
       ),

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:did_app/ui/views/document/widgets/document_share_dialog.dart';
 import 'package:did_app/ui/views/document/document_versions_screen.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen displaying detailed information about a document
 class DocumentDetailScreen extends ConsumerStatefulWidget {
@@ -38,34 +39,35 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(documentNotifierProvider);
     final document = state.selectedDocument;
+    final l10n = AppLocalizations.of(context)!;
 
     if (state.isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Document Details')),
+        appBar: AppBar(title: Text(l10n.documentDetailTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     if (document == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Document Details')),
+        appBar: AppBar(title: Text(l10n.documentDetailTitle)),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              const Text(
-                'Document not found',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Text(
+                l10n.documentNotFoundTitle,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              Text(
-                  'The document with ID ${widget.documentId} could not be found.'),
+              Text(l10n.documentNotFoundContent(widget.documentId)),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _loadDocument,
-                child: const Text('Retry'),
+                child: Text(l10n.retryButton),
               ),
             ],
           ),
@@ -78,7 +80,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
     final issuedAt = dateFormat.format(document.issuedAt);
     final expiresAt = document.expiresAt != null
         ? dateFormat.format(document.expiresAt!)
-        : 'No expiration date';
+        : l10n.noExpirationDate;
     final updatedAt = dateFormat.format(document.updatedAt);
 
     return Scaffold(
@@ -90,38 +92,38 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
             onPressed: document.isShareable
                 ? () => _shareDocument(context, document)
                 : null,
-            tooltip: 'Share',
+            tooltip: l10n.shareDocumentAction,
           ),
           IconButton(
             icon: const Icon(Icons.verified_user),
             onPressed: () => _verifyDocument(context, document),
-            tooltip: 'Verify authenticity',
+            tooltip: l10n.verifyAuthenticityAction,
           ),
           IconButton(
             icon: const Icon(Icons.download),
             onPressed: () => _downloadDocument(context, document),
-            tooltip: 'Download',
+            tooltip: l10n.downloadDocumentAction,
           ),
           PopupMenuButton<String>(
             onSelected: (value) => _handleMenuAction(context, value, document),
             itemBuilder: (context) => [
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'edit',
-                child: Text('Edit'),
+                child: Text(l10n.editDocumentAction),
               ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'versions',
-                child: Text('View versions'),
+                child: Text(l10n.viewVersionsAction),
               ),
               if (document.verificationStatus !=
                   DocumentVerificationStatus.verified)
-                const PopupMenuItem<String>(
+                PopupMenuItem<String>(
                   value: 'sign',
-                  child: Text('Sign'),
+                  child: Text(l10n.signDocumentAction),
                 ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'delete',
-                child: Text('Delete'),
+                child: Text(l10n.deleteDocumentAction),
               ),
             ],
           ),
@@ -154,13 +156,12 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
                       color: Colors.grey,
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                        'Document preview not available in this version'),
+                    Text(l10n.documentPreviewNotAvailable),
                     const SizedBox(height: 8),
                     TextButton.icon(
                       onPressed: () => _downloadDocument(context, document),
                       icon: const Icon(Icons.download),
-                      label: const Text('Download to view'),
+                      label: Text(l10n.downloadToViewButton),
                     ),
                   ],
                 ),
@@ -170,27 +171,36 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
 
             // Document details sections
             _buildInfoSection(
-              title: 'Document Information',
+              context: context,
+              title: l10n.documentInfoSectionTitle,
               icon: Icons.description,
               children: [
-                _buildInfoRow('Type', _getDocumentTypeName(document.type)),
-                _buildInfoRow('Status',
-                    _getVerificationStatusText(document.verificationStatus)),
+                _buildInfoRow(context, l10n.documentTypeLabel,
+                    _getDocumentTypeName(document.type, context)),
+                _buildInfoRow(
+                    context,
+                    l10n.documentStatusLabel,
+                    _getVerificationStatusText(
+                        document.verificationStatus, context)),
                 if (document.description != null)
-                  _buildInfoRow('Description', document.description!),
-                _buildInfoRow('Version', document.version.toString()),
+                  _buildInfoRow(context, l10n.documentDescriptionLabel,
+                      document.description!),
+                _buildInfoRow(context, l10n.documentVersionLabel,
+                    document.version.toString()),
               ],
             ),
             const SizedBox(height: 16),
 
             _buildInfoSection(
-              title: 'Issuer & Dates',
+              context: context,
+              title: l10n.issuerAndDatesSectionTitle,
               icon: Icons.business,
               children: [
-                _buildInfoRow('Issuer', document.issuer),
-                _buildInfoRow('Issue Date', issuedAt),
-                _buildInfoRow('Expiration Date', expiresAt),
-                _buildInfoRow('Last Updated', updatedAt),
+                _buildInfoRow(context, l10n.issuerLabelDetail, document.issuer),
+                _buildInfoRow(context, l10n.issueDateLabelDetail, issuedAt),
+                _buildInfoRow(
+                    context, l10n.expirationDateLabelDetail, expiresAt),
+                _buildInfoRow(context, l10n.lastUpdatedLabel, updatedAt),
               ],
             ),
             const SizedBox(height: 16),
@@ -198,32 +208,35 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
             if (document.verificationStatus ==
                 DocumentVerificationStatus.verified)
               _buildInfoSection(
-                title: 'Verification',
+                context: context,
+                title: l10n.verificationSectionTitle,
                 icon: Icons.verified_user,
                 children: [
-                  _buildInfoRow('Verified', 'Yes'),
+                  _buildInfoRow(context, l10n.verifiedLabel, l10n.yesVerified),
                   if (document.issuerAddress != null)
-                    _buildInfoRow('Issuer Address', document.issuerAddress!),
+                    _buildInfoRow(context, l10n.issuerAddressLabel,
+                        document.issuerAddress!),
                   if (document.blockchainTxId != null)
-                    _buildInfoRow('Blockchain TX', document.blockchainTxId!),
-                  _buildInfoRow(
-                      'eIDAS Level', _getEidasLevelText(document.eidasLevel)),
+                    _buildInfoRow(context, l10n.blockchainTxLabel,
+                        document.blockchainTxId!),
+                  _buildInfoRow(context, l10n.eidasLevelLabelDetail,
+                      _getEidasLevelText(document.eidasLevel, context)),
                 ],
               ),
             const SizedBox(height: 16),
 
             if (document.tags != null && document.tags!.isNotEmpty)
-              _buildTagsSection(document.tags!),
+              _buildTagsSection(context, document.tags!),
             const SizedBox(height: 16),
 
             if (state.documentShares.isNotEmpty)
-              _buildSharesSection(state.documentShares),
+              _buildSharesSection(context, state.documentShares),
             const SizedBox(height: 16),
 
-            _buildMetadataSection(document.metadata),
+            _buildMetadataSection(context, document.metadata),
             const SizedBox(height: 16),
 
-            _buildTechnicalSection(document),
+            _buildTechnicalSection(context, document),
           ],
         ),
       ),
@@ -231,6 +244,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   }
 
   Widget _buildDocumentHeader(BuildContext context, Document document) {
+    final l10n = AppLocalizations.of(context)!;
     final statusColor = _getStatusColor(document.verificationStatus);
 
     return Row(
@@ -279,7 +293,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
-            _getVerificationStatusText(document.verificationStatus),
+            _getVerificationStatusText(document.verificationStatus, context),
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: statusColor,
@@ -291,6 +305,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   }
 
   Widget _buildInfoSection({
+    required BuildContext context,
     required String title,
     required IconData icon,
     required List<Widget> children,
@@ -318,7 +333,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(BuildContext context, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -345,17 +360,18 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
     );
   }
 
-  Widget _buildTagsSection(List<String> tags) {
+  Widget _buildTagsSection(BuildContext context, List<String> tags) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           children: [
-            Icon(Icons.tag, size: 18, color: Colors.grey),
-            SizedBox(width: 8),
+            const Icon(Icons.tag, size: 18, color: Colors.grey),
+            const SizedBox(width: 8),
             Text(
-              'Tags',
-              style: TextStyle(
+              l10n.tagsSectionTitle,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -379,7 +395,8 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
     );
   }
 
-  Widget _buildSharesSection(List<DocumentShare> shares) {
+  Widget _buildSharesSection(BuildContext context, List<DocumentShare> shares) {
+    final l10n = AppLocalizations.of(context)!;
     final dateFormat = DateFormat('dd/MM/yyyy');
 
     return Column(
@@ -389,9 +406,9 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
           children: [
             const Icon(Icons.share, size: 18, color: Colors.grey),
             const SizedBox(width: 8),
-            const Text(
-              'Active Shares',
-              style: TextStyle(
+            Text(
+              l10n.activeSharesSectionTitle,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -401,7 +418,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
               onPressed: () {
                 // Show add share dialog in full implementation
               },
-              child: const Text('Share New'),
+              child: Text(l10n.shareNewButton),
             ),
           ],
         ),
@@ -411,11 +428,12 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
           return ListTile(
             contentPadding: EdgeInsets.zero,
             title: Text(share.recipientDescription),
-            subtitle: Text('Expires: ${dateFormat.format(share.expiresAt)}'),
+            subtitle: Text(
+                '${l10n.expiresShareLabel}: ${dateFormat.format(share.expiresAt)}'),
             trailing: IconButton(
               icon: const Icon(Icons.delete_outline),
               onPressed: () => _revokeShare(context, share),
-              tooltip: 'Revoke',
+              tooltip: l10n.revokeShareTooltip,
             ),
           );
         }),
@@ -423,7 +441,9 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
     );
   }
 
-  Widget _buildMetadataSection(Map<String, dynamic>? metadata) {
+  Widget _buildMetadataSection(
+      BuildContext context, Map<String, dynamic>? metadata) {
+    final l10n = AppLocalizations.of(context)!;
     if (metadata == null || metadata.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -431,13 +451,13 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           children: [
-            Icon(Icons.data_object, size: 18, color: Colors.grey),
-            SizedBox(width: 8),
+            const Icon(Icons.data_object, size: 18, color: Colors.grey),
+            const SizedBox(width: 8),
             Text(
-              'Metadata',
-              style: TextStyle(
+              l10n.metadataSectionTitle,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -447,35 +467,36 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
         const SizedBox(height: 8),
         const Divider(),
         ...metadata.entries.map(
-          (entry) => _buildInfoRow(entry.key, entry.value.toString()),
+          (entry) => _buildInfoRow(context, entry.key, entry.value.toString()),
         ),
       ],
     );
   }
 
-  Widget _buildTechnicalSection(Document document) {
+  Widget _buildTechnicalSection(BuildContext context, Document document) {
+    final l10n = AppLocalizations.of(context)!;
     return ExpansionTile(
-      title: const Text('Technical Details'),
+      title: Text(l10n.technicalDetailsSectionTitle),
       collapsedIconColor: Colors.grey,
       children: [
         ListTile(
-          title: const Text('Document ID'),
+          title: Text(l10n.documentIdLabelDetail),
           subtitle: Text(document.id),
           dense: true,
         ),
         ListTile(
-          title: const Text('Document Hash'),
+          title: Text(l10n.documentHashLabel),
           subtitle: Text(document.documentHash),
           dense: true,
         ),
         if (document.issuerSignature != null)
           ListTile(
-            title: const Text('Issuer Signature'),
+            title: Text(l10n.issuerSignatureLabel),
             subtitle: Text(document.issuerSignature!),
             dense: true,
           ),
         ListTile(
-          title: const Text('Owner Identity'),
+          title: Text(l10n.ownerIdentityLabel),
           subtitle: Text(document.ownerIdentityId),
           dense: true,
         ),
@@ -486,17 +507,16 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   // Actions
   Future<void> _downloadDocument(
       BuildContext context, Document document) async {
+    final l10n = AppLocalizations.of(context)!;
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Download document'),
-        content: const Text(
-          'The document download feature will be implemented soon.',
-        ),
+        title: Text(l10n.downloadDialogTitle),
+        content: Text(l10n.downloadFeatureNotAvailable),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.closeButton),
           ),
         ],
       ),
@@ -504,10 +524,11 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   }
 
   Future<void> _shareDocument(BuildContext context, Document document) async {
+    final l10n = AppLocalizations.of(context)!;
     if (!document.isShareable) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('This document is not shareable'),
+        SnackBar(
+          content: Text(l10n.documentNotShareable),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -521,16 +542,17 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   }
 
   Future<void> _verifyDocument(BuildContext context, Document document) async {
+    final l10n = AppLocalizations.of(context)!;
     // Show loading indicator
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
+      builder: (context) => AlertDialog(
         content: Row(
           children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 16),
-            Text('Verification in progress...'),
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Text(l10n.verificationInProgressDialog),
           ],
         ),
       ),
@@ -552,16 +574,17 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Verification result'),
+            title: Text(l10n.verificationResultDialogTitle),
             content: Text(
               status != null
-                  ? 'Status: ${_getVerificationStatusText(status)}'
-                  : 'Verification failed. Please try again.',
+                  ? l10n.verificationStatusResult(
+                      _getVerificationStatusText(status, context))
+                  : l10n.verificationFailedError,
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
+                child: Text(l10n.closeButton),
               ),
             ],
           ),
@@ -578,12 +601,12 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: Text('An error occurred: $e'),
+            title: Text(l10n.errorDialogTitle),
+            content: Text(l10n.genericErrorMessage(e.toString())),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
+                child: Text(l10n.closeButton),
               ),
             ],
           ),
@@ -593,15 +616,17 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   }
 
   Future<void> _revokeShare(BuildContext context, DocumentShare share) async {
+    final l10n = AppLocalizations.of(context)!;
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirm Revocation'),
-        content: Text('Revoke access for ${share.recipientDescription}?'),
+        title: Text(l10n.confirmRevocationDialogTitle),
+        content: Text(
+            l10n.confirmRevocationDialogContent(share.recipientDescription)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancelButton),
           ),
           TextButton(
             onPressed: () async {
@@ -609,7 +634,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
               await _doRevokeShare(context, share);
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Revoke'),
+            child: Text(l10n.revokeShareButton),
           ),
         ],
       ),
@@ -617,16 +642,17 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   }
 
   Future<void> _doRevokeShare(BuildContext context, DocumentShare share) async {
+    final l10n = AppLocalizations.of(context)!;
     // Show loading indicator
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
+      builder: (context) => AlertDialog(
         content: Row(
           children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 16),
-            Text('Revoking share...'),
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Text(l10n.revokingShareDialog),
           ],
         ),
       ),
@@ -648,7 +674,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              success ? 'Share revoked successfully' : 'Failed to revoke share',
+              success ? l10n.shareRevokedSuccess : l10n.failedToRevokeShare,
             ),
             behavior: SnackBarBehavior.floating,
           ),
@@ -664,7 +690,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('An error occurred: $e'),
+            content: Text(l10n.genericErrorMessage(e.toString())),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.red,
           ),
@@ -679,6 +705,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
     String action,
     Document document,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     switch (action) {
       case 'edit':
         _editDocument(context, document);
@@ -696,18 +723,17 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   }
 
   void _editDocument(BuildContext context, Document document) {
+    final l10n = AppLocalizations.of(context)!;
     // For a complete implementation, this would open an edit dialog
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit document'),
-        content: const Text(
-          'The document editing feature will be implemented soon.',
-        ),
+        title: Text(l10n.editDocumentDialogTitle),
+        content: Text(l10n.editFeatureNotAvailable),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.closeButton),
           ),
         ],
       ),
@@ -726,10 +752,11 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
 
   Future<void> _signDocument(BuildContext context, Document document) async {
     final identity = ref.read(identityNotifierProvider).identity;
+    final l10n = AppLocalizations.of(context)!;
     if (identity == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('You need an identity to sign documents'),
+        SnackBar(
+          content: Text(l10n.needIdentityToSignError),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -740,12 +767,12 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
+      builder: (context) => AlertDialog(
         content: Row(
           children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 16),
-            Text('Signing in progress...'),
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Text(l10n.signingInProgressDialog),
           ],
         ),
       ),
@@ -769,16 +796,16 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Document signed'),
+            title: Text(l10n.documentSignedDialogTitle),
             content: Text(
               signedDocument != null
-                  ? 'The document was signed successfully.'
-                  : 'Signing failed. Please try again.',
+                  ? l10n.documentSignedSuccess
+                  : l10n.documentSigningFailed,
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
+                child: Text(l10n.closeButton),
               ),
             ],
           ),
@@ -795,12 +822,12 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: Text('An error occurred: $e'),
+            title: Text(l10n.errorDialogTitle),
+            content: Text(l10n.genericErrorMessage(e.toString())),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
+                child: Text(l10n.closeButton),
               ),
             ],
           ),
@@ -810,15 +837,16 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   }
 
   void _confirmDeleteDocument(BuildContext context, Document document) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirm deletion'),
-        content: Text('Are you sure you want to delete "${document.title}" ?'),
+        title: Text(l10n.confirmDeletionDialogTitle),
+        content: Text(l10n.confirmDeletionDialogContent(document.title)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancelButton),
           ),
           TextButton(
             onPressed: () {
@@ -826,7 +854,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
               _deleteDocument(context, document);
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text(l10n.deleteButton),
           ),
         ],
       ),
@@ -834,16 +862,17 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   }
 
   Future<void> _deleteDocument(BuildContext context, Document document) async {
+    final l10n = AppLocalizations.of(context)!;
     // Show loading indicator
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
+      builder: (context) => AlertDialog(
         content: Row(
           children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 16),
-            Text('Deletion in progress...'),
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Text(l10n.deletionInProgressDialog),
           ],
         ),
       ),
@@ -866,8 +895,8 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
           SnackBar(
             content: Text(
               success
-                  ? 'Document deleted successfully'
-                  : 'Document deletion failed',
+                  ? l10n.documentDeletedSuccess
+                  : l10n.documentDeletionFailed,
             ),
             behavior: SnackBarBehavior.floating,
           ),
@@ -886,7 +915,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('An error occurred: $e'),
+            content: Text(l10n.genericErrorMessage(e.toString())),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.red,
           ),
@@ -921,28 +950,29 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
     }
   }
 
-  String _getDocumentTypeName(DocumentType type) {
+  String _getDocumentTypeName(DocumentType type, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (type) {
       case DocumentType.nationalId:
-        return 'National ID';
+        return l10n.documentTypeNationalId;
       case DocumentType.passport:
-        return 'Passport';
+        return l10n.documentTypePassport;
       case DocumentType.drivingLicense:
-        return 'Driving License';
+        return l10n.documentTypeDrivingLicense;
       case DocumentType.diploma:
-        return 'Diploma';
+        return l10n.documentTypeDiploma;
       case DocumentType.certificate:
-        return 'Certificate';
+        return l10n.documentTypeCertificate;
       case DocumentType.addressProof:
-        return 'Address Proof';
+        return l10n.documentTypeAddressProof;
       case DocumentType.bankDocument:
-        return 'Bank Document';
+        return l10n.documentTypeBankDocument;
       case DocumentType.medicalRecord:
-        return 'Medical Record';
+        return l10n.documentTypeMedicalRecord;
       case DocumentType.corporateDocument:
-        return 'Corporate Document';
+        return l10n.documentTypeCorporateDocument;
       case DocumentType.other:
-        return 'Other';
+        return l10n.documentTypeOther;
     }
   }
 
@@ -961,29 +991,32 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
     }
   }
 
-  String _getVerificationStatusText(DocumentVerificationStatus status) {
+  String _getVerificationStatusText(
+      DocumentVerificationStatus status, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (status) {
       case DocumentVerificationStatus.unverified:
-        return 'Unverified';
+        return l10n.verificationStatusUnverified;
       case DocumentVerificationStatus.pending:
-        return 'Pending';
+        return l10n.verificationStatusPending;
       case DocumentVerificationStatus.verified:
-        return 'Verified';
+        return l10n.verificationStatusVerified;
       case DocumentVerificationStatus.rejected:
-        return 'Rejected';
+        return l10n.verificationStatusRejectedDetail;
       case DocumentVerificationStatus.expired:
-        return 'Expired';
+        return l10n.verificationStatusExpiredDetail;
     }
   }
 
-  String _getEidasLevelText(EidasLevel level) {
+  String _getEidasLevelText(EidasLevel level, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (level) {
       case EidasLevel.low:
-        return 'Low';
+        return l10n.eidasLevelLow;
       case EidasLevel.substantial:
-        return 'Substantial';
+        return l10n.eidasLevelSubstantial;
       case EidasLevel.high:
-        return 'High';
+        return l10n.eidasLevelHigh;
     }
   }
 }
