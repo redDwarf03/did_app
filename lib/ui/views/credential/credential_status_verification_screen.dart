@@ -8,6 +8,7 @@ import 'package:did_app/application/credential/providers.dart';
 import 'package:did_app/ui/common/app_card.dart';
 import 'package:did_app/ui/common/section_title.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:go_router/go_router.dart';
 
 /// Écran de vérification du statut d'une attestation utilisant Status List 2021
 class CredentialStatusVerificationScreen extends ConsumerStatefulWidget {
@@ -99,6 +100,10 @@ class _CredentialStatusVerificationScreenState
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.verifyStatusTitle),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

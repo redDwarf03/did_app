@@ -35,7 +35,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       setState(() => _selectedIndex = 0);
     } else if (location.startsWith('/main/identity')) {
       setState(() => _selectedIndex = 1);
-    } else if (location.startsWith('/main/credentials')) {
+    } else if (location.startsWith('/main/credential')) {
       setState(() => _selectedIndex = 2);
     } else if (location.startsWith('/main/documents')) {
       setState(() => _selectedIndex = 3);
@@ -69,7 +69,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               GoRouter.of(context).go('/main/identity');
               break;
             case 2:
-              GoRouter.of(context).go('/main/credentials');
+              GoRouter.of(context).go('/main/credential');
               break;
             case 3:
               GoRouter.of(context).go('/main/documents');

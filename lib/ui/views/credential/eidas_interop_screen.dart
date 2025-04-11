@@ -138,6 +138,15 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionTitle(title: l10n.eidasTrustRegistryTitle),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0, left: 4.0, right: 4.0),
+          child: Text(
+            // TODO: Localize
+            'Synchronize with the official EU trust registry to verify issuers.',
+            // l10n.eidasTrustRegistryDescription,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
         AppCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,15 +196,28 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionTitle(title: l10n.eidasTitle),
+        SectionTitle(
+            title:
+                'EUDI Wallet'), // TODO: Localize (l10n.eudiWalletSectionTitle)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0, left: 4.0, right: 4.0),
+          child: Text(
+            // TODO: Localize
+            'Interact with your European Digital Identity Wallet (EUDI Wallet). Note: Simulated functionality.',
+            // l10n.eudiWalletSectionDescription,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
         AppCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
                 leading: const Icon(Icons.wallet),
-                title: Text(l10n.eidasTitle),
-                subtitle: Text(l10n.eidasDescription),
+                title: Text(
+                    'EUDI Wallet Interaction'), // TODO: Localize (l10n.eudiWalletInteractionTitle)
+                subtitle: Text(
+                    'Import from or share credentials with the EUDI Wallet.'), // TODO: Localize (l10n.eudiWalletInteractionDesc)
               ),
               const Divider(),
               Padding(
@@ -230,7 +252,18 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionTitle(title: l10n.eidasTrustRegistryTitle),
+        SectionTitle(
+            title:
+                'eIDAS Compatible Credentials'), // TODO: Localize (l10n.eidasCompatibleCredentialsTitle)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0, left: 4.0, right: 4.0),
+          child: Text(
+            // TODO: Localize
+            'These credentials are already in a format recognized by the eIDAS framework.',
+            // l10n.eidasCompatibleCredentialsDescription,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
         if (compatibleCredentials.isEmpty)
           Padding(
             padding: const EdgeInsets.all(16),
@@ -333,7 +366,18 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionTitle(title: l10n.eidasTitle),
+        SectionTitle(
+            title:
+                'Convertible Credentials'), // TODO: Localize (l10n.eidasConvertibleCredentialsTitle)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0, left: 4.0, right: 4.0),
+          child: Text(
+            // TODO: Localize
+            'These credentials can be converted to the eIDAS format for better interoperability.',
+            // l10n.eidasConvertibleCredentialsDescription,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
         if (convertibleCredentials.isEmpty)
           Padding(
             padding: const EdgeInsets.all(16),
@@ -398,7 +442,18 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionTitle(title: l10n.actionsSection),
+        SectionTitle(
+            title:
+                'Manual Import/Export'), // TODO: Localize (l10n.importExportSectionTitle)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0, left: 4.0, right: 4.0),
+          child: Text(
+            // TODO: Localize
+            'Manually import or export credentials in eIDAS-compatible JSON format.',
+            // l10n.importExportSectionDescription,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
         AppCard(
           child: Padding(
             padding: const EdgeInsets.all(16),

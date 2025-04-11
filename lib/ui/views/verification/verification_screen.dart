@@ -5,6 +5,7 @@ import 'package:did_app/ui/views/verification/verification_success_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:go_router/go_router.dart';
 
 /// Main screen for identity verification
 class VerificationScreen extends ConsumerWidget {
@@ -162,10 +163,8 @@ class VerificationScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(l10n.goBackButton),
+                  onPressed: () => context.pushNamed('createIdentity'),
+                  child: Text(l10n.createIdentityButtonList),
                 ),
               ],
             ),

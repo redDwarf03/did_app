@@ -6,8 +6,8 @@ import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 
 /// Phone verification step component for verification process
 class PhoneVerificationStep extends ConsumerStatefulWidget {
@@ -36,7 +36,7 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
   int _remainingTime = 0;
 
   // For international phone number handling
-  PhoneNumber _phoneNumber = PhoneNumber(isoCode: 'US');
+  PhoneNumber _phoneNumber = PhoneNumber(isoCode: IsoCode.US, nsn: '');
   String _completePhoneNumber = '';
 
   // Random generator for mock verification code
@@ -266,39 +266,45 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
 
   /// Build the phone number input field
   Widget _buildPhoneInput() {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
+    return TextFormField(
+      controller: _phoneController,
+      decoration: InputDecoration(
+        labelText: 'Phone Number',
+        hintText: '+33 6XX XX XX XX',
+        border: OutlineInputBorder(),
+        prefixIcon: Icon(Icons.phone),
       ),
-      child: InternationalPhoneNumberInput(
-        onInputChanged: (PhoneNumber number) {
+      keyboardType: TextInputType.phone,
+      onChanged: (value) {
+        try {
+          final phone = PhoneNumber.parse(
+            value,
+            destinationCountry: IsoCode.FR,
+          );
           setState(() {
-            _phoneNumber = number;
+            _phoneNumber = phone;
           });
-        },
-        selectorConfig: const SelectorConfig(
-          selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
-        ),
-        autoValidateMode: AutovalidateMode.onUserInteraction,
-        selectorTextStyle: const TextStyle(color: Colors.black),
-        initialValue: _phoneNumber,
-        textFieldController: _phoneController,
-        keyboardType: const TextInputType.numberWithOptions(
-          signed: true,
-          decimal: true,
-        ),
-        inputDecoration: const InputDecoration(
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          border: InputBorder.none,
-          hintText: 'Phone Number',
-        ),
-        onSaved: (PhoneNumber number) {
-          setState(() {
-            _phoneNumber = number;
-          });
-        },
-      ),
+        } catch (e) {
+          // Invalid phone number format
+        }
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a phone number';
+        }
+        try {
+          final phone = PhoneNumber.parse(
+            value,
+            destinationCountry: IsoCode.FR,
+          );
+          if (!phone.isValid(type: PhoneNumberType.mobile)) {
+            return 'Please enter a valid mobile number';
+          }
+        } catch (e) {
+          return 'Invalid phone number format';
+        }
+        return null;
+      },
     );
   }
 
@@ -354,7 +360,7 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
       });
 
       // Get the complete phone number with country code
-      _completePhoneNumber = _phoneNumber.phoneNumber ?? '';
+      _completePhoneNumber = '+${_phoneNumber.countryCode}${_phoneNumber.nsn}';
 
       // Simulate network request delay
       await Future.delayed(const Duration(seconds: 1));

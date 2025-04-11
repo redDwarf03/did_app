@@ -51,7 +51,7 @@ dependencies:
   # Navigation
   go_router: ^14.6.2
 
-  intl_phone_number_input: ^0.7.4
+  phone_numbers_parser: ^9.0.3
   json_annotation: ^4.8.1
 
   # Using Official Material Symbols Icons variable fonts

@@ -300,7 +300,6 @@
     "documentTypeCorporateDocument",
     "documentTypeOther",
     "verificationStatusUnverified",
-    "verificationStatusPending",
     "verificationStatusVerified",
     "verificationStatusRejectedDetail",
     "verificationStatusExpiredDetail",
@@ -512,6 +511,8 @@
     "statusListMenuTitle",
     "statusListMenuDesc",
     "credentialDetails",
-    "verificationResults"
+    "verificationResults",
+    "confirmButton",
+    "verificationStatusPendingDescription"
   ]
 }
