@@ -1,6 +1,8 @@
+import 'package:did_app/ui/common/widgets/menu_card.dart';
+import 'package:did_app/ui/common/widgets/stats_item.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:go_router/go_router.dart';
 
 /// Écran d'accueil de l'application
 class HomeScreen extends StatelessWidget {
@@ -72,57 +74,26 @@ class HomeScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildStatsItem(
-                  context,
-                  Icons.credit_card,
-                  '3',
-                  l10n.credentialsStatsLabel,
+                StatsItem(
+                  icon: Icons.credit_card,
+                  count: '3',
+                  label: l10n.credentialsStatsLabel,
                 ),
-                _buildStatsItem(
-                  context,
-                  Icons.security,
-                  '1',
-                  l10n.verifiedIdentityStatsLabel,
+                StatsItem(
+                  icon: Icons.security,
+                  count: '1',
+                  label: l10n.verifiedIdentityStatsLabel,
                 ),
-                _buildStatsItem(
-                  context,
-                  Icons.share,
-                  '5',
-                  l10n.sharesStatsLabel,
+                StatsItem(
+                  icon: Icons.share,
+                  count: '5',
+                  label: l10n.sharesStatsLabel,
                 ),
               ],
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildStatsItem(
-    BuildContext context,
-    IconData icon,
-    String count,
-    String label,
-  ) {
-    return Column(
-      children: [
-        Icon(icon, color: Colors.blue, size: 28),
-        const SizedBox(height: 8),
-        Text(
-          count,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
-      ],
     );
   }
 
@@ -141,110 +112,46 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         ),
-        _buildMenuCard(
-          context,
-          l10n.secureAuthMenuTitle,
-          l10n.secureAuthMenuDesc,
-          Icons.security,
-          Colors.indigo,
-          () => context.push('/secure_auth'),
+        MenuCard(
+          title: l10n.secureAuthMenuTitle,
+          subtitle: l10n.secureAuthMenuDesc,
+          icon: Icons.security,
+          color: Colors.indigo,
+          onTap: () => context.push('/secure_auth'),
         ),
         const SizedBox(height: 12),
-        _buildMenuCard(
-          context,
-          l10n.eidasInteropMenuTitle,
-          l10n.eidasInteropMenuDesc,
-          Icons.public,
-          Colors.green,
-          () => context.push('/eidas/interop'),
+        MenuCard(
+          title: l10n.eidasInteropMenuTitle,
+          subtitle: l10n.eidasInteropMenuDesc,
+          icon: Icons.public,
+          color: Colors.green,
+          onTap: () => context.push('/eidas/interop'),
         ),
         const SizedBox(height: 12),
-        _buildMenuCard(
-          context,
-          l10n.credentialsMenuTitle,
-          l10n.credentialsMenuDesc,
-          Icons.credit_card,
-          Colors.orange,
-          () {}, // À implémenter
+        MenuCard(
+          title: l10n.credentialsMenuTitle,
+          subtitle: l10n.credentialsMenuDesc,
+          icon: Icons.credit_card,
+          color: Colors.orange,
+          onTap: () {}, // À implémenter
         ),
         const SizedBox(height: 12),
-        _buildMenuCard(
-          context,
-          l10n.statusListMenuTitle,
-          l10n.statusListMenuDesc,
-          Icons.verified_user,
-          Colors.teal,
-          () => context.push('/status_list/dashboard'),
+        MenuCard(
+          title: l10n.statusListMenuTitle,
+          subtitle: l10n.statusListMenuDesc,
+          icon: Icons.verified_user,
+          color: Colors.teal,
+          onTap: () => context.push('/status_list/dashboard'),
         ),
         const SizedBox(height: 12),
-        _buildMenuCard(
-          context,
-          l10n.secureShareMenuTitle,
-          l10n.secureShareMenuDesc,
-          Icons.share,
-          Colors.purple,
-          () {}, // À implémenter
+        MenuCard(
+          title: l10n.secureShareMenuTitle,
+          subtitle: l10n.secureShareMenuDesc,
+          icon: Icons.share,
+          color: Colors.purple,
+          onTap: () {}, // À implémenter
         ),
       ],
-    );
-  }
-
-  Widget _buildMenuCard(
-    BuildContext context,
-    String title,
-    String subtitle,
-    IconData icon,
-    Color color,
-    VoidCallback onTap,
-  ) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: color, size: 28),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.arrow_forward_ios, size: 16),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

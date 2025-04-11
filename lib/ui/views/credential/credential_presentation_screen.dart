@@ -1,10 +1,9 @@
 import 'package:did_app/application/credential/providers.dart';
-import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/application/providers/credential_presentation_provider.dart';
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Écran pour la présentation sélective d'attributs avec ZKP
 class CredentialPresentationScreen extends ConsumerStatefulWidget {
@@ -129,7 +128,7 @@ class _CredentialPresentationScreenState
   Widget _buildContent(BuildContext context, WidgetRef ref) {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -137,7 +136,7 @@ class _CredentialPresentationScreenState
           const SizedBox(height: 24),
           // Liste des attestations
           ..._credentials
-              .map((credential) => _buildCredentialSection(credential)),
+              .map(_buildCredentialSection),
           const SizedBox(height: 24),
           // Section prédicat (si affichée)
           if (_usePredicate) _buildPredicatesSection(),
@@ -208,7 +207,7 @@ class _CredentialPresentationScreenState
               children: [
                 Icon(
                   _getCredentialTypeIcon(
-                      _getCredentialTypeFromList(credential.type)),
+                      _getCredentialTypeFromList(credential.type),),
                   color: Theme.of(context).primaryColor,
                 ),
                 const SizedBox(width: 8),
@@ -254,7 +253,7 @@ class _CredentialPresentationScreenState
                       if (!selectedAttrs.contains(attr)) {
                         _selectedAttributes[credential.id] = [
                           ...selectedAttrs,
-                          attr
+                          attr,
                         ];
                       }
                     } else {
@@ -310,7 +309,7 @@ class _CredentialPresentationScreenState
                       );
 
                       // Trouver un attribut numérique
-                      String? numericAttr = _getNumericAttribute(credential);
+                      final numericAttr = _getNumericAttribute(credential);
 
                       if (numericAttr != null) {
                         final predicate = CredentialPredicate(
@@ -553,7 +552,6 @@ class PresentationResultScreen extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Icon(
               Icons.check_circle,
@@ -581,7 +579,7 @@ class PresentationResultScreen extends StatelessWidget {
               child: Center(
                 child: link != null
                     ? const Icon(Icons.qr_code,
-                        size: 150, color: Colors.black87)
+                        size: 150, color: Colors.black87,)
                     : const Icon(Icons.error, size: 64, color: Colors.red),
               ),
             ),
@@ -601,14 +599,14 @@ class PresentationResultScreen extends StatelessWidget {
               title: l10n.generalInformationSection,
               children: [
                 _buildInfoRow(l10n.credentialTypeLabel,
-                    '${presentation.verifiableCredentials.length}'),
+                    '${presentation.verifiableCredentials.length}',),
                 _buildInfoRow(l10n.documentTypeLabel,
-                    '${presentation.revealedAttributes?.length ?? 0}'),
+                    '${presentation.revealedAttributes.length ?? 0}',),
                 if (presentation.verifiableCredentials.isNotEmpty)
                   _buildInfoRow(l10n.credentialsSection,
-                      '${presentation.verifiableCredentials.length}'),
+                      '${presentation.verifiableCredentials.length}',),
                 _buildInfoRow(l10n.createdLabel,
-                    _formatDate(presentation.created ?? DateTime.now())),
+                    _formatDate(presentation.created ?? DateTime.now()),),
               ],
             ),
             if (message != null && message!.isNotEmpty) ...[
@@ -832,7 +830,7 @@ class _BeginnerInfoBoxState extends State<_BeginnerInfoBox> {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'C\'est comme prouver que vous connaissez le code d\'un coffre-fort sans révéler le code lui-même.',
+                  "C'est comme prouver que vous connaissez le code d'un coffre-fort sans révéler le code lui-même.",
                   style: TextStyle(fontStyle: FontStyle.italic),
                 ),
                 const SizedBox(height: 16),

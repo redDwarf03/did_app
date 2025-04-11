@@ -1,8 +1,8 @@
 import 'package:did_app/application/verification/providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen to start a new identity verification process
 class VerificationStartScreen extends ConsumerStatefulWidget {
@@ -104,10 +104,10 @@ class _VerificationStartScreenState
         const SizedBox(height: 16),
         Card(
           elevation: 0,
-          color: Colors.blue.withOpacity(0.1),
+          color: Colors.blue.withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: Colors.blue.withOpacity(0.3)),
+            side: BorderSide(color: Colors.blue.withValues(alpha: 0.3)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -215,7 +215,7 @@ class _VerificationStartScreenState
               vertical: 2,
             ),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: Colors.blue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -288,8 +288,8 @@ class _VerificationStartScreenState
           });
         }
       },
-      title: Text(
-        "I agree to the terms and privacy policy",
+      title: const Text(
+        'I agree to the terms and privacy policy',
       ),
       subtitle: GestureDetector(
         onTap: () => _showTermsAndConditions(l10n),
@@ -322,17 +322,17 @@ class _VerificationStartScreenState
   List<String> _getRequiredDocuments(AppLocalizations l10n) {
     final documents = <String>[];
     // Common documents for all levels
-    documents.add("Email Verification");
-    documents.add("Phone Number");
+    documents.add('Email Verification');
+    documents.add('Phone Number');
 
     if (_selectedLevel == VerificationLevel.standard ||
         _selectedLevel == VerificationLevel.advanced) {
-      documents.add("Government ID (Passport, National ID)");
-      documents.add("Proof of Address");
+      documents.add('Government ID (Passport, National ID)');
+      documents.add('Proof of Address');
     }
 
     if (_selectedLevel == VerificationLevel.advanced) {
-      documents.add("Biometric Verification");
+      documents.add('Biometric Verification');
     }
 
     return documents;

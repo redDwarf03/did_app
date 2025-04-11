@@ -36,7 +36,7 @@ class TwoFactorAuthService {
 
       return true;
     } catch (e) {
-      debugPrint('Erreur lors de l\'envoi du code OTP: $e');
+      debugPrint("Erreur lors de l'envoi du code OTP: $e");
       return false;
     }
   }
@@ -96,7 +96,7 @@ class TwoFactorAuthService {
 
   /// Récupère l'email associé au dernier code OTP envoyé
   Future<String?> getOtpEmail() async {
-    return await _secureStorage.read(key: _emailKey);
+    return _secureStorage.read(key: _emailKey);
   }
 
   /// Génère un code OTP aléatoire à 6 chiffres
@@ -108,13 +108,13 @@ class TwoFactorAuthService {
 
 /// Résultat de la vérification d'un code OTP
 class OtpVerificationResult {
-  final bool isValid;
-  final String message;
-  final bool isExpired;
 
   OtpVerificationResult({
     required this.isValid,
     required this.message,
     this.isExpired = false,
   });
+  final bool isValid;
+  final String message;
+  final bool isExpired;
 }

@@ -5,8 +5,8 @@ import 'package:did_app/application/verification/providers.dart';
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 
 /// Phone verification step component for verification process
@@ -36,7 +36,7 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
   int _remainingTime = 0;
 
   // For international phone number handling
-  PhoneNumber _phoneNumber = PhoneNumber(isoCode: IsoCode.US, nsn: '');
+  PhoneNumber _phoneNumber = const PhoneNumber(isoCode: IsoCode.US, nsn: '');
   String _completePhoneNumber = '';
 
   // Random generator for mock verification code
@@ -180,7 +180,7 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
                     Expanded(
                       child: Text(
                         l10n.demoPhoneVerificationCodeMessage(
-                            _mockVerificationCode),
+                            _mockVerificationCode,),
                         style: const TextStyle(
                           fontStyle: FontStyle.italic,
                           fontSize: 14,
@@ -268,7 +268,7 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
   Widget _buildPhoneInput() {
     return TextFormField(
       controller: _phoneController,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         labelText: 'Phone Number',
         hintText: '+33 6XX XX XX XX',
         border: OutlineInputBorder(),

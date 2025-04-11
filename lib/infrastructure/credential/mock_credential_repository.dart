@@ -4,35 +4,34 @@ import 'dart:math';
 
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/credential/credential_repository.dart';
-import 'package:flutter/foundation.dart';
 
 /// Implémentation simulée du repository pour les attestations vérifiables
 ///
 /// Cette classe simule la gestion d'attestations vérifiables pour le développement et les tests.
 /// Elle sera remplacée par une implémentation réelle utilisant la blockchain Archethic.
 class MockCredentialRepository implements CredentialRepository {
-  final Map<String, Credential> _storage = {};
-  final _credentialsController = StreamController<List<Credential>>.broadcast();
 
   // Génère des attestations de test
   MockCredentialRepository() {
     _initMockCredentials();
   }
+  final Map<String, Credential> _storage = {};
+  final _credentialsController = StreamController<List<Credential>>.broadcast();
 
   void _initMockCredentials() {
     final identityCredential = Credential(
       id: '1234-5678-9012-3456',
       context: [
         'https://www.w3.org/2018/credentials/v1',
-        'https://www.w3.org/2018/credentials/identity/v1'
+        'https://www.w3.org/2018/credentials/identity/v1',
       ],
       type: ['VerifiableCredential', 'IdentityCredential'],
       issuanceDate: DateTime.now().subtract(const Duration(days: 15)),
       issuer: 'did:archethic:government_authority',
       subject: 'did:archethic:user123',
-      name: 'Carte d\'identité',
+      name: "Carte d'identité",
       description:
-          'Carte d\'identité nationale émise par les autorités françaises',
+          "Carte d'identité nationale émise par les autorités françaises",
       credentialSubject: {
         'id': 'did:archethic:user123',
         'firstName': 'Jean',
@@ -67,7 +66,7 @@ class MockCredentialRepository implements CredentialRepository {
       id: '2345-6789-0123-4567',
       context: [
         'https://www.w3.org/2018/credentials/v1',
-        'https://www.w3.org/2018/credentials/examples/v1'
+        'https://www.w3.org/2018/credentials/examples/v1',
       ],
       type: ['VerifiableCredential', 'UniversityDegreeCredential'],
       issuanceDate: DateTime.now().subtract(const Duration(days: 120)),
@@ -85,7 +84,6 @@ class MockCredentialRepository implements CredentialRepository {
         'graduationDate': '2023-06-15',
         'gpa': '3.8',
       },
-      expirationDate: null, // Un diplôme n'expire pas
       proof: {
         'type': 'ArchethicSignature2023',
         'created': DateTime.now()
@@ -113,14 +111,14 @@ class MockCredentialRepository implements CredentialRepository {
       id: '3456-7890-1234-5678',
       context: [
         'https://www.w3.org/2018/credentials/v1',
-        'https://www.w3.org/2018/credentials/health/v1'
+        'https://www.w3.org/2018/credentials/health/v1',
       ],
       type: ['VerifiableCredential', 'HealthInsuranceCredential'],
       issuanceDate: DateTime.now().subtract(const Duration(days: 60)),
       issuer: 'did:archethic:national_health_insurance',
       subject: 'did:archethic:user123',
-      name: 'Carte d\'assurance maladie',
-      description: 'Attestation d\'affiliation à l\'assurance maladie',
+      name: "Carte d'assurance maladie",
+      description: "Attestation d'affiliation à l'assurance maladie",
       credentialSubject: {
         'id': 'did:archethic:user123',
         'policyNumber': 'HEALTH123456789',
@@ -312,7 +310,7 @@ class MockCredentialRepository implements CredentialRepository {
       id: '9876-5432-1098-7654',
       context: [
         'https://www.w3.org/2018/credentials/v1',
-        'https://www.w3.org/2018/credentials/examples/v1'
+        'https://www.w3.org/2018/credentials/examples/v1',
       ],
       type: ['VerifiableCredential', 'EmploymentCredential'],
       issuanceDate: DateTime.now(),

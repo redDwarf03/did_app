@@ -1,6 +1,6 @@
+import 'package:did_app/domain/credential/status_list_2021.dart';
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:did_app/domain/credential/status_list_2021.dart';
 
 part 'credential.freezed.dart';
 part 'credential.g.dart';
@@ -61,8 +61,7 @@ enum CredentialType {
 
 /// Modèle représentant une attestation
 @freezed
-class Credential with _$Credential {
-  const Credential._(); // Ajout d'un constructeur privé pour les getters
+class Credential with _$Credential { // Ajout d'un constructeur privé pour les getters
 
   const factory Credential({
     /// Identifiant unique de l'attestation
@@ -117,6 +116,7 @@ class Credential with _$Credential {
     /// Preuve cryptographique
     required Map<String, dynamic> proof,
   }) = _Credential;
+  const Credential._();
 
   factory Credential.fromJson(Map<String, dynamic> json) =>
       _$CredentialFromJson(json);

@@ -10,7 +10,7 @@ final credentialByIdProvider = FutureProvider.family<Credential?, String>(
     try {
       return await repository.getCredentialById(credentialId);
     } catch (e) {
-      throw Exception('Erreur lors de la récupération de l\'attestation: $e');
+      throw Exception("Erreur lors de la récupération de l'attestation: $e");
     }
   },
 );

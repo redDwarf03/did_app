@@ -1,12 +1,11 @@
 import 'package:did_app/application/credential/eidas_provider.dart';
-import 'package:did_app/application/credential/providers.dart';
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/ui/common/app_card.dart';
 import 'package:did_app/ui/common/section_title.dart';
 import 'package:did_app/ui/views/credential/eidas_trust_registry_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Écran de vérification des attestations eIDAS
 class EidasVerificationScreen extends ConsumerStatefulWidget {
@@ -107,7 +106,9 @@ class _EidasVerificationScreenState
   }
 
   Widget _buildVerificationResultCard(
-      dynamic verificationResult, AppLocalizations l10n) {
+    dynamic verificationResult,
+    AppLocalizations l10n,
+  ) {
     final isValid = verificationResult.isValid;
 
     return Column(
@@ -124,8 +125,8 @@ class _EidasVerificationScreenState
                   height: 64,
                   decoration: BoxDecoration(
                     color: isValid
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.red.withOpacity(0.1),
+                        ? Colors.green.withValues(alpha: 0.1)
+                        : Colors.red.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -161,7 +162,9 @@ class _EidasVerificationScreenState
   }
 
   Widget _buildRevocationStatusCard(
-      dynamic revocationStatus, AppLocalizations l10n) {
+    dynamic revocationStatus,
+    AppLocalizations l10n,
+  ) {
     final isRevoked = revocationStatus.isRevoked;
 
     return Column(
@@ -178,8 +181,8 @@ class _EidasVerificationScreenState
                   height: 64,
                   decoration: BoxDecoration(
                     color: !isRevoked
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.red.withOpacity(0.1),
+                        ? Colors.green.withValues(alpha: 0.1)
+                        : Colors.red.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -234,17 +237,29 @@ class _EidasVerificationScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildDetailRow(l10n, l10n.issuerLabel,
-                    details?['issuer'] ?? widget.credential.issuer),
-                const SizedBox(height: 8),
-                _buildDetailRow(l10n, l10n.issuanceDateLabel,
-                    details?['issuanceDate'] ?? ''),
-                const SizedBox(height: 8),
-                _buildDetailRow(l10n, l10n.proofMethodLabel,
-                    details?['verificationMethod'] ?? ''),
+                _buildDetailRow(
+                  l10n,
+                  l10n.issuerLabel,
+                  details?['issuer'] ?? widget.credential.issuer,
+                ),
                 const SizedBox(height: 8),
                 _buildDetailRow(
-                    l10n, l10n.proofTypeLabel, details?['proofType'] ?? ''),
+                  l10n,
+                  l10n.issuanceDateLabel,
+                  details?['issuanceDate'] ?? '',
+                ),
+                const SizedBox(height: 8),
+                _buildDetailRow(
+                  l10n,
+                  l10n.proofMethodLabel,
+                  details?['verificationMethod'] ?? '',
+                ),
+                const SizedBox(height: 8),
+                _buildDetailRow(
+                  l10n,
+                  l10n.proofTypeLabel,
+                  details?['proofType'] ?? '',
+                ),
               ],
             ),
           ),
@@ -276,7 +291,7 @@ class _EidasVerificationScreenState
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
+                        color: Colors.blue.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -295,7 +310,7 @@ class _EidasVerificationScreenState
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
                             l10n.eidasInteropDescription,
                             style: const TextStyle(fontSize: 14),
@@ -312,12 +327,18 @@ class _EidasVerificationScreenState
                 ),
                 const SizedBox(height: 8),
                 _buildComplianceCheck(
-                    'W3C Verifiable Credentials Format', true),
-                _buildComplianceCheck(l10n.proofSignatureLabel,
-                    verificationResult?.isValid ?? false),
+                  'W3C Verifiable Credentials Format',
+                  true,
+                ),
+                _buildComplianceCheck(
+                  l10n.proofSignatureLabel,
+                  verificationResult?.isValid ?? false,
+                ),
                 _buildComplianceCheck('eIDAS Context', true),
                 _buildComplianceCheck(
-                    l10n.eudiWalletTitle, eidasState.isEudiWalletAvailable),
+                  l10n.eudiWalletTitle,
+                  eidasState.isEudiWalletAvailable,
+                ),
                 _buildComplianceCheck(l10n.verifiedIssuer, issuerTrusted),
 
                 // Section registre de confiance
@@ -331,10 +352,12 @@ class _EidasVerificationScreenState
                   const SizedBox(height: 8),
                   if (eidasState.lastSyncDate != null)
                     Text(
-                        '${l10n.lastSynchronization}: ${_formatDateTime(eidasState.lastSyncDate!)}'),
+                      '${l10n.lastSynchronization}: ${_formatDateTime(eidasState.lastSyncDate!)}',
+                    ),
                   if (trustListReport != null)
                     Text(
-                        '${l10n.trustedIssuers}: ${trustListReport['totalIssuers']}'),
+                      '${l10n.trustedIssuers}: ${trustListReport['totalIssuers']}',
+                    ),
                   const SizedBox(height: 8),
                   OutlinedButton.icon(
                     onPressed: _openTrustRegistry,
@@ -364,7 +387,7 @@ class _EidasVerificationScreenState
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ElevatedButton.icon(
-          onPressed: () => _generateQrCode(),
+          onPressed: _generateQrCode,
           icon: const Icon(Icons.qr_code),
           label: Text(l10n.shareButtonLabel),
         ),
@@ -406,7 +429,7 @@ class _EidasVerificationScreenState
 
   Widget _buildComplianceCheck(String label, bool isCompliant) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
           Icon(
@@ -447,7 +470,7 @@ class _EidasVerificationScreenState
               height: 200,
               color: Colors.grey.shade300,
               child: qrCodeData != null
-                  ? Center(
+                  ? const Center(
                       child:
                           Icon(Icons.qr_code, size: 150, color: Colors.black87),
                     )

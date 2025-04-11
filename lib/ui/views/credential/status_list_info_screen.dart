@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:did_app/ui/common/section_title.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Écran d'information sur le standard Status List 2021
 class StatusList2021InfoScreen extends ConsumerWidget {
@@ -47,7 +47,7 @@ class StatusList2021InfoScreen extends ConsumerWidget {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -82,20 +82,28 @@ class StatusList2021InfoScreen extends ConsumerWidget {
   }
 
   Widget _buildIntroductionSection(
-      BuildContext context, AppLocalizations l10n) {
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionTitle(title: l10n.introductionTitle),
         const SizedBox(height: 16),
-        Text(l10n.statusList2021IntroductionP1,
-            style: Theme.of(context).textTheme.bodyLarge),
+        Text(
+          l10n.statusList2021IntroductionP1,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
         const SizedBox(height: 12),
-        Text(l10n.statusList2021IntroductionP2,
-            style: Theme.of(context).textTheme.bodyLarge),
+        Text(
+          l10n.statusList2021IntroductionP2,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
         const SizedBox(height: 12),
-        Text(l10n.statusList2021IntroductionP3,
-            style: Theme.of(context).textTheme.bodyLarge),
+        Text(
+          l10n.statusList2021IntroductionP3,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
       ],
     );
   }
@@ -174,7 +182,7 @@ class StatusList2021InfoScreen extends ConsumerWidget {
               Container(
                 width: 2,
                 height: 50,
-                color: Theme.of(context).primaryColor.withOpacity(0.5),
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
               ),
           ],
         ),
@@ -258,7 +266,7 @@ class StatusList2021InfoScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: Theme.of(context).primaryColor),
@@ -288,7 +296,9 @@ class StatusList2021InfoScreen extends ConsumerWidget {
   }
 
   Widget _buildImplementationSection(
-      BuildContext context, AppLocalizations l10n) {
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -332,7 +342,7 @@ class StatusList2021InfoScreen extends ConsumerWidget {
                     color: Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text(
+                  child: const Text(
                     '''
 {
   "id": "https://example.com/credentials/123#revocation",
@@ -341,7 +351,7 @@ class StatusList2021InfoScreen extends ConsumerWidget {
   "statusListIndex": "94",
   "statusListCredential": "https://example.com/status/3"
 }''',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'monospace',
                       fontSize: 12,
                     ),
@@ -463,8 +473,8 @@ class StatusList2021InfoScreen extends ConsumerWidget {
         onTap: () {
           // Ouvrir l'URL (à implémenter)
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Ouverture de l\'URL non implémentée'),
+            const SnackBar(
+              content: Text("Ouverture de l'URL non implémentée"),
             ),
           );
         },

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:did_app/application/credential/credential_status_provider.dart';
 import 'package:did_app/application/credential/providers.dart';
 import 'package:did_app/domain/credential/credential.dart';
@@ -7,8 +5,10 @@ import 'package:did_app/domain/credential/credential_status.dart';
 import 'package:did_app/ui/common/app_card.dart';
 import 'package:did_app/ui/common/section_title.dart';
 import 'package:did_app/ui/views/credential/credential_detail_screen.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 /// Écran de renouvellement des attestations
 class CredentialRenewalScreen extends ConsumerStatefulWidget {
@@ -48,7 +48,7 @@ class _CredentialRenewalScreenState
       final renewalNeeded = await statusNotifier.checkForRenewalNeeded(
         credentials,
         const Duration(
-            days: 30), // Renouveler si expiration dans moins de 30 jours
+            days: 30,), // Renouveler si expiration dans moins de 30 jours
       );
 
       setState(() {
@@ -144,9 +144,9 @@ class _CredentialRenewalScreenState
   }
 
   Widget _buildRenewalCard(Credential credential, AppLocalizations l10n) {
-    final bool isExpired = credential.expirationDate != null &&
+    final isExpired = credential.expirationDate != null &&
         credential.expirationDate!.isBefore(DateTime.now());
-    final bool isRevoked = ref
+    final isRevoked = ref
             .read(credentialStatusNotifierProvider)
             .checkResults[credential.id]
             ?.status ==
@@ -155,8 +155,7 @@ class _CredentialRenewalScreenState
     final expiryMessage = credential.expirationDate != null
         ? isExpired
             ? l10n.expiredStatus
-            : l10n.expirationDateLabel +
-                ': ${DateFormat('dd/MM/yyyy').format(credential.expirationDate!)}'
+            : '${l10n.expirationDateLabel}: ${DateFormat('dd/MM/yyyy').format(credential.expirationDate!)}'
         : '';
 
     final credentialType = _getCredentialTypeFromList(credential.type);
@@ -171,7 +170,7 @@ class _CredentialRenewalScreenState
                 : isExpired
                     ? const Icon(Icons.warning, color: Colors.orange, size: 36)
                     : Icon(_getCredentialTypeIcon(credentialType),
-                        color: Colors.amber, size: 36),
+                        color: Colors.amber, size: 36,),
             title: Text(_getCredentialName(credential)),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +245,7 @@ class _CredentialRenewalScreenState
   }
 
   Future<void> _initiateRenewal(
-      Credential credential, AppLocalizations l10n) async {
+      Credential credential, AppLocalizations l10n,) async {
     // Déplacer l'attestation vers "en cours"
     setState(() {
       _renewalCandidates.remove(credential);

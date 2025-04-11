@@ -1,23 +1,21 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+import 'package:did_app/application/credential/providers.dart';
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/credential/credential_status.dart';
 import 'package:did_app/infrastructure/credential/status_list_2021_service.dart';
-import 'package:did_app/application/credential/providers.dart';
-import 'package:did_app/ui/common/app_card.dart';
 import 'package:did_app/ui/common/section_title.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 /// Écran de vérification du statut d'une attestation utilisant Status List 2021
 class CredentialStatusVerificationScreen extends ConsumerStatefulWidget {
-  final String credentialId;
-
   const CredentialStatusVerificationScreen({
     super.key,
     required this.credentialId,
   });
+  final String credentialId;
 
   @override
   ConsumerState<CredentialStatusVerificationScreen> createState() =>
@@ -178,7 +176,10 @@ class _CredentialStatusVerificationScreenState
   }
 
   Widget _buildContent(
-      BuildContext context, Credential credential, AppLocalizations l10n) {
+    BuildContext context,
+    Credential credential,
+    AppLocalizations l10n,
+  ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -269,31 +270,32 @@ class _CredentialStatusVerificationScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionTitle(title: l10n.verificationResults),
-        _isVerifying
-            ? const Card(
-                child: Padding(
-                  padding: EdgeInsets.all(32.0),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 16),
-                        Text('Vérification en cours...'),
-                      ],
+        if (_isVerifying)
+          const Card(
+            child: Padding(
+              padding: EdgeInsets.all(32),
+              child: Center(
+                child: Column(
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Vérification en cours...'),
+                  ],
+                ),
+              ),
+            ),
+          )
+        else
+          _statusResult != null
+              ? _buildStatusResultCard(l10n)
+              : const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(32),
+                    child: Center(
+                      child: Text('Aucune vérification effectuée'),
                     ),
                   ),
                 ),
-              )
-            : _statusResult != null
-                ? _buildStatusResultCard(l10n)
-                : Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32.0),
-                      child: Center(
-                        child: Text('Aucune vérification effectuée'),
-                      ),
-                    ),
-                  ),
       ],
     );
   }
@@ -333,7 +335,7 @@ class _CredentialStatusVerificationScreenState
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
+                  color: Colors.red.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.red.shade300),
                 ),

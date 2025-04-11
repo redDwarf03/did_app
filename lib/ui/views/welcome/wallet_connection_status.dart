@@ -1,7 +1,7 @@
 import 'package:did_app/application/session/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Widget displaying the current wallet connection status
 class WalletConnectionStatus extends ConsumerWidget {

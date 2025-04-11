@@ -1,9 +1,9 @@
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen displayed when verification is successfully completed
 class VerificationSuccessScreen extends ConsumerWidget {
@@ -129,7 +129,7 @@ class VerificationSuccessScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             _buildInfoRow(l10n.certificateIdLabel, certificate.id,
-                copyable: true, l10n: l10n),
+                copyable: true, l10n: l10n,),
             _buildInfoRow(
               l10n.issuedDateLabel,
               _formatDate(certificate.issuedAt),
@@ -154,7 +154,7 @@ class VerificationSuccessScreen extends ConsumerWidget {
 
   /// Build an information row with label and value
   Widget _buildInfoRow(String label, String value,
-      {bool copyable = false, required AppLocalizations l10n}) {
+      {bool copyable = false, required AppLocalizations l10n,}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -188,7 +188,7 @@ class VerificationSuccessScreen extends ConsumerWidget {
 
   /// Build the eIDAS compliance badge
   Widget _buildEidasComplianceBadge(
-      BuildContext context, AppLocalizations l10n) {
+      BuildContext context, AppLocalizations l10n,) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

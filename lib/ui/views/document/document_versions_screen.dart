@@ -1,9 +1,9 @@
 import 'package:did_app/application/document/providers.dart';
 import 'package:did_app/domain/document/document.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen displaying the version history of a document
 class DocumentVersionsScreen extends ConsumerStatefulWidget {
@@ -84,12 +84,13 @@ class _DocumentVersionsScreenState
   Future<void> _compareVersions() async {
     // In a real implementation, this would show a diff view between versions
 
-    showDialog(
+    await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.compareVersionsDialogTitle),
         content: Text(
-            AppLocalizations.of(context)!.compareVersionsFeatureNotAvailable),
+          AppLocalizations.of(context)!.compareVersionsFeatureNotAvailable,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -128,8 +129,11 @@ class _DocumentVersionsScreenState
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline,
-                          size: 64, color: Colors.red),
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red,
+                      ),
                       const SizedBox(height: 16),
                       Text(
                         _errorMessage!,
@@ -158,12 +162,11 @@ class _DocumentVersionsScreenState
         // Version list - left sidebar
         SizedBox(
           width: 280,
-          child: Container(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               border: Border(
                 right: BorderSide(
                   color: Colors.grey.shade300,
-                  width: 1,
                 ),
               ),
             ),
@@ -190,7 +193,7 @@ class _DocumentVersionsScreenState
 
                       return ListTile(
                         selected: isSelected,
-                        selectedTileColor: Colors.blue.withOpacity(0.1),
+                        selectedTileColor: Colors.blue.withValues(alpha: 0.1),
                         leading: CircleAvatar(
                           backgroundColor: isSelected
                               ? Theme.of(context).primaryColor
@@ -325,15 +328,17 @@ class _DocumentVersionsScreenState
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.description,
                     size: 64,
                     color: Colors.grey,
                   ),
-                  SizedBox(height: 16),
-                  Text(AppLocalizations.of(context)!
-                      .documentPreviewNotAvailableVersions),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 16),
+                  Text(
+                    AppLocalizations.of(context)!
+                        .documentPreviewNotAvailableVersions,
+                  ),
+                  const SizedBox(height: 8),
                   Text(
                     AppLocalizations.of(context)!.downloadToViewInstructions,
                     style: const TextStyle(color: Colors.grey),
@@ -360,11 +365,14 @@ class _DocumentVersionsScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildInfoRow(
-                      AppLocalizations.of(context)!.versionIdLabel, version.id),
+                    AppLocalizations.of(context)!.versionIdLabel,
+                    version.id,
+                  ),
                   const Divider(),
                   _buildInfoRow(
-                      AppLocalizations.of(context)!.documentHashLabelDetail,
-                      version.documentHash),
+                    AppLocalizations.of(context)!.documentHashLabelDetail,
+                    version.documentHash,
+                  ),
                   const Divider(),
                   _buildInfoRow(
                     AppLocalizations.of(context)!.storagePathLabel,
@@ -416,9 +424,11 @@ class _DocumentVersionsScreenState
   }
 
   Future<void> _downloadVersionContent(
-      DocumentVersion version, BuildContext context) async {
+    DocumentVersion version,
+    BuildContext context,
+  ) async {
     final l10n = AppLocalizations.of(context)!;
-    showDialog(
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
@@ -448,8 +458,10 @@ class _DocumentVersionsScreenState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                l10n.downloadSuccessMessage(version.versionNumber,
-                    (content.length / 1024).toStringAsFixed(2)),
+                l10n.downloadSuccessMessage(
+                  version.versionNumber,
+                  (content.length / 1024).toStringAsFixed(2),
+                ),
               ),
               behavior: SnackBarBehavior.floating,
             ),
@@ -458,8 +470,11 @@ class _DocumentVersionsScreenState
           // Handle download error
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(l10n.documentDownloadUnexpectedError(
-                  'Download failed: Content was null')),
+              content: Text(
+                l10n.documentDownloadUnexpectedError(
+                  'Download failed: Content was null',
+                ),
+              ),
               backgroundColor: Colors.red,
             ),
           );

@@ -61,7 +61,7 @@ class PasswordlessAuthService {
       if (storedToken == null || expiryString == null || storedEmail == null) {
         return AuthVerificationResult(
           isValid: false,
-          message: 'Aucun jeton d\'authentification en attente',
+          message: "Aucun jeton d'authentification en attente",
         );
       }
 
@@ -69,7 +69,7 @@ class PasswordlessAuthService {
       if (email != storedEmail) {
         return AuthVerificationResult(
           isValid: false,
-          message: 'L\'email ne correspond pas',
+          message: "L'email ne correspond pas",
         );
       }
 
@@ -97,7 +97,7 @@ class PasswordlessAuthService {
       } else {
         return AuthVerificationResult(
           isValid: false,
-          message: 'Jeton d\'authentification invalide',
+          message: "Jeton d'authentification invalide",
         );
       }
     } catch (e) {
@@ -150,7 +150,7 @@ class PasswordlessAuthService {
 
     // Dans une implémentation réelle, nous signerions réellement le JWT avec une clé secrète
     // Pour cette démo, nous utilisons un secret fixe
-    final secret = 'votre_secret_tres_long_et_tres_complexe';
+    const secret = 'votre_secret_tres_long_et_tres_complexe';
     final data = '$encodedHeader.$encodedPayload';
     final bytes = utf8.encode(data + secret);
     final signature = base64Url.encode(sha256.convert(bytes).bytes);
@@ -181,15 +181,14 @@ class PasswordlessAuthService {
 
 /// Résultat de la vérification d'authentification
 class AuthVerificationResult {
-  final bool isValid;
-  final String message;
-  final bool isExpired;
-  final String? token;
-
   AuthVerificationResult({
     required this.isValid,
     required this.message,
     this.isExpired = false,
     this.token,
   });
+  final bool isValid;
+  final String message;
+  final bool isExpired;
+  final String? token;
 }

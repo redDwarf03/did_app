@@ -1,11 +1,11 @@
 import 'package:did_app/application/document/providers.dart';
 import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/domain/document/document.dart';
+import 'package:did_app/ui/views/document/document_detail_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:did_app/ui/views/document/document_detail_screen.dart';
-import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen displaying documents shared with the user
 class SharedDocumentsScreen extends ConsumerStatefulWidget {
@@ -68,7 +68,7 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
     }
 
     // Show loading indicator
-    showDialog(
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
@@ -94,7 +94,7 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
 
       // Open document if successful
       if (document != null && context.mounted) {
-        Navigator.of(context).push(
+        await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => DocumentDetailScreen(documentId: document.id),
           ),
@@ -103,7 +103,8 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                AppLocalizations.of(context)!.failedToAccessSharedDocument),
+              AppLocalizations.of(context)!.failedToAccessSharedDocument,
+            ),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -118,8 +119,9 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!
-                .genericErrorMessage(e.toString())),
+            content: Text(
+              AppLocalizations.of(context)!.genericErrorMessage(e.toString()),
+            ),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.red,
           ),
@@ -194,8 +196,11 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline,
-                          size: 64, color: Colors.red),
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red,
+                      ),
                       const SizedBox(height: 16),
                       Text(
                         _errorMessage!,
@@ -212,7 +217,9 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
   }
 
   Widget _buildSharedDocumentsList(
-      BuildContext context, List<DocumentShare> shares) {
+    BuildContext context,
+    List<DocumentShare> shares,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     if (shares.isEmpty) {
       return Center(
@@ -329,7 +336,7 @@ class _SharedDocumentsScreenState extends ConsumerState<SharedDocumentsScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
+                  color: Colors.blue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(

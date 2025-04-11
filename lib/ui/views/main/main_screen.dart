@@ -3,11 +3,10 @@ import 'package:did_app/ui/views/credential/credential_list_screen.dart';
 import 'package:did_app/ui/views/document/document_list_screen.dart';
 import 'package:did_app/ui/views/identity/identity_screen.dart';
 import 'package:did_app/ui/views/verification/verification_screen.dart';
-import 'package:did_app/ui/views/welcome/welcome_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Main application screen with bottom navigation
 class MainScreen extends ConsumerStatefulWidget {

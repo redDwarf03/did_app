@@ -1,8 +1,8 @@
+import 'package:did_app/domain/credential/credential.dart';
+import 'package:did_app/domain/credential/credential_status.dart';
+import 'package:did_app/infrastructure/credential/credential_status_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:did_app/domain/credential/credential_status.dart';
-import 'package:did_app/domain/credential/credential.dart';
-import 'package:did_app/infrastructure/credential/credential_status_service.dart';
 
 part 'credential_status_provider.freezed.dart';
 
@@ -35,12 +35,12 @@ class CredentialStatusState with _$CredentialStatusState {
 
 /// Notifier pour gérer l'état des vérifications de statut
 class CredentialStatusNotifier extends StateNotifier<CredentialStatusState> {
-  final Ref _ref;
-  final CredentialStatusService _service;
 
   CredentialStatusNotifier(this._ref)
       : _service = _ref.read(credentialStatusServiceProvider),
         super(const CredentialStatusState(checkResults: {}));
+  final Ref _ref;
+  final CredentialStatusService _service;
 
   /// Vérifie le statut d'une attestation
   Future<void> checkStatus(Credential credential) async {

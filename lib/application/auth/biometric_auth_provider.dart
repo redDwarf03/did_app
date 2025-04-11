@@ -1,6 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:did_app/domain/auth/biometric_auth_model.dart';
 import 'package:did_app/infrastructure/auth/biometric_auth_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Provider pour le service d'authentification biométrique
 final biometricAuthServiceProvider = Provider<BiometricAuthService>((ref) {
@@ -34,7 +34,7 @@ class BiometricAuthNotifier extends StateNotifier<BiometricAuthState> {
         state = state.copyWith(
           status: AuthStatus.unavailable,
           errorMessage:
-              'L\'authentification biométrique n\'est pas disponible sur cet appareil',
+              "L'authentification biométrique n'est pas disponible sur cet appareil",
         );
         return;
       }
@@ -45,7 +45,7 @@ class BiometricAuthNotifier extends StateNotifier<BiometricAuthState> {
       if (availableBiometrics.isEmpty) {
         state = state.copyWith(
           status: AuthStatus.notSetUp,
-          errorMessage: 'Aucune biométrie n\'est configurée sur cet appareil',
+          errorMessage: "Aucune biométrie n'est configurée sur cet appareil",
         );
         return;
       }
@@ -99,7 +99,7 @@ class BiometricAuthNotifier extends StateNotifier<BiometricAuthState> {
 
   /// Authentifie l'utilisateur avec la biométrie
   Future<bool> authenticateWithBiometrics({
-    String reason = 'Veuillez vous authentifier pour accéder à l\'application',
+    String reason = "Veuillez vous authentifier pour accéder à l'application",
   }) async {
     try {
       // Si la biométrie n'est pas activée, retourner true (bypass)
@@ -126,7 +126,7 @@ class BiometricAuthNotifier extends StateNotifier<BiometricAuthState> {
     } catch (e) {
       state = state.copyWith(
         status: AuthStatus.failed,
-        errorMessage: 'Erreur lors de l\'authentification: $e',
+        errorMessage: "Erreur lors de l'authentification: $e",
       );
       return false;
     }

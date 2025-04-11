@@ -5,9 +5,9 @@ import 'package:did_app/application/document/providers.dart';
 import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/domain/document/document.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen for adding new documents or editing existing ones
 class DocumentFormScreen extends ConsumerStatefulWidget {
@@ -356,7 +356,7 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(Icons.error_outline,
-                          size: 64, color: Colors.red),
+                          size: 64, color: Colors.red,),
                       const SizedBox(height: 16),
                       Text(
                         _errorMessage!,
@@ -422,7 +422,7 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                                 _fileName!,
                                                 style: const TextStyle(
                                                     fontWeight:
-                                                        FontWeight.bold),
+                                                        FontWeight.bold,),
                                               ),
                                               Text(
                                                 '${(_fileBytes!.length / 1024).toStringAsFixed(2)} KB',
@@ -563,7 +563,7 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                 Row(
                                   children: [
                                     Text(AppLocalizations.of(context)!
-                                        .expirationDateLabelForm),
+                                        .expirationDateLabelForm,),
                                     const SizedBox(width: 16),
                                     Expanded(
                                       child: OutlinedButton(
@@ -616,7 +616,7 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                 // Shareable switch
                                 SwitchListTile(
                                   title: Text(AppLocalizations.of(context)!
-                                      .documentIsShareableSwitch),
+                                      .documentIsShareableSwitch,),
                                   subtitle: Text(
                                     AppLocalizations.of(context)!
                                         .documentIsShareableSubtitle,
@@ -632,24 +632,24 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
 
                                 // eIDAS level
                                 Text(AppLocalizations.of(context)!
-                                    .eidasLevelLabelForm),
+                                    .eidasLevelLabelForm,),
                                 const SizedBox(height: 8),
                                 SegmentedButton<EidasLevel>(
                                   segments: [
                                     ButtonSegment(
                                       value: EidasLevel.low,
                                       label: Text(AppLocalizations.of(context)!
-                                          .eidasLevelLowLabel),
+                                          .eidasLevelLowLabel,),
                                     ),
                                     ButtonSegment(
                                       value: EidasLevel.substantial,
                                       label: Text(AppLocalizations.of(context)!
-                                          .eidasLevelSubstantialLabel),
+                                          .eidasLevelSubstantialLabel,),
                                     ),
                                     ButtonSegment(
                                       value: EidasLevel.high,
                                       label: Text(AppLocalizations.of(context)!
-                                          .eidasLevelHighLabel),
+                                          .eidasLevelHighLabel,),
                                     ),
                                   ],
                                   selected: {_eidasLevel},
@@ -666,13 +666,13 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                                 Row(
                                   children: [
                                     Text(AppLocalizations.of(context)!
-                                        .tagsLabelForm),
+                                        .tagsLabelForm,),
                                     const Spacer(),
                                     TextButton.icon(
                                       onPressed: _showTagDialog,
                                       icon: const Icon(Icons.add),
                                       label: Text(AppLocalizations.of(context)!
-                                          .addTagButtonForm),
+                                          .addTagButtonForm,),
                                     ),
                                   ],
                                 ),

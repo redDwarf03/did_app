@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/credential/eidas_credential.dart';
-import 'package:flutter/services.dart';
 
 /// Service pour gérer les attestations eIDAS et l'intégration avec l'EUDI Wallet
 class EidasCredentialService {
@@ -12,16 +10,16 @@ class EidasCredentialService {
       final Map<String, dynamic> jsonData = jsonDecode(jsonString);
 
       // Vérifier que c'est bien un document eIDAS
-      final List<dynamic>? context = jsonData['@context'] as List<dynamic>?;
+      final context = jsonData['@context'] as List<dynamic>?;
       if (context == null ||
           !context.any((e) => e.toString().contains('eidas'))) {
-        throw FormatException('Le document n\'est pas au format eIDAS');
+        throw const FormatException("Le document n'est pas au format eIDAS");
       }
 
       final eidasCredential = EidasCredential.fromJson(jsonData);
       return eidasCredential.toCredential();
     } catch (e) {
-      print('Erreur lors de l\'import: $e');
+      print("Erreur lors de l'import: $e");
       return null;
     }
   }
@@ -58,14 +56,14 @@ class EidasCredentialService {
     }
 
     // Ajouter les contextes eIDAS
-    List<String> newContext = List.from(credential.context);
+    final newContext = List<String>.from(credential.context);
     if (!newContext
         .contains('https://ec.europa.eu/2023/credentials/eidas/v1')) {
       newContext.add('https://ec.europa.eu/2023/credentials/eidas/v1');
     }
 
     // Adapter le type si nécessaire
-    List<String> newType = List.from(credential.type);
+    final newType = List<String>.from(credential.type);
     if (credential.type.contains('IdentityCredential')) {
       if (!newType.contains('VerifiableId')) {
         newType.add('VerifiableId');
@@ -112,11 +110,11 @@ class EidasCredentialService {
       // pour demander à l'EUDI Wallet de partager une attestation
 
       // Simulation: charger un exemple de credential eIDAS
-      final String jsonString = await _loadSampleEidasCredential();
+      final jsonString = await _loadSampleEidasCredential();
 
       return importFromJson(jsonString);
     } catch (e) {
-      print('Erreur lors de l\'import depuis EUDI Wallet: $e');
+      print("Erreur lors de l'import depuis EUDI Wallet: $e");
       return null;
     }
   }
@@ -181,13 +179,13 @@ class EidasCredentialService {
 
   /// Vérifie la signature cryptographique d'une attestation eIDAS
   Future<VerificationResult> verifyEidasCredential(
-      EidasCredential credential) async {
+      EidasCredential credential,) async {
     try {
       // Vérifier que le document contient une preuve
       if (credential.proof == null) {
         return VerificationResult(
           isValid: false,
-          message: 'L\'attestation ne contient pas de preuve cryptographique',
+          message: "L'attestation ne contient pas de preuve cryptographique",
         );
       }
 
@@ -198,7 +196,7 @@ class EidasCredentialService {
         return VerificationResult(
           isValid: false,
           message:
-              'L\'attestation a expiré le ${_formatDate(credential.expirationDate!)}',
+              "L'attestation a expiré le ${_formatDate(credential.expirationDate)}",
         );
       }
 
@@ -209,7 +207,7 @@ class EidasCredentialService {
 
       // Pour cette démo, on simule une vérification réussie
       await Future.delayed(
-          const Duration(seconds: 1)); // Simuler le temps de vérification
+          const Duration(seconds: 1),); // Simuler le temps de vérification
 
       return VerificationResult(
         isValid: true,
@@ -231,7 +229,7 @@ class EidasCredentialService {
 
   /// Vérifie le statut de révocation d'une attestation eIDAS
   Future<RevocationStatus> checkRevocationStatus(
-      EidasCredential credential) async {
+      EidasCredential credential,) async {
     try {
       // Vérifier que le document contient un statut
       if (credential.credentialStatus == null) {
@@ -249,7 +247,7 @@ class EidasCredentialService {
 
       // Pour cette démo, on simule une vérification réussie (non révoquée)
       await Future.delayed(const Duration(
-          milliseconds: 800)); // Simuler le temps de vérification
+          milliseconds: 800,),); // Simuler le temps de vérification
 
       return RevocationStatus(
         isRevoked: false,
@@ -271,7 +269,7 @@ class EidasCredentialService {
 
   /// Génère une signature eIDAS pour une attestation
   Future<EidasProof> generateEidasSignature(
-      Map<String, dynamic> credentialData) async {
+      Map<String, dynamic> credentialData,) async {
     // Dans une implémentation réelle, on utiliserait une cryptographie conforme à eIDAS
     // comme Ed25519Signature2020 ou EcdsaSecp256k1Signature2019
 
@@ -310,23 +308,19 @@ class EidasCredentialService {
 
 /// Modèle de résultat de vérification
 class VerificationResult {
-  final bool isValid;
-  final String message;
-  final Map<String, dynamic>? details;
 
   VerificationResult({
     required this.isValid,
     required this.message,
     this.details,
   });
+  final bool isValid;
+  final String message;
+  final Map<String, dynamic>? details;
 }
 
 /// Modèle de statut de révocation
 class RevocationStatus {
-  final bool isRevoked;
-  final String message;
-  final DateTime lastChecked;
-  final Map<String, dynamic>? details;
 
   RevocationStatus({
     required this.isRevoked,
@@ -334,4 +328,8 @@ class RevocationStatus {
     required this.lastChecked,
     this.details,
   });
+  final bool isRevoked;
+  final String message;
+  final DateTime lastChecked;
+  final Map<String, dynamic>? details;
 }

@@ -1,18 +1,17 @@
 import 'package:did_app/application/credential/eidas_provider.dart';
 import 'package:did_app/application/credential/providers.dart';
 import 'package:did_app/domain/credential/credential.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:did_app/ui/common/app_card.dart';
 import 'package:did_app/ui/common/section_title.dart';
 import 'package:did_app/ui/views/credential/credential_certificate_screen.dart';
 import 'package:did_app/ui/views/credential/credential_presentation_screen.dart';
-import 'package:did_app/ui/views/credential/eidas_interop_screen.dart';
 import 'package:did_app/ui/views/credential/credential_status_verification_screen.dart';
+import 'package:did_app/ui/views/credential/eidas_interop_screen.dart';
 import 'package:did_app/ui/views/credential/revocation_management_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 /// Extensions pour ajouter des méthodes utiles à Credential
 extension CredentialExtension on Credential {
@@ -55,7 +54,7 @@ class CredentialDetailScreen extends ConsumerWidget {
                   return Tooltip(
                     message: l10n.eidasCompatibleTooltip,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Icon(
                         Icons.euro_symbol,
                         color: Theme.of(context).colorScheme.primary,
@@ -122,7 +121,7 @@ class CredentialDetailScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        heroTag: "helpFAB",
+        heroTag: 'helpFAB',
         onPressed: () => _showBeginnerHelp(context, l10n),
         tooltip: l10n.beginnerHelpTooltip,
         child: const Icon(Icons.help_outline),
@@ -131,7 +130,7 @@ class CredentialDetailScreen extends ConsumerWidget {
         data: (credential) {
           if (credential == null) return null;
           return Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 Expanded(
@@ -201,7 +200,7 @@ class CredentialDetailScreen extends ConsumerWidget {
             );
 
             // Ouvrir l'écran d'interopérabilité eIDAS
-            Navigator.push(
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => const EidasInteropScreen(),
@@ -230,9 +229,9 @@ class CredentialDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildCredentialDetails(
-      BuildContext context, Credential credential, AppLocalizations l10n) {
+      BuildContext context, Credential credential, AppLocalizations l10n,) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -242,8 +241,7 @@ class CredentialDetailScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           _buildCredentialSubjectSection(context, credential, l10n),
           const SizedBox(height: 24),
-          if (credential.proof != null)
-            _buildProofSection(context, credential.proof!, l10n),
+          _buildProofSection(context, credential.proof, l10n),
           const SizedBox(height: 16),
           _buildActionsCard(context, l10n),
         ],
@@ -252,7 +250,7 @@ class CredentialDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildStatusCard(
-      BuildContext context, Credential credential, AppLocalizations l10n) {
+      BuildContext context, Credential credential, AppLocalizations l10n,) {
     final theme = Theme.of(context);
 
     Color statusColor;
@@ -300,7 +298,7 @@ class CredentialDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildGeneralInfoSection(
-      BuildContext context, Credential credential, AppLocalizations l10n) {
+      BuildContext context, Credential credential, AppLocalizations l10n,) {
     final theme = Theme.of(context);
     final dateFormat = DateFormat('dd/MM/yyyy');
 
@@ -350,7 +348,7 @@ class CredentialDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildCredentialSubjectSection(
-      BuildContext context, Credential credential, AppLocalizations l10n) {
+      BuildContext context, Credential credential, AppLocalizations l10n,) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: credential.credentialSubject.entries.map((entry) {
@@ -374,7 +372,7 @@ class CredentialDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildProofSection(
-      BuildContext context, Map<String, dynamic> proof, AppLocalizations l10n) {
+      BuildContext context, Map<String, dynamic> proof, AppLocalizations l10n,) {
     final created = proof['created'] != null
         ? DateTime.tryParse(proof['created'].toString()) ?? DateTime.now()
         : DateTime.now();
@@ -477,14 +475,14 @@ class CredentialDetailScreen extends ConsumerWidget {
   String _formatKey(String key) {
     // Convert camelCase to words with spaces and capitalize first letter
     final result = key.replaceAllMapped(
-      RegExp(r'([A-Z])'),
+      RegExp('([A-Z])'),
       (match) => ' ${match.group(0)}',
     );
     return result.substring(0, 1).toUpperCase() + result.substring(1);
   }
 
   String _formatValue(
-      BuildContext context, dynamic value, AppLocalizations l10n) {
+      BuildContext context, dynamic value, AppLocalizations l10n,) {
     if (value == null) return l10n.unspecified;
     if (value is DateTime) {
       return DateFormat('dd/MM/yyyy').format(value);
@@ -569,7 +567,7 @@ class CredentialDetailScreen extends ConsumerWidget {
                   child: Text(
                     l10n.understandCredentialTitle,
                     style: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.bold),
+                        fontSize: 22, fontWeight: FontWeight.bold,),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -621,7 +619,7 @@ class CredentialDetailScreen extends ConsumerWidget {
 
   /// Construit une section d'aide avec titre, contenu et icône
   Widget _buildHelpSection(
-      BuildContext context, String title, String content, IconData icon) {
+      BuildContext context, String title, String content, IconData icon,) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -639,7 +637,7 @@ class CredentialDetailScreen extends ConsumerWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
+                      fontSize: 16, fontWeight: FontWeight.bold,),
                 ),
                 const SizedBox(height: 5),
                 Text(

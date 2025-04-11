@@ -61,7 +61,8 @@ class CredentialCard extends StatelessWidget {
                 children: [
                   Icon(
                     _getCredentialTypeIcon(
-                        _getCredentialTypeFromList(credential.type)),
+                      _getCredentialTypeFromList(credential.type),
+                    ),
                     color: Theme.of(context).primaryColor,
                   ),
                   const SizedBox(width: 8),
@@ -80,7 +81,7 @@ class CredentialCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
+                      color: statusColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -100,7 +101,8 @@ class CredentialCard extends StatelessWidget {
                           ),
                         Text(
                           _getVerificationStatusText(
-                              credential.verificationStatus),
+                            credential.verificationStatus,
+                          ),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,

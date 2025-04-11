@@ -1,21 +1,22 @@
-import 'dart:convert';
 import 'dart:async';
-import 'package:http/http.dart' as http;
-import 'package:did_app/domain/credential/qualified_credential.dart';
+import 'dart:convert';
+
 import 'package:did_app/domain/credential/credential.dart';
+import 'package:did_app/domain/credential/qualified_credential.dart';
 import 'package:did_app/infrastructure/credential/eidas_trust_list.dart';
+import 'package:http/http.dart' as http;
 
 /// Résultat de la vérification d'une attestation
 class VerificationResult {
-  final bool isValid;
-  final String message;
-  final Map<String, dynamic>? details;
 
   VerificationResult({
     required this.isValid,
     required this.message,
     this.details,
   });
+  final bool isValid;
+  final String message;
+  final Map<String, dynamic>? details;
 }
 
 /// Statut d'un émetteur dans le registre de confiance
@@ -26,10 +27,6 @@ class IssuerStatus {
     this.validityPeriod,
   });
 
-  final bool isQualified;
-  final String? assuranceLevel;
-  final DateTimeRange? validityPeriod;
-
   factory IssuerStatus.fromJson(Map<String, dynamic> json) {
     return IssuerStatus(
       isQualified: json['isQualified'] as bool,
@@ -39,6 +36,10 @@ class IssuerStatus {
           : null,
     );
   }
+
+  final bool isQualified;
+  final String? assuranceLevel;
+  final DateTimeRange? validityPeriod;
 }
 
 /// Période de validité
@@ -48,26 +49,19 @@ class DateTimeRange {
     required this.end,
   });
 
-  final DateTime start;
-  final DateTime end;
-
   factory DateTimeRange.fromJson(Map<String, dynamic> json) {
     return DateTimeRange(
       start: DateTime.parse(json['start'] as String),
       end: DateTime.parse(json['end'] as String),
     );
   }
+
+  final DateTime start;
+  final DateTime end;
 }
 
 /// Service pour gérer les attestations qualifiées selon eIDAS 2.0
 class QualifiedCredentialService {
-  final http.Client _httpClient;
-  final String _trustRegistryUrl;
-  final EidasTrustList _trustList;
-
-  // Cache des vérifications pour améliorer les performances
-  final Map<String, IssuerStatus> _issuerStatusCache = {};
-  final Map<String, QualifiedTrustService> _trustServiceCache = {};
 
   QualifiedCredentialService({
     http.Client? httpClient,
@@ -77,6 +71,13 @@ class QualifiedCredentialService {
         _trustRegistryUrl =
             trustRegistryUrl ?? 'https://eu-trust-registry.europa.eu/api/v1',
         _trustList = trustList ?? EidasTrustList.instance;
+  final http.Client _httpClient;
+  final String _trustRegistryUrl;
+  final EidasTrustList _trustList;
+
+  // Cache des vérifications pour améliorer les performances
+  final Map<String, IssuerStatus> _issuerStatusCache = {};
+  final Map<String, QualifiedTrustService> _trustServiceCache = {};
 
   /// Vérifie si une attestation est qualifiée selon eIDAS 2.0
   Future<bool> isQualified(Credential credential) async {
@@ -166,7 +167,7 @@ class QualifiedCredentialService {
 
   /// Vérifie la conformité d'une attestation qualifiée
   Future<VerificationResult> verifyQualifiedCredential(
-      QualifiedCredential qualifiedCredential) async {
+      QualifiedCredential qualifiedCredential,) async {
     try {
       // 1. Vérifier l'attestation de base
       final isValidBase = await isQualified(qualifiedCredential.credential);
@@ -174,7 +175,7 @@ class QualifiedCredentialService {
         return VerificationResult(
           isValid: false,
           message:
-              'L\'attestation ne répond pas aux critères de qualification eIDAS',
+              "L'attestation ne répond pas aux critères de qualification eIDAS",
         );
       }
 
@@ -187,7 +188,7 @@ class QualifiedCredentialService {
       if (!isCertificateValid) {
         return VerificationResult(
           isValid: false,
-          message: 'Le certificat qualifié n\'est pas valide ou a expiré',
+          message: "Le certificat qualifié n'est pas valide ou a expiré",
         );
       }
 
@@ -201,7 +202,7 @@ class QualifiedCredentialService {
       if (!isSignatureValid) {
         return VerificationResult(
           isValid: false,
-          message: 'La signature qualifiée n\'est pas valide',
+          message: "La signature qualifiée n'est pas valide",
         );
       }
 
@@ -297,7 +298,7 @@ class QualifiedCredentialService {
     }
 
     // En cas d'erreur ou si l'émetteur n'est pas trouvé, retourner non qualifié
-    final defaultStatus = IssuerStatus(isQualified: false);
+    const defaultStatus = IssuerStatus(isQualified: false);
     _issuerStatusCache[issuer] = defaultStatus;
     return defaultStatus;
   }
@@ -363,9 +364,9 @@ class QualifiedCredentialService {
 
   /// Construit un service de confiance à partir des données de base
   QualifiedTrustService _buildTrustServiceFromBasicData(
-      Map<String, dynamic> data, String issuerId) {
+      Map<String, dynamic> data, String issuerId,) {
     // Déterminer le niveau d'assurance
-    AssuranceLevel level = AssuranceLevel.low;
+    var level = AssuranceLevel.low;
     if (data['assuranceLevel'] == 'substantial') {
       level = AssuranceLevel.substantial;
     } else if (data['assuranceLevel'] == 'high') {
@@ -515,7 +516,7 @@ class QualifiedCredentialService {
       final evidenceMap = evidence.first as Map;
 
       // Tous les attributs de niveau élevé doivent être présents
-      return highLevelAttributes.every((attr) => evidenceMap.containsKey(attr));
+      return highLevelAttributes.every(evidenceMap.containsKey);
     }
 
     return false;
@@ -531,7 +532,7 @@ class QualifiedCredentialService {
     ];
 
     // Pour le niveau substantiel, un certain nombre d'attributs doivent être présents
-    int attributesFound = 0;
+    var attributesFound = 0;
 
     for (final attr in substantialAttributes) {
       if (credential.credentialSubject.containsKey(attr)) {
@@ -589,7 +590,7 @@ class QualifiedCredentialService {
 
   /// Vérifie la validité d'un certificat qualifié
   Future<bool> _verifyQualifiedCertificate(
-      String certificateId, String providerId) async {
+      String certificateId, String providerId,) async {
     try {
       // Vérifier dans le registre de confiance
       final response = await _httpClient.get(
@@ -638,7 +639,7 @@ class QualifiedCredentialService {
 
   /// Vérifie une signature qualifiée
   Future<bool> _verifyQualifiedSignature(Credential credential,
-      String qualifiedProof, QualifiedSignatureType signatureType) async {
+      String qualifiedProof, QualifiedSignatureType signatureType,) async {
     // Dans une implémentation réelle, on vérifierait la signature avec le bon algorithme
     // selon le type de signature qualifiée (QES, QESeal, QWAC)
 

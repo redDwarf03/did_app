@@ -2,6 +2,14 @@ import 'package:did_app/domain/credential/credential_status.dart';
 
 /// Résultat d'une opération de révocation
 class RevocationResult {
+
+  const RevocationResult({
+    required this.credentialId,
+    required this.success,
+    this.errorMessage,
+    this.details,
+    required this.timestamp,
+  });
   /// ID de l'attestation révoquée
   final String credentialId;
 
@@ -16,14 +24,6 @@ class RevocationResult {
 
   /// Date de la révocation
   final DateTime timestamp;
-
-  const RevocationResult({
-    required this.credentialId,
-    required this.success,
-    this.errorMessage,
-    this.details,
-    required this.timestamp,
-  });
 }
 
 /// Interface pour le service de révocation des attestations
@@ -46,7 +46,7 @@ abstract class RevocationService {
 
   /// Obtient l'historique des révocations d'une attestation
   Future<List<RevocationHistoryEntry>> getRevocationHistory(
-      String credentialId);
+      String credentialId,);
 
   /// Synchronise le statut de révocation avec le serveur
   Future<void> syncRevocationStatus(String credentialId);
@@ -57,6 +57,15 @@ abstract class RevocationService {
 
 /// Entrée d'historique de révocation
 class RevocationHistoryEntry {
+
+  const RevocationHistoryEntry({
+    required this.credentialId,
+    required this.timestamp,
+    required this.action,
+    this.reason,
+    this.details,
+    required this.actor,
+  });
   /// ID de l'attestation
   final String credentialId;
 
@@ -74,15 +83,6 @@ class RevocationHistoryEntry {
 
   /// Acteur ayant effectué l'action
   final String actor;
-
-  const RevocationHistoryEntry({
-    required this.credentialId,
-    required this.timestamp,
-    required this.action,
-    this.reason,
-    this.details,
-    required this.actor,
-  });
 }
 
 /// Action de révocation

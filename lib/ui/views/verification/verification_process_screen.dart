@@ -1,8 +1,8 @@
 import 'package:did_app/application/verification/providers.dart';
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Screen that guides the user through the verification process steps
@@ -38,7 +38,7 @@ class _VerificationProcessScreenState
           // Help button
           IconButton(
             icon: const Icon(Icons.help_outline),
-            tooltip: "Process Help",
+            tooltip: 'Process Help',
             onPressed: () => _showHelpDialog(context),
           ),
         ],
@@ -97,10 +97,10 @@ class _VerificationProcessScreenState
 
     return Card(
       elevation: 2,
-      color: statusColor.withOpacity(0.1),
+      color: statusColor.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: statusColor.withOpacity(0.3)),
+        side: BorderSide(color: statusColor.withValues(alpha: 0.3)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -126,7 +126,9 @@ class _VerificationProcessScreenState
                   ),
                   Text(
                     _getStatusDescription(
-                        widget.verificationProcess.status, l10n),
+                      widget.verificationProcess.status,
+                      l10n,
+                    ),
                     style: const TextStyle(fontSize: 14),
                   ),
                 ],
@@ -148,7 +150,7 @@ class _VerificationProcessScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Step ${currentStepIndex + 1} of ${steps.length}",
+          'Step ${currentStepIndex + 1} of ${steps.length}',
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 14,
@@ -157,14 +159,14 @@ class _VerificationProcessScreenState
         const SizedBox(height: 8),
         LinearProgressIndicator(
           value: progress,
-          backgroundColor: Colors.grey.withOpacity(0.3),
+          backgroundColor: Colors.grey.withValues(alpha: 0.3),
         ),
         const SizedBox(height: 8),
-        Row(
+        const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Start"),
-            Text("Complete"),
+            Text('Start'),
+            Text('Complete'),
           ],
         ),
       ],
@@ -185,8 +187,8 @@ class _VerificationProcessScreenState
             : null);
 
     if (step == null) {
-      return Center(
-        child: Text("No step information available"),
+      return const Center(
+        child: Text('No step information available'),
       );
     }
 
@@ -220,7 +222,8 @@ class _VerificationProcessScreenState
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: _getStepStatusColor(step.status).withOpacity(0.1),
+                    color:
+                        _getStepStatusColor(step.status).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -243,9 +246,9 @@ class _VerificationProcessScreenState
             const SizedBox(height: 24),
 
             // Placeholder content
-            Center(
+            const Center(
               child: Text(
-                "Complete this step according to the instructions",
+                'Complete this step according to the instructions',
                 textAlign: TextAlign.center,
               ),
             ),
@@ -257,11 +260,11 @@ class _VerificationProcessScreenState
               children: [
                 TextButton(
                   onPressed: () => _showStepHelp(context, step),
-                  child: Text('Help'),
+                  child: const Text('Help'),
                 ),
                 ElevatedButton(
                   onPressed: () => _mockStepSubmission(l10n, currentStepIndex),
-                  child: Text(l10n.submitButton ?? "Submit"),
+                  child: Text(l10n.submitButton ?? 'Submit'),
                 ),
               ],
             ),
@@ -277,15 +280,18 @@ class _VerificationProcessScreenState
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-            "Help for: ${_getStepTitle(step.type, AppLocalizations.of(context)!)}"),
+          'Help for: ${_getStepTitle(step.type, AppLocalizations.of(context)!)}',
+        ),
         content: SingleChildScrollView(
-          child: Text("Help text for step ${step.id}" ??
-              "No specific help available for this step."),
+          child: Text(
+            'Help text for step ${step.id}' ??
+                'No specific help available for this step.',
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text("Close"),
+            child: const Text('Close'),
           ),
         ],
       ),
@@ -307,7 +313,7 @@ class _VerificationProcessScreenState
       }
 
       // TODO: Add logic to check if this is the final step
-      bool isFinalStep = true; // Assuming final step for this mock
+      const isFinalStep = true; // Assuming final step for this mock
 
       if (isFinalStep) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -324,8 +330,9 @@ class _VerificationProcessScreenState
             barrierDismissible: false,
             builder: (dialogContext) => AlertDialog(
               title: Text(l10n.verificationResultDialogTitle),
-              content: Text(
-                  "Step submitted successfully. You can now proceed to the next step."),
+              content: const Text(
+                'Step submitted successfully. You can now proceed to the next step.',
+              ),
               actions: [
                 TextButton(
                   onPressed: () =>
@@ -348,8 +355,8 @@ class _VerificationProcessScreenState
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Cancel Verification?"),
-        content: Text("Are you sure you want to cancel?"),
+        title: const Text('Cancel Verification?'),
+        content: const Text('Are you sure you want to cancel?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -373,9 +380,9 @@ class _VerificationProcessScreenState
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Verification Process Help"),
-        content: SingleChildScrollView(
-          child: Text("Follow the steps to complete verification."),
+        title: const Text('Verification Process Help'),
+        content: const SingleChildScrollView(
+          child: Text('Follow the steps to complete verification.'),
         ),
         actions: [
           TextButton(
@@ -412,26 +419,28 @@ class _VerificationProcessScreenState
 
   String _getStatusText(VerificationStatus status, AppLocalizations l10n) {
     return switch (status) {
-      VerificationStatus.notStarted => "Not Started",
+      VerificationStatus.notStarted => 'Not Started',
       VerificationStatus.inProgress => l10n.verificationStatusInProgress,
-      VerificationStatus.pendingReview => "Pending Review",
+      VerificationStatus.pendingReview => 'Pending Review',
       VerificationStatus.completed => l10n.verificationStatusCompleted,
-      VerificationStatus.rejected => "Rejected",
-      VerificationStatus.expired => "Expired",
+      VerificationStatus.rejected => 'Rejected',
+      VerificationStatus.expired => 'Expired',
     };
   }
 
   String _getStatusDescription(
-      VerificationStatus status, AppLocalizations l10n) {
+    VerificationStatus status,
+    AppLocalizations l10n,
+  ) {
     return switch (status) {
-      VerificationStatus.notStarted => "Verification has not started yet.",
+      VerificationStatus.notStarted => 'Verification has not started yet.',
       VerificationStatus.inProgress =>
         l10n.verificationStatusInProgressDescription,
-      VerificationStatus.pendingReview => "Your submission is pending review.",
+      VerificationStatus.pendingReview => 'Your submission is pending review.',
       VerificationStatus.completed =>
         l10n.verificationStatusCompletedDescription,
       VerificationStatus.rejected => l10n.verificationStatusFailedDescription,
-      VerificationStatus.expired => "This verification process has expired.",
+      VerificationStatus.expired => 'This verification process has expired.',
     };
   }
 
@@ -449,13 +458,13 @@ class _VerificationProcessScreenState
 
   String _getStepTitle(VerificationStepType type, AppLocalizations l10n) {
     return switch (type) {
-      VerificationStepType.emailVerification => "Email Verification",
-      VerificationStepType.phoneVerification => "Phone Verification",
-      VerificationStepType.idDocumentVerification => "ID Document Verification",
-      VerificationStepType.addressVerification => "Address Verification",
-      VerificationStepType.livenessCheck => "Liveness Check",
-      VerificationStepType.biometricVerification => "Biometric Verification",
-      VerificationStepType.additionalDocuments => "Additional Documents",
+      VerificationStepType.emailVerification => 'Email Verification',
+      VerificationStepType.phoneVerification => 'Phone Verification',
+      VerificationStepType.idDocumentVerification => 'ID Document Verification',
+      VerificationStepType.addressVerification => 'Address Verification',
+      VerificationStepType.livenessCheck => 'Liveness Check',
+      VerificationStepType.biometricVerification => 'Biometric Verification',
+      VerificationStepType.additionalDocuments => 'Additional Documents',
     };
   }
 
@@ -470,13 +479,15 @@ class _VerificationProcessScreenState
   }
 
   String _getStepStatusText(
-      VerificationStepStatus status, AppLocalizations l10n) {
+    VerificationStepStatus status,
+    AppLocalizations l10n,
+  ) {
     return switch (status) {
-      VerificationStepStatus.notStarted => "Not Started",
+      VerificationStepStatus.notStarted => 'Not Started',
       VerificationStepStatus.inProgress => l10n.stepStatusInProgress,
       VerificationStepStatus.completed => l10n.stepStatusCompleted,
-      VerificationStepStatus.rejected => "Rejected",
-      VerificationStepStatus.actionRequired => "Action Required",
+      VerificationStepStatus.rejected => 'Rejected',
+      VerificationStepStatus.actionRequired => 'Action Required',
     };
   }
 }

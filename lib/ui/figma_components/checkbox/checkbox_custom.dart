@@ -1,5 +1,5 @@
-import 'package:did_app/ui/figma_components/custom_styles.dart';
 import 'package:archethic_dapp_framework_flutter/archethic_dapp_framework_flutter.dart';
+import 'package:did_app/ui/figma_components/custom_styles.dart';
 import 'package:flutter/material.dart';
 
 class CheckboxCustom extends StatelessWidget {

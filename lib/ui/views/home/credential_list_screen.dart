@@ -1,13 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:did_app/application/credential/providers.dart';
-import 'package:did_app/domain/credential/credential.dart';
-import 'package:did_app/ui/common/app_card.dart';
-import 'package:did_app/ui/views/credential/credential_status_screen.dart';
 import 'package:did_app/ui/views/credential/add_credential_screen.dart';
 import 'package:did_app/ui/views/credential/credential_detail_screen.dart';
+import 'package:did_app/ui/views/credential/credential_status_screen.dart';
 import 'package:did_app/ui/views/credential/widgets/credential_card.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CredentialListScreen extends ConsumerWidget {
   const CredentialListScreen({super.key});
@@ -43,7 +41,7 @@ class CredentialListScreen extends ConsumerWidget {
             return _buildEmptyState(context, l10n);
           }
           return Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: ListView.builder(
               itemCount: credentials.length,
               itemBuilder: (context, index) {
@@ -133,7 +131,7 @@ class CredentialListScreen extends ConsumerWidget {
   Widget _buildEmptyState(BuildContext context, AppLocalizations l10n) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

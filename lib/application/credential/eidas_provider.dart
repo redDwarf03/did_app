@@ -158,7 +158,6 @@ class EidasNotifier extends StateNotifier<EidasState> {
   Future<Credential?> importFromJson(String jsonString) async {
     state = state.copyWith(
       isLoading: true,
-      errorMessage: null,
     );
 
     try {
@@ -173,7 +172,7 @@ class EidasNotifier extends StateNotifier<EidasState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors de l\'importation: $e',
+        errorMessage: "Erreur lors de l'importation: $e",
       );
       return null;
     }
@@ -183,7 +182,6 @@ class EidasNotifier extends StateNotifier<EidasState> {
   Future<String?> exportToJson(Credential credential) async {
     state = state.copyWith(
       isLoading: true,
-      errorMessage: null,
     );
 
     try {
@@ -198,7 +196,7 @@ class EidasNotifier extends StateNotifier<EidasState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors de l\'exportation: $e',
+        errorMessage: "Erreur lors de l'exportation: $e",
       );
       return null;
     }
@@ -214,7 +212,6 @@ class EidasNotifier extends StateNotifier<EidasState> {
   Future<Credential?> makeEidasCompatible(Credential credential) async {
     state = state.copyWith(
       isLoading: true,
-      errorMessage: null,
     );
 
     try {
@@ -239,7 +236,6 @@ class EidasNotifier extends StateNotifier<EidasState> {
   Future<Credential?> importFromEudiWallet() async {
     state = state.copyWith(
       isLoading: true,
-      errorMessage: null,
     );
 
     try {
@@ -253,7 +249,7 @@ class EidasNotifier extends StateNotifier<EidasState> {
       final service = _ref.read(eidasCredentialServiceProvider);
 
       // Simulation: charger un exemple de credential eIDAS
-      final String jsonString = await service.exportToJson(Credential(
+      final jsonString = await service.exportToJson(Credential(
         id: 'urn:uuid:${DateTime.now().millisecondsSinceEpoch}',
         type: ['VerifiableCredential', 'EuropeanIdentityCredential'],
         issuer: 'did:example:eudi-wallet-issuer',
@@ -278,7 +274,7 @@ class EidasNotifier extends StateNotifier<EidasState> {
           'proofPurpose': 'assertionMethod',
           'proofValue': 'zQeVbY4oey5q2M3XKaxup3tmzN4DRFTLVqpLMweBrSxBz',
         },
-      ));
+      ),);
 
       final credential = await service.importFromJson(jsonString);
 
@@ -290,7 +286,7 @@ class EidasNotifier extends StateNotifier<EidasState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors de l\'importation depuis EUDI Wallet: $e',
+        errorMessage: "Erreur lors de l'importation depuis EUDI Wallet: $e",
       );
       return null;
     }
@@ -298,12 +294,9 @@ class EidasNotifier extends StateNotifier<EidasState> {
 
   /// Vérifie l'authenticité d'une attestation eIDAS
   Future<eidas_service.VerificationResult> verifyCredential(
-      Credential credential) async {
+      Credential credential,) async {
     state = state.copyWith(
       isLoading: true,
-      errorMessage: null,
-      verificationResult: null,
-      revocationStatus: null,
     );
 
     try {
@@ -324,7 +317,7 @@ class EidasNotifier extends StateNotifier<EidasState> {
       }
 
       // Vérifier si l'émetteur est dans la liste de confiance européenne
-      bool issuerTrusted = false;
+      var issuerTrusted = false;
       if (eidasCredential.issuer.id.isNotEmpty) {
         issuerTrusted = await EidasTrustList.instance
             .isIssuerTrusted(eidasCredential.issuer.id);
@@ -336,7 +329,7 @@ class EidasNotifier extends StateNotifier<EidasState> {
             (revocationStatus?.isRevoked != true) &&
             issuerTrusted,
         message: _buildVerificationMessage(
-            verificationResult, revocationStatus, issuerTrusted),
+            verificationResult, revocationStatus, issuerTrusted,),
         details: {
           ...?verificationResult.details,
           'issuerTrusted': issuerTrusted,
@@ -400,7 +393,6 @@ class EidasNotifier extends StateNotifier<EidasState> {
   Future<String?> generateQrCodeForCredential(Credential credential) async {
     state = state.copyWith(
       isLoading: true,
-      errorMessage: null,
     );
 
     try {
@@ -434,7 +426,6 @@ class EidasNotifier extends StateNotifier<EidasState> {
   Future<bool> synchronizeWithEidasInfrastructure() async {
     state = state.copyWith(
       isLoading: true,
-      errorMessage: null,
     );
 
     try {
@@ -471,13 +462,13 @@ class EidasNotifier extends StateNotifier<EidasState> {
         return true;
       } else {
         throw Exception(
-            'Échec de la synchronisation avec le registre européen');
+            'Échec de la synchronisation avec le registre européen',);
       }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage:
-            'Erreur lors de la synchronisation avec l\'infrastructure eIDAS: $e',
+            "Erreur lors de la synchronisation avec l'infrastructure eIDAS: $e",
       );
       return false;
     }
@@ -577,7 +568,7 @@ class EidasNotifier extends StateNotifier<EidasState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors de la vérification de l\'émetteur: $e',
+        errorMessage: "Erreur lors de la vérification de l'émetteur: $e",
       );
 
       return {
@@ -616,14 +607,13 @@ class EidasNotifier extends StateNotifier<EidasState> {
   Future<bool> shareWithEudiWallet(Credential credential) async {
     if (!state.isEudiWalletAvailable) {
       state = state.copyWith(
-        errorMessage: 'L\'EUDI Wallet n\'est pas disponible sur cet appareil',
+        errorMessage: "L'EUDI Wallet n'est pas disponible sur cet appareil",
       );
       return false;
     }
 
     state = state.copyWith(
       isLoading: true,
-      errorMessage: null,
     );
 
     try {

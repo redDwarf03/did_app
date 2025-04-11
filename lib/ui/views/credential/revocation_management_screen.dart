@@ -1,20 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/credential/credential_status.dart';
 import 'package:did_app/domain/credential/revocation_service.dart';
 import 'package:did_app/infrastructure/credential/status_list_2021_revocation_service.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 /// Écran de gestion des révocations d'attestations
 class RevocationManagementScreen extends ConsumerStatefulWidget {
-  final String credentialId;
-
   const RevocationManagementScreen({
-    Key? key,
+    super.key,
     required this.credentialId,
-  }) : super(key: key);
+  });
+  final String credentialId;
 
   @override
   ConsumerState<RevocationManagementScreen> createState() =>
@@ -201,9 +199,10 @@ class _RevocationManagementScreenState
           const SizedBox(height: 24),
           if (_error != null) _buildErrorMessage(),
           const SizedBox(height: 16),
-          _isRevoked
-              ? _buildUnrevocationForm(l10n)
-              : _buildRevocationForm(l10n),
+          if (_isRevoked)
+            _buildUnrevocationForm(l10n)
+          else
+            _buildRevocationForm(l10n),
           const SizedBox(height: 32),
           Text(
             l10n.revocationHistory,
@@ -267,7 +266,7 @@ class _RevocationManagementScreenState
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+        color: Colors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.red),
       ),
@@ -437,7 +436,8 @@ class _RevocationManagementScreenState
                 Text(DateFormat.yMMMd().add_Hm().format(entry.timestamp)),
                 if (entry.reason != null)
                   Text(
-                      '${l10n.reason}: ${_getReasonText(entry.reason!, l10n)}'),
+                    '${l10n.reason}: ${_getReasonText(entry.reason!, l10n)}',
+                  ),
                 if (entry.details != null && entry.details!.isNotEmpty)
                   Text('${l10n.details}: ${entry.details}'),
               ],

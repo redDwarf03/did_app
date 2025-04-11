@@ -1,9 +1,9 @@
+import 'package:did_app/domain/credential/status_list_2021.dart';
+import 'package:did_app/infrastructure/credential/status_list_2021_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:did_app/infrastructure/credential/status_list_2021_service.dart';
-import 'package:did_app/domain/credential/status_list_2021.dart';
-import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Écran de gestion des listes de statut Status List 2021
 class StatusListDashboardScreen extends ConsumerStatefulWidget {
@@ -162,7 +162,7 @@ class _StatusListDashboardScreenState
           _buildAddStatusListForm(l10n),
           if (_error != null)
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Text(
                 _error!,
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
@@ -194,7 +194,7 @@ class _StatusListDashboardScreenState
 
   Widget _buildAddStatusListForm(AppLocalizations l10n) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Row(
         children: [
           Expanded(
@@ -225,12 +225,12 @@ class _StatusListDashboardScreenState
 
   Widget _buildStatusListUrlList(AppLocalizations l10n) {
     return Card(
-      margin: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: Text(
               l10n.managedStatusListsTitle,
               style: Theme.of(context).textTheme.titleMedium,
@@ -272,12 +272,12 @@ class _StatusListDashboardScreenState
     if (_selectedList == null) return const SizedBox();
 
     return Card(
-      margin: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 Expanded(
@@ -297,7 +297,7 @@ class _StatusListDashboardScreenState
           const Divider(),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               children: [
                 _buildDetailRow(
                   l10n.listIdLabel,
@@ -336,7 +336,7 @@ class _StatusListDashboardScreenState
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

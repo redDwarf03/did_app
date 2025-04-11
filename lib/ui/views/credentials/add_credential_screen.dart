@@ -1,9 +1,8 @@
 import 'package:did_app/application/credentials/providers.dart';
-import 'package:did_app/domain/credentials/credential.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen for adding a new credential to the wallet
 class AddCredentialScreen extends ConsumerStatefulWidget {
@@ -70,7 +69,7 @@ class _AddCredentialScreenState extends ConsumerState<AddCredentialScreen> {
                   hintText: 'https://issuer.example.com/credentials',
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.link),
-                  helperText: "Enter the URL provided by the credential issuer",
+                  helperText: 'Enter the URL provided by the credential issuer',
                 ),
                 keyboardType: TextInputType.url,
                 validator: (value) {
@@ -78,7 +77,7 @@ class _AddCredentialScreenState extends ConsumerState<AddCredentialScreen> {
                     return l10n.issuerValidationError;
                   }
                   if (!Uri.parse(value).isAbsolute) {
-                    return "Please enter a valid URL";
+                    return 'Please enter a valid URL';
                   }
                   return null;
                 },
@@ -180,11 +179,11 @@ class _AddCredentialScreenState extends ConsumerState<AddCredentialScreen> {
               backgroundColor: Colors.blue,
               child: Icon(Icons.school, color: Colors.white),
             ),
-            title: const Text("University Diploma"),
-            subtitle: const Text("https://example.university.edu/credentials"),
+            title: const Text('University Diploma'),
+            subtitle: const Text('https://example.university.edu/credentials'),
             onTap: () {
               _issuerUrlController.text =
-                  "https://example.university.edu/credentials";
+                  'https://example.university.edu/credentials';
             },
           ),
         ),
@@ -194,11 +193,11 @@ class _AddCredentialScreenState extends ConsumerState<AddCredentialScreen> {
               backgroundColor: Colors.green,
               child: Icon(Icons.business, color: Colors.white),
             ),
-            title: const Text("Employment Certificate"),
-            subtitle: const Text("https://example.employer.com/credentials"),
+            title: const Text('Employment Certificate'),
+            subtitle: const Text('https://example.employer.com/credentials'),
             onTap: () {
               _issuerUrlController.text =
-                  "https://example.employer.com/credentials";
+                  'https://example.employer.com/credentials';
             },
           ),
         ),
@@ -227,7 +226,7 @@ class _AddCredentialScreenState extends ConsumerState<AddCredentialScreen> {
               content: Text(l10n.credentialReceivedMessage),
               backgroundColor: Colors.green,
               action: SnackBarAction(
-                label: "View",
+                label: 'View',
                 textColor: Colors.white,
                 onPressed: () {
                   // Navigate to the credential details in a real app
@@ -244,7 +243,7 @@ class _AddCredentialScreenState extends ConsumerState<AddCredentialScreen> {
           final l10n = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("Error: ${e.toString()}"),
+              content: Text('Error: $e'),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 5),
             ),

@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:did_app/application/auth/biometric_auth_provider.dart';
 import 'package:did_app/domain/auth/biometric_auth_model.dart';
 import 'package:did_app/ui/views/auth/secure_auth_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Login screen with support for different authentication methods
 class LoginScreen extends ConsumerStatefulWidget {
@@ -58,7 +58,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 16),
                 if (isBiometricAvailable)
                   _buildBiometricLoginButton(
-                      authState.currentBiometricType, l10n),
+                    authState.currentBiometricType,
+                    l10n,
+                  ),
                 const SizedBox(height: 24),
                 _buildDivider(l10n),
                 const SizedBox(height: 24),
@@ -104,7 +106,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+        color: Colors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.red),
       ),
@@ -129,7 +131,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         labelText: l10n.emailLabel,
-        hintText: "example@email.com",
+        hintText: 'example@email.com',
         prefixIcon: const Icon(Icons.email),
         border: const OutlineInputBorder(),
       ),
@@ -142,8 +144,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       controller: _passwordController,
       obscureText: !_isPasswordVisible,
       decoration: InputDecoration(
-        labelText: "Password",
-        hintText: "Enter your password",
+        labelText: 'Password',
+        hintText: 'Enter your password',
         prefixIcon: const Icon(Icons.lock),
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
@@ -177,12 +179,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 }
               },
             ),
-            const Text("Remember me"),
+            const Text('Remember me'),
           ],
         ),
         TextButton(
           onPressed: _isLoading ? null : () => _forgotPassword(l10n),
-          child: const Text("Forgot Password?"),
+          child: const Text('Forgot Password?'),
         ),
       ],
     );
@@ -208,22 +210,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildBiometricLoginButton(
-      BiometricType biometricType, AppLocalizations l10n) {
+    BiometricType biometricType,
+    AppLocalizations l10n,
+  ) {
     IconData icon;
     String label;
 
     switch (biometricType) {
       case BiometricType.fingerprint:
         icon = Icons.fingerprint;
-        label = "Login with Fingerprint";
+        label = 'Login with Fingerprint';
         break;
       case BiometricType.faceId:
         icon = Icons.face;
-        label = "Login with Face ID";
+        label = 'Login with Face ID';
         break;
       case BiometricType.iris:
         icon = Icons.visibility;
-        label = "Login with Iris Scan";
+        label = 'Login with Iris Scan';
         break;
       case BiometricType.none:
       default:
@@ -243,14 +247,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildDivider(AppLocalizations l10n) {
-    return Row(
+    return const Row(
       children: [
-        const Expanded(child: Divider()),
+        Expanded(child: Divider()),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: const Text("OR", style: TextStyle(color: Colors.grey)),
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Text('OR', style: TextStyle(color: Colors.grey)),
         ),
-        const Expanded(child: Divider()),
+        Expanded(child: Divider()),
       ],
     );
   }
@@ -262,7 +266,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         OutlinedButton.icon(
           onPressed: _isLoading ? null : () => _sendMagicLink(l10n),
           icon: const Icon(Icons.link),
-          label: const Text("Login with Magic Link"),
+          label: const Text('Login with Magic Link'),
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 14),
           ),
@@ -271,7 +275,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         OutlinedButton.icon(
           onPressed: _isLoading ? null : () => _sendNotification(l10n),
           icon: const Icon(Icons.notifications),
-          label: const Text("Login with Push Notification"),
+          label: const Text('Login with Push Notification'),
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 14),
           ),
@@ -282,7 +286,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Widget _buildSecureSettingsButton(AppLocalizations l10n) {
     return TextButton(
-      onPressed: () => _openSecureSettings(),
+      onPressed: _openSecureSettings,
       child: Text(l10n.secureAuthMenuTitle),
     );
   }
@@ -293,7 +297,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       setState(() {
-        _errorMessage = "Email and password are required";
+        _errorMessage = 'Email and password are required';
       });
       return;
     }
@@ -302,7 +306,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(email)) {
       setState(() {
-        _errorMessage = "Please enter a valid email address";
+        _errorMessage = 'Please enter a valid email address';
       });
       return;
     }
@@ -323,13 +327,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       } else {
         setState(() {
           _isLoading = false;
-          _errorMessage = "Invalid email or password";
+          _errorMessage = 'Invalid email or password';
         });
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = "Login error: ${e.toString()}";
+        _errorMessage = 'Login error: $e';
       });
     }
   }
@@ -344,7 +348,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final success = await ref
           .read(biometricAuthStateProvider.notifier)
           .authenticateWithBiometrics(
-            reason: "Authenticate to access your account",
+            reason: 'Authenticate to access your account',
           );
 
       if (success) {
@@ -354,13 +358,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         setState(() {
           _isLoading = false;
           _errorMessage =
-              authState.errorMessage ?? "Biometric authentication failed";
+              authState.errorMessage ?? 'Biometric authentication failed';
         });
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = "Authentication error: ${e.toString()}";
+        _errorMessage = 'Authentication error: $e';
       });
     }
   }
@@ -370,7 +374,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (email.isEmpty) {
       setState(() {
-        _errorMessage = "Please enter your email to receive a magic link";
+        _errorMessage = 'Please enter your email to receive a magic link';
       });
       return;
     }
@@ -379,7 +383,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(email)) {
       setState(() {
-        _errorMessage = "Please enter a valid email address";
+        _errorMessage = 'Please enter a valid email address';
       });
       return;
     }
@@ -401,7 +405,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Magic link sent to $email"),
+            content: Text('Magic link sent to $email'),
             backgroundColor: Colors.green,
           ),
         );
@@ -409,7 +413,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = "Error sending magic link: ${e.toString()}";
+        _errorMessage = 'Error sending magic link: $e';
       });
     }
   }
@@ -432,7 +436,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Login notification sent to your device"),
+            content: Text('Login notification sent to your device'),
             backgroundColor: Colors.green,
           ),
         );
@@ -440,7 +444,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = "Error sending notification: ${e.toString()}";
+        _errorMessage = 'Error sending notification: $e';
       });
     }
   }
@@ -450,7 +454,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (email.isEmpty) {
       setState(() {
-        _errorMessage = "Please enter your email to reset your password";
+        _errorMessage = 'Please enter your email to reset your password';
       });
       return;
     }
@@ -459,7 +463,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(email)) {
       setState(() {
-        _errorMessage = "Please enter a valid email address";
+        _errorMessage = 'Please enter a valid email address';
       });
       return;
     }
@@ -467,7 +471,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Password reset instructions sent to $email"),
+        content: Text('Password reset instructions sent to $email'),
         backgroundColor: Colors.green,
       ),
     );
@@ -487,7 +491,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Login successful"),
+          content: Text('Login successful'),
           backgroundColor: Colors.green,
         ),
       );

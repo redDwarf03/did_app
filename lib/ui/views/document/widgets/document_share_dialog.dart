@@ -140,7 +140,6 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
                       ),
                       items: [
                         const DropdownMenuItem(
-                          value: null,
                           child: Text('Unlimited'),
                         ),
                         for (int i = 1; i <= 10; i++)
@@ -235,7 +234,7 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
     }
 
     // Show loading indicator
-    showDialog(
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const AlertDialog(
@@ -347,7 +346,7 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
             const SizedBox(height: 16),
             Text('Recipient: ${share.recipientDescription}'),
             Text(
-                'Expires: ${DateFormat('dd MMM yyyy').format(share.expiresAt)}'),
+                'Expires: ${DateFormat('dd MMM yyyy').format(share.expiresAt)}',),
             if (share.accessCode != null)
               Text('Access Code: ${share.accessCode}'),
             if (share.maxAccessCount != null)

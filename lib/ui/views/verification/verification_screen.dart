@@ -3,8 +3,8 @@ import 'package:did_app/application/verification/providers.dart';
 import 'package:did_app/ui/views/verification/verification_process_screen.dart';
 import 'package:did_app/ui/views/verification/verification_success_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Main screen for identity verification

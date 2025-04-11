@@ -1,5 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:did_app/domain/credentials/credential.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Provider for credential state management
 final credentialsNotifierProvider =
@@ -9,15 +9,15 @@ final credentialsNotifierProvider =
 
 /// State class for credentials
 class CredentialsState {
-  final List<Credential> credentials;
-  final bool isLoading;
-  final String? error;
 
   CredentialsState({
     this.credentials = const [],
     this.isLoading = false,
     this.error,
   });
+  final List<Credential> credentials;
+  final bool isLoading;
+  final String? error;
 
   CredentialsState copyWith({
     List<Credential>? credentials,
@@ -38,7 +38,7 @@ class CredentialsNotifier extends StateNotifier<CredentialsState> {
 
   /// Request a new credential from an issuer
   Future<void> requestCredential(String issuerUrl) async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       // Mock implementation - in a real app, this would call an API

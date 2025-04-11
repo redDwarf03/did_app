@@ -17,7 +17,7 @@ final credentialByIdProvider = FutureProvider.family<Credential?, String>(
     try {
       return await repository.getCredentialById(credentialId);
     } catch (e) {
-      throw Exception('Erreur lors de la récupération de l\'attestation: $e');
+      throw Exception("Erreur lors de la récupération de l'attestation: $e");
     }
   },
 );
@@ -134,7 +134,7 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors du chargement de l\'attestation: $e',
+        errorMessage: "Erreur lors du chargement de l'attestation: $e",
       );
       return null;
     }
@@ -224,7 +224,7 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors de l\'ajout de l\'attestation: $e',
+        errorMessage: "Erreur lors de l'ajout de l'attestation: $e",
       );
       return false;
     }
@@ -330,7 +330,7 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors de la réception de l\'attestation: $e',
+        errorMessage: "Erreur lors de la réception de l'attestation: $e",
       );
       return null;
     }

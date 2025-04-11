@@ -1,8 +1,7 @@
+import 'package:did_app/ui/common/widgets/menu_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:go_router/go_router.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -20,7 +19,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         title: Text(l10n.welcomeTitle),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -43,28 +42,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 48),
-            _buildFeatureCard(
-              l10n: l10n,
+            MenuCard(
               title: l10n.secureAuthFeatureTitle,
-              description: l10n.secureAuthFeatureDesc,
+              subtitle: l10n.secureAuthFeatureDesc,
               icon: Icons.fingerprint,
               color: Colors.indigo,
               onTap: () => context.push('/login'),
             ),
             const SizedBox(height: 16),
-            _buildFeatureCard(
-              l10n: l10n,
+            MenuCard(
               title: l10n.eidasInteropFeatureTitle,
-              description: l10n.eidasInteropFeatureDesc,
+              subtitle: l10n.eidasInteropFeatureDesc,
               icon: Icons.public,
               color: Colors.green,
               onTap: () => context.push('/eidas/interop'),
             ),
             const SizedBox(height: 16),
-            _buildFeatureCard(
-              l10n: l10n,
+            MenuCard(
               title: l10n.appExplorerFeatureTitle,
-              description: l10n.appExplorerFeatureDesc,
+              subtitle: l10n.appExplorerFeatureDesc,
               icon: Icons.apps,
               color: Colors.orange,
               onTap: () => context.push('/home'),
@@ -79,65 +75,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFeatureCard({
-    required AppLocalizations l10n,
-    required String title,
-    required String description,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: color, size: 28),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.arrow_forward_ios, size: 16),
-            ],
-          ),
         ),
       ),
     );

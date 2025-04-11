@@ -1,19 +1,20 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:did_app/domain/credential/credential_status.dart';
+
 import 'package:did_app/domain/credential/credential.dart';
+import 'package:did_app/domain/credential/credential_status.dart';
+import 'package:http/http.dart' as http;
 
 /// Service pour gérer la vérification des statuts de révocation
 class CredentialStatusService {
-  final http.Client _httpClient;
-  final Duration _checkInterval;
-  final Map<String, StatusList> _statusListCache = {};
 
   CredentialStatusService({
     http.Client? httpClient,
     Duration? checkInterval,
   })  : _httpClient = httpClient ?? http.Client(),
         _checkInterval = checkInterval ?? const Duration(hours: 1);
+  final http.Client _httpClient;
+  final Duration _checkInterval;
+  final Map<String, StatusList> _statusListCache = {};
 
   /// Vérifie le statut d'une attestation
   Future<StatusCheckResult> checkStatus(Credential credential) async {

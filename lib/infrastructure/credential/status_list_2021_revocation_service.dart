@@ -1,19 +1,15 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:did_app/domain/credential/credential_status.dart';
 import 'package:did_app/domain/credential/revocation_service.dart';
 import 'package:did_app/infrastructure/credential/credential_status_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
 
 /// Service d'implémentation de la révocation des attestations
 /// utilisant le standard Status List 2021
 class StatusList2021RevocationService implements RevocationService {
-  final http.Client _httpClient;
-  final CredentialStatusService _statusService;
-  final Box<Map<dynamic, dynamic>> _historyBox;
-  final String _apiEndpoint;
-  final String _apiKey;
 
   StatusList2021RevocationService({
     required http.Client httpClient,
@@ -26,6 +22,11 @@ class StatusList2021RevocationService implements RevocationService {
         _historyBox = historyBox,
         _apiEndpoint = apiEndpoint,
         _apiKey = apiKey;
+  final http.Client _httpClient;
+  final CredentialStatusService _statusService;
+  final Box<Map<dynamic, dynamic>> _historyBox;
+  final String _apiEndpoint;
+  final String _apiKey;
 
   @override
   Future<RevocationResult> revokeCredential({
@@ -39,7 +40,7 @@ class StatusList2021RevocationService implements RevocationService {
         return RevocationResult(
           credentialId: credentialId,
           success: false,
-          errorMessage: 'L\'attestation est déjà révoquée',
+          errorMessage: "L'attestation est déjà révoquée",
           timestamp: DateTime.now(),
         );
       }
@@ -110,7 +111,7 @@ class StatusList2021RevocationService implements RevocationService {
         return RevocationResult(
           credentialId: credentialId,
           success: false,
-          errorMessage: 'L\'attestation n\'est pas révoquée',
+          errorMessage: "L'attestation n'est pas révoquée",
           timestamp: DateTime.now(),
         );
       }
@@ -154,7 +155,7 @@ class StatusList2021RevocationService implements RevocationService {
         return RevocationResult(
           credentialId: credentialId,
           success: false,
-          errorMessage: 'Erreur lors de l\'annulation de la révocation: $error',
+          errorMessage: "Erreur lors de l'annulation de la révocation: $error",
           timestamp: DateTime.now(),
         );
       }
@@ -162,7 +163,7 @@ class StatusList2021RevocationService implements RevocationService {
       return RevocationResult(
         credentialId: credentialId,
         success: false,
-        errorMessage: 'Exception lors de l\'annulation de la révocation: $e',
+        errorMessage: "Exception lors de l'annulation de la révocation: $e",
         timestamp: DateTime.now(),
       );
     }

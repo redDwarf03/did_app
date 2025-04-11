@@ -1,11 +1,9 @@
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/ui/common/section_title.dart';
-import 'package:did_app/ui/common/app_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Écran affichant l'attestation sous forme de certificat visuel
 class CredentialCertificateScreen extends ConsumerWidget {
@@ -48,7 +46,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             _buildCertificate(context, l10n),
@@ -71,9 +69,9 @@ class CredentialCertificateScreen extends ConsumerWidget {
 
     // On détermine le type d'attestation pour personnaliser le certificat
     final credentialType = _getCredentialTypeFromList(credential.type);
-    IconData typeIcon = _getCredentialTypeIcon(credentialType);
-    String typeTitle = l10n.defaultCredentialName;
-    Color accentColor = theme.colorScheme.primary;
+    final typeIcon = _getCredentialTypeIcon(credentialType);
+    var typeTitle = l10n.defaultCredentialName;
+    var accentColor = theme.colorScheme.primary;
 
     switch (credentialType) {
       case CredentialType.identity:
@@ -129,14 +127,13 @@ class CredentialCertificateScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             spreadRadius: 1,
           ),
         ],
         border: Border.all(
-          color: accentColor.withOpacity(0.5),
-          width: 1,
+          color: accentColor.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
@@ -146,7 +143,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
             height: 80,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: accentColor.withOpacity(0.1),
+              color: accentColor.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -158,7 +155,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
                 Positioned.fill(
                   child: CustomPaint(
                     painter: CertificatePatternPainter(
-                      color: accentColor.withOpacity(0.1),
+                      color: accentColor.withValues(alpha: 0.1),
                     ),
                   ),
                 ),
@@ -189,7 +186,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
 
           // Contenu du certificat
           Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -294,7 +291,9 @@ class CredentialCertificateScreen extends ConsumerWidget {
   }
 
   List<Widget> _buildCertificateContent(
-      BuildContext context, AppLocalizations l10n) {
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     final theme = Theme.of(context);
     final subjectData = credential.credentialSubject;
     final widgets = <Widget>[];
@@ -302,26 +301,40 @@ class CredentialCertificateScreen extends ConsumerWidget {
     if (credential.type.contains('IdentityCredential')) {
       // Pour une attestation d'identité
       widgets.addAll([
-        _buildContentRow(l10n.fullNameLabelDetails,
-            '${subjectData['firstName']} ${subjectData['lastName']}'),
         _buildContentRow(
-            l10n.dobLabelDetails, subjectData['dateOfBirth'] ?? ''),
+          l10n.fullNameLabelDetails,
+          '${subjectData['firstName']} ${subjectData['lastName']}',
+        ),
         _buildContentRow(
-            l10n.nationalityLabelDetails, subjectData['nationality'] ?? ''),
+          l10n.dobLabelDetails,
+          subjectData['dateOfBirth'] ?? '',
+        ),
+        _buildContentRow(
+          l10n.nationalityLabelDetails,
+          subjectData['nationality'] ?? '',
+        ),
         if (subjectData['documentNumber'] != null)
           _buildContentRow(
-              l10n.documentIdLabelDetail, subjectData['documentNumber']),
+            l10n.documentIdLabelDetail,
+            subjectData['documentNumber'],
+          ),
       ]);
     } else if (credential.type.contains('UniversityDegreeCredential')) {
       // Pour un diplôme
       final degree = subjectData['degree'] as Map<String, dynamic>? ?? {};
       widgets.addAll([
         _buildContentRow(
-            l10n.documentTypeLabel, '${degree['type']} en ${degree['field']}'),
-        _buildContentRow(l10n.issuerLabelDetail,
-            credential.issuer.replaceAll('did:archethic:', '')),
+          l10n.documentTypeLabel,
+          '${degree['type']} en ${degree['field']}',
+        ),
         _buildContentRow(
-            l10n.issueDateLabelDetail, subjectData['graduationDate'] ?? ''),
+          l10n.issuerLabelDetail,
+          credential.issuer.replaceAll('did:archethic:', ''),
+        ),
+        _buildContentRow(
+          l10n.issueDateLabelDetail,
+          subjectData['graduationDate'] ?? '',
+        ),
         if (subjectData['gpa'] != null)
           _buildContentRow(l10n.documentDescriptionLabel, subjectData['gpa']),
       ]);
@@ -329,15 +342,25 @@ class CredentialCertificateScreen extends ConsumerWidget {
       // Pour une attestation d'assurance santé
       widgets.addAll([
         _buildContentRow(
-            l10n.issuerLabelDetail, subjectData['insuranceProvider'] ?? ''),
+          l10n.issuerLabelDetail,
+          subjectData['insuranceProvider'] ?? '',
+        ),
         _buildContentRow(
-            l10n.documentIdLabelDetail, subjectData['policyNumber'] ?? ''),
+          l10n.documentIdLabelDetail,
+          subjectData['policyNumber'] ?? '',
+        ),
         _buildContentRow(
-            l10n.issueDateLabelDetail, subjectData['coverageStart'] ?? ''),
+          l10n.issueDateLabelDetail,
+          subjectData['coverageStart'] ?? '',
+        ),
         _buildContentRow(
-            l10n.expirationDateLabelDetail, subjectData['coverageEnd'] ?? ''),
+          l10n.expirationDateLabelDetail,
+          subjectData['coverageEnd'] ?? '',
+        ),
         _buildContentRow(
-            l10n.documentTypeLabel, subjectData['coverageType'] ?? ''),
+          l10n.documentTypeLabel,
+          subjectData['coverageType'] ?? '',
+        ),
       ]);
     } else if (credential.type.contains('EmploymentCredential')) {
       // Pour une attestation d'emploi
@@ -346,11 +369,17 @@ class CredentialCertificateScreen extends ConsumerWidget {
         _buildContentRow(l10n.documentTypeLabel, subjectData['position'] ?? ''),
         _buildContentRow(l10n.issuerLabelDetail, employer['name'] ?? ''),
         _buildContentRow(
-            l10n.documentDescriptionLabel, subjectData['department'] ?? ''),
+          l10n.documentDescriptionLabel,
+          subjectData['department'] ?? '',
+        ),
         _buildContentRow(
-            l10n.issueDateLabelDetail, subjectData['startDate'] ?? ''),
+          l10n.issueDateLabelDetail,
+          subjectData['startDate'] ?? '',
+        ),
         _buildContentRow(
-            l10n.documentIdLabelDetail, subjectData['employeeId'] ?? ''),
+          l10n.documentIdLabelDetail,
+          subjectData['employeeId'] ?? '',
+        ),
       ]);
     } else {
       // Pour tout autre type d'attestation, afficher tous les attributs
@@ -370,7 +399,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
 
   Widget _buildContentRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -429,7 +458,6 @@ class CredentialCertificateScreen extends ConsumerWidget {
                     border: Border(
                       bottom: BorderSide(
                         color: theme.colorScheme.primary,
-                        width: 1,
                       ),
                     ),
                   ),
@@ -462,7 +490,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             _buildInfoRow(
@@ -504,7 +532,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             _buildInfoRow(
@@ -556,7 +584,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           Icon(icon, color: theme.colorScheme.primary, size: 20),
@@ -647,9 +675,8 @@ class CredentialCertificateScreen extends ConsumerWidget {
 
 /// Peintre personnalisé pour dessiner un motif sur le certificat
 class CertificatePatternPainter extends CustomPainter {
-  final Color color;
-
   CertificatePatternPainter({required this.color});
+  final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -659,7 +686,7 @@ class CertificatePatternPainter extends CustomPainter {
       ..strokeWidth = 1.0;
 
     // Dessiner un motif de lignes en diagonale
-    for (double i = -size.height; i < size.width + size.height; i += 20) {
+    for (var i = -size.height; i < size.width + size.height; i += 20) {
       canvas.drawLine(
         Offset(i, 0),
         Offset(i + size.height, size.height),

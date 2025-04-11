@@ -2,6 +2,19 @@ import 'package:flutter/material.dart';
 
 /// Widget de carte stylisée pour l'application
 class AppCard extends StatelessWidget {
+  const AppCard({
+    super.key,
+    required this.title,
+    required this.child,
+    this.accentColor,
+    this.actionIcon,
+    this.onActionPressed,
+    this.elevation = 2.0,
+    this.isExpanded = false,
+    this.expanded,
+    this.onExpansionChanged,
+  });
+
   /// Titre de la carte
   final String title;
 
@@ -28,19 +41,6 @@ class AppCard extends StatelessWidget {
 
   /// Callback lors de l'expansion
   final Function(bool)? onExpansionChanged;
-
-  const AppCard({
-    super.key,
-    required this.title,
-    required this.child,
-    this.accentColor,
-    this.actionIcon,
-    this.onActionPressed,
-    this.elevation = 2.0,
-    this.isExpanded = false,
-    this.expanded,
-    this.onExpansionChanged,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -90,11 +90,10 @@ class AppCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: effectiveAccentColor.withOpacity(0.08),
+              color: effectiveAccentColor.withValues(alpha: 0.08),
               border: Border(
                 bottom: BorderSide(
-                  color: effectiveAccentColor.withOpacity(0.2),
-                  width: 1,
+                  color: effectiveAccentColor.withValues(alpha: 0.2),
                 ),
               ),
             ),

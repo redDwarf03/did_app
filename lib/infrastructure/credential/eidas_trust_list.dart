@@ -39,7 +39,7 @@ class EidasTrustList {
     _addTrustedIssuer(
       TrustedIssuer(
         did: 'did:example:ministry-interior',
-        name: 'Ministère de l\'Intérieur',
+        name: "Ministère de l'Intérieur",
         country: 'FR',
         serviceType: 'IdentityProvider',
         trustLevel: TrustLevel.high,
@@ -116,7 +116,7 @@ class EidasTrustList {
 
   /// Récupère les émetteurs de confiance pour un pays spécifique
   Future<List<TrustedIssuer>> getTrustedIssuersByCountry(
-      String countryCode) async {
+      String countryCode,) async {
     await _initialize();
     return _trustedIssuers.values
         .where((issuer) => issuer.country == countryCode)
@@ -125,7 +125,7 @@ class EidasTrustList {
 
   /// Récupère les émetteurs de confiance par type de service
   Future<List<TrustedIssuer>> getTrustedIssuersByServiceType(
-      String serviceType) async {
+      String serviceType,) async {
     await _initialize();
     return _trustedIssuers.values
         .where((issuer) => issuer.serviceType == serviceType)
@@ -173,7 +173,7 @@ class EidasTrustList {
 
   /// Convertit les données d'un émetteur en format standard eIDAS
   String exportTrustedIssuerToEidas(TrustedIssuer issuer) {
-    final Map<String, dynamic> eidasFormat = {
+    final eidasFormat = <String, dynamic>{
       'id': issuer.did,
       'type': ['TrustedIssuer', 'EidasService'],
       'name': issuer.name,
@@ -228,6 +228,15 @@ class EidasTrustList {
 
 /// Modèle d'émetteur de confiance
 class TrustedIssuer {
+
+  TrustedIssuer({
+    required this.did,
+    required this.name,
+    required this.country,
+    required this.serviceType,
+    required this.trustLevel,
+    required this.validUntil,
+  });
   /// Identifiant de l'émetteur (généralement un DID)
   final String did;
 
@@ -245,15 +254,6 @@ class TrustedIssuer {
 
   /// Date de validité
   final DateTime validUntil;
-
-  TrustedIssuer({
-    required this.did,
-    required this.name,
-    required this.country,
-    required this.serviceType,
-    required this.trustLevel,
-    required this.validUntil,
-  });
 }
 
 /// Niveaux de confiance eIDAS

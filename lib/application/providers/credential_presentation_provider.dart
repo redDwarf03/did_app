@@ -1,13 +1,10 @@
-import 'package:did_app/domain/credential/credential.dart';
-import 'package:did_app/domain/credential/qualified_credential.dart';
-import 'package:did_app/domain/identity/digital_identity.dart';
-import 'package:did_app/infrastructure/credential/mock_credential_repository.dart';
-import 'package:did_app/infrastructure/credential/qualified_credential_service.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 import 'package:did_app/application/credential/providers.dart';
 import 'package:did_app/application/identity/providers.dart';
+import 'package:did_app/domain/credential/credential.dart';
+import 'package:did_app/domain/identity/digital_identity.dart';
+import 'package:did_app/infrastructure/credential/qualified_credential_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 
 /// État du provider de présentation d'attestations
 class CredentialPresentationState {
@@ -60,7 +57,7 @@ final qualifiedCredentialServiceProvider = Provider<QualifiedCredentialService>(
 /// Provider pour la gestion des présentations d'attestations
 final credentialPresentationProvider = StateNotifierProvider<
     CredentialPresentationNotifier, CredentialPresentationState>(
-  (ref) => CredentialPresentationNotifier(ref),
+  CredentialPresentationNotifier.new,
 );
 
 /// Notifier pour la gestion des présentations d'attestations
@@ -81,7 +78,7 @@ class CredentialPresentationNotifier
     String? domain,
     String? message,
   }) async {
-    state = state.copyWith(loading: true, error: null);
+    state = state.copyWith(loading: true);
 
     try {
       // Vérifier que l'utilisateur a une identité
@@ -109,12 +106,12 @@ class CredentialPresentationNotifier
       // Vérifier la qualification des attestations
       final qualifiedService = _ref.read(qualifiedCredentialServiceProvider);
       final qualifiedStatuses = await Future.wait(
-          credentials.map((c) => qualifiedService.isQualified(c)));
+          credentials.map(qualifiedService.isQualified),);
 
       // Créer les contextes eIDAS
-      final List<String> contexts = [
+      final contexts = <String>[
         'https://www.w3.org/2018/credentials/v1',
-        'https://ec.europa.eu/digital-identity/credentials/v1'
+        'https://ec.europa.eu/digital-identity/credentials/v1',
       ];
 
       // Déterminer les types à inclure
@@ -130,7 +127,7 @@ class CredentialPresentationNotifier
           identity: identity,
           credentials: credentials,
           challenge: challenge,
-          domain: domain);
+          domain: domain,);
 
       // Créer la présentation
       final presentation = CredentialPresentation(
@@ -149,7 +146,7 @@ class CredentialPresentationNotifier
     } catch (e) {
       state = state.copyWith(
         loading: false,
-        error: 'Erreur lors de la création de la présentation: ${e.toString()}',
+        error: 'Erreur lors de la création de la présentation: $e',
       );
       return null;
     }
@@ -192,8 +189,8 @@ class CredentialPresentationNotifier
 
   /// Vérifie une présentation
   Future<VerificationResult> verifyPresentation(
-      CredentialPresentation presentation) async {
-    state = state.copyWith(isValidating: true, error: null);
+      CredentialPresentation presentation,) async {
+    state = state.copyWith(isValidating: true);
 
     try {
       // Vérifier la cohérence de la présentation
@@ -208,7 +205,7 @@ class CredentialPresentationNotifier
 
       // Vérifier la validité des attestations
       final invalidCredentials = presentation.verifiableCredentials.where((c) =>
-          !c.isValid || c.verificationStatus == VerificationStatus.invalid);
+          !c.isValid || c.verificationStatus == VerificationStatus.invalid,);
 
       if (invalidCredentials.isNotEmpty) {
         final result = VerificationResult(
@@ -230,7 +227,7 @@ class CredentialPresentationNotifier
         // Vérifier que toutes les attestations sont qualifiées
         final qualifiedStatuses = await Future.wait(presentation
             .verifiableCredentials
-            .map((c) => qualifiedService.isQualified(c)));
+            .map(qualifiedService.isQualified),);
 
         if (!qualifiedStatuses.every((q) => q)) {
           final result = VerificationResult(
@@ -272,7 +269,7 @@ class CredentialPresentationNotifier
     } catch (e) {
       final result = VerificationResult(
         isValid: false,
-        message: 'Erreur lors de la vérification: ${e.toString()}',
+        message: 'Erreur lors de la vérification: $e',
       );
       state = state.copyWith(isValidating: false, verificationResult: result);
       return result;

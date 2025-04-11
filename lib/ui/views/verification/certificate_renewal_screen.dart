@@ -1,9 +1,9 @@
 import 'package:did_app/application/verification/providers.dart';
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen to renew an expired or expiring certificate
 class CertificateRenewalScreen extends ConsumerStatefulWidget {
@@ -32,16 +32,16 @@ class _CertificateRenewalScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Certificate Renewal"),
+        title: const Text('Certificate Renewal'),
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 16),
-                  Text("Initializing renewal process..."),
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Initializing renewal process...'),
                 ],
               ),
             )
@@ -77,8 +77,8 @@ class _CertificateRenewalScreenState
                         });
                       }
                     },
-                    title: Text(
-                      "I understand the renewal process and agree to the terms",
+                    title: const Text(
+                      'I understand the renewal process and agree to the terms',
                     ),
                     controlAffinity: ListTileControlAffinity.leading,
                     contentPadding: EdgeInsets.zero,
@@ -95,7 +95,7 @@ class _CertificateRenewalScreenState
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: Text("Start Renewal"),
+                      child: const Text('Start Renewal'),
                     ),
                   ),
                 ],
@@ -113,14 +113,14 @@ class _CertificateRenewalScreenState
     return Card(
       elevation: 2,
       color: isExpired
-          ? Colors.red.withOpacity(0.1)
-          : Colors.orange.withOpacity(0.1),
+          ? Colors.red.withValues(alpha: 0.1)
+          : Colors.orange.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
           color: isExpired
-              ? Colors.red.withOpacity(0.3)
-              : Colors.orange.withOpacity(0.3),
+              ? Colors.red.withValues(alpha: 0.3)
+              : Colors.orange.withValues(alpha: 0.3),
         ),
       ),
       child: Padding(
@@ -186,10 +186,10 @@ class _CertificateRenewalScreenState
         const SizedBox(height: 16),
         Card(
           elevation: 0,
-          color: Colors.blue.withOpacity(0.1),
+          color: Colors.blue.withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: Colors.blue.withOpacity(0.3)),
+            side: BorderSide(color: Colors.blue.withValues(alpha: 0.3)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -313,11 +313,11 @@ class _CertificateRenewalScreenState
   String _getEidasLevelText(EidasLevel level, AppLocalizations l10n) {
     switch (level) {
       case EidasLevel.low:
-        return "Low Assurance Level";
+        return 'Low Assurance Level';
       case EidasLevel.substantial:
-        return "Substantial Assurance Level";
+        return 'Substantial Assurance Level';
       case EidasLevel.high:
-        return "High Assurance Level";
+        return 'High Assurance Level';
     }
   }
 
@@ -338,12 +338,12 @@ class _CertificateRenewalScreenState
           ref.read(verificationNotifierProvider).verificationProcess;
 
       if (verificationProcess == null) {
-        throw Exception("Failed to initialize verification process");
+        throw Exception('Failed to initialize verification process');
       }
 
       // Navigate to the verification process screen
       if (mounted) {
-        final Map<String, String> queryParams = {};
+        final queryParams = <String, String>{};
 
         // Convert complex object to simple string parameters
         final processJson = verificationProcess.toJson();
@@ -364,7 +364,7 @@ class _CertificateRenewalScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Failed to start renewal: ${e.toString()}"),
+            content: Text('Failed to start renewal: $e'),
             backgroundColor: Colors.red,
           ),
         );

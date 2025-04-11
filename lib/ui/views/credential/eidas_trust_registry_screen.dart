@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:did_app/application/credential/eidas_provider.dart';
 import 'package:did_app/infrastructure/credential/eidas_trust_list.dart';
 import 'package:did_app/ui/common/widgets/app_card.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 /// Écran pour interagir avec le registre de confiance européen
 class EidasTrustRegistryScreen extends ConsumerStatefulWidget {
@@ -80,9 +80,9 @@ class _EidasTrustRegistryScreenState
       body: eidasState.isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: () => _synchronizeWithEuRegistry(),
+              onRefresh: _synchronizeWithEuRegistry,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -138,7 +138,7 @@ class _EidasTrustRegistryScreenState
       color: Colors.red.shade100,
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             const Icon(Icons.error, color: Colors.red),
@@ -156,7 +156,10 @@ class _EidasTrustRegistryScreenState
   }
 
   Widget _buildSyncStatusCard(
-      DateTime? lastSyncDate, DateFormat dateFormat, AppLocalizations l10n) {
+    DateTime? lastSyncDate,
+    DateFormat dateFormat,
+    AppLocalizations l10n,
+  ) {
     return AppCard(
       title: l10n.lastSynchronization,
       child: Column(
@@ -173,14 +176,14 @@ class _EidasTrustRegistryScreenState
           ),
           const Divider(),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: ElevatedButton.icon(
               icon: const Icon(Icons.sync),
               label: Text(l10n.synchronizeWithEuRegistry),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 48),
               ),
-              onPressed: () => _synchronizeWithEuRegistry(),
+              onPressed: _synchronizeWithEuRegistry,
             ),
           ),
         ],
@@ -195,7 +198,7 @@ class _EidasTrustRegistryScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: TextField(
               decoration: InputDecoration(
                 labelText: l10n.issuerIdentifierHint,
@@ -210,7 +213,7 @@ class _EidasTrustRegistryScreenState
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: ElevatedButton.icon(
               icon: const Icon(Icons.verified_user),
               label: Text(l10n.verifyInRegistryButton),
@@ -224,13 +227,13 @@ class _EidasTrustRegistryScreenState
           ),
           if (_isVerifyingIssuer)
             const Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16),
               child: Center(child: CircularProgressIndicator()),
             ),
           if (_verificationResult != null) ...[
             const Divider(),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -284,22 +287,19 @@ class _EidasTrustRegistryScreenState
                           const Divider(),
                           const SizedBox(height: 8),
                           Text(
-                            l10n.verificationStatus +
-                                ': ${_verificationResult!['verification']['status']}',
+                            '${l10n.verificationStatus}: ${_verificationResult!['verification']['status']}',
                           ),
                           if (_verificationResult!['verification']
                                   ['timestamp'] !=
                               null)
                             Text(
-                              l10n.verificationTimestamp +
-                                  ': ${_verificationResult!['verification']['timestamp']}',
+                              '${l10n.verificationTimestamp}: ${_verificationResult!['verification']['timestamp']}',
                             ),
                           if (_verificationResult!['verification']
                                   ['trustLevel'] !=
                               null)
                             Text(
-                              l10n.verificationTrustLevel +
-                                  ': ${_verificationResult!['verification']['trustLevel']}',
+                              '${l10n.verificationTrustLevel}: ${_verificationResult!['verification']['trustLevel']}',
                             ),
                         ],
                       ],
@@ -315,11 +315,13 @@ class _EidasTrustRegistryScreenState
   }
 
   Widget _buildTrustListReportCard(
-      Map<String, dynamic> report, AppLocalizations l10n) {
+    Map<String, dynamic> report,
+    AppLocalizations l10n,
+  ) {
     return AppCard(
       title: l10n.trustListReportTitle,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -350,8 +352,11 @@ class _EidasTrustRegistryScreenState
     );
   }
 
-  Widget _buildReportItem(
-      {required IconData icon, required String label, required String value}) {
+  Widget _buildReportItem({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
     return ListTile(
       leading: Icon(icon),
       title: Text(label),
@@ -360,7 +365,9 @@ class _EidasTrustRegistryScreenState
   }
 
   Widget _buildTrustLevelStats(
-      Map<String, dynamic> trustLevelCounts, AppLocalizations l10n) {
+    Map<String, dynamic> trustLevelCounts,
+    AppLocalizations l10n,
+  ) {
     final total = (trustLevelCounts['low'] ?? 0) +
         (trustLevelCounts['substantial'] ?? 0) +
         (trustLevelCounts['high'] ?? 0);
@@ -369,7 +376,7 @@ class _EidasTrustRegistryScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: [
               const Icon(Icons.bar_chart),
@@ -409,9 +416,13 @@ class _EidasTrustRegistryScreenState
   }
 
   Widget _buildTrustLevelBar(
-      String label, Color color, double percentage, String count) {
+    String label,
+    Color color,
+    double percentage,
+    String count,
+  ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
           SizedBox(width: 100, child: Text(label)),
@@ -450,14 +461,14 @@ class _EidasTrustRegistryScreenState
       child: _isLoadingSchemes
           ? const Center(
               child: Padding(
-                padding: EdgeInsets.all(24.0),
+                padding: EdgeInsets.all(24),
                 child: CircularProgressIndicator(),
               ),
             )
           : _trustSchemes == null ||
                   (_trustSchemes?['schemes'] as List?)?.isEmpty == true
               ? Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16),
                   child: Text(l10n.noTrustSchemesAvailable),
                 )
               : ListView.builder(
@@ -479,7 +490,7 @@ class _EidasTrustRegistryScreenState
                       ),
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -489,14 +500,17 @@ class _EidasTrustRegistryScreenState
                                 Text(
                                   l10n.requirementsLabel,
                                   style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 const SizedBox(height: 4),
                                 ...List.generate(
                                   (scheme['requirements'] as List).length,
                                   (i) => Padding(
                                     padding: const EdgeInsets.only(
-                                        left: 16.0, top: 4.0),
+                                      left: 16,
+                                      top: 4,
+                                    ),
                                     child: Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -523,11 +537,13 @@ class _EidasTrustRegistryScreenState
   }
 
   Widget _buildInteropReportCard(
-      Map<String, dynamic> report, AppLocalizations l10n) {
+    Map<String, dynamic> report,
+    AppLocalizations l10n,
+  ) {
     return AppCard(
       title: l10n.interopReportTitle,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -559,7 +575,7 @@ class _EidasTrustRegistryScreenState
               const Divider(),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
                   l10n.countryDistribution,
                   style: const TextStyle(fontWeight: FontWeight.bold),
@@ -572,7 +588,9 @@ class _EidasTrustRegistryScreenState
                       (report['issuersByCountry'] as Map).entries.elementAt(i);
                   return Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 4.0),
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -594,7 +612,7 @@ class _EidasTrustRegistryScreenState
     return AppCard(
       title: l10n.filtersTitle,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -679,7 +697,10 @@ class _EidasTrustRegistryScreenState
   }
 
   Widget _buildTrustLevelFilterChip(
-      String label, TrustLevel? level, TrustLevel? selectedLevel) {
+    String label,
+    TrustLevel? level,
+    TrustLevel? selectedLevel,
+  ) {
     return FilterChip(
       label: Text(label),
       selected: level == selectedLevel,
@@ -692,7 +713,10 @@ class _EidasTrustRegistryScreenState
   }
 
   Widget _buildCountryFilterChip(
-      String label, String? countryCode, String? selectedCountry) {
+    String label,
+    String? countryCode,
+    String? selectedCountry,
+  ) {
     return FilterChip(
       label: Text(label),
       selected: countryCode == selectedCountry,
@@ -705,12 +729,14 @@ class _EidasTrustRegistryScreenState
   }
 
   Widget _buildTrustedIssuersList(
-      List<TrustedIssuer> issuers, AppLocalizations l10n) {
+    List<TrustedIssuer> issuers,
+    AppLocalizations l10n,
+  ) {
     return AppCard(
-      title: l10n.trustedIssuersTitle + ' (${issuers.length})',
+      title: '${l10n.trustedIssuersTitle} (${issuers.length})',
       child: issuers.isEmpty
           ? Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Center(
                 child: Text(l10n.noTrustedIssuersFound),
               ),
@@ -733,7 +759,7 @@ class _EidasTrustRegistryScreenState
                   ),
                   isThreeLine: true,
                   leading: CircleAvatar(
-                    backgroundColor: color.withOpacity(0.2),
+                    backgroundColor: color.withValues(alpha: 0.2),
                     child: Icon(Icons.verified_user, color: color),
                   ),
                   trailing: Chip(
@@ -744,7 +770,7 @@ class _EidasTrustRegistryScreenState
                               ? l10n.substantial
                               : l10n.low,
                     ),
-                    backgroundColor: color.withOpacity(0.2),
+                    backgroundColor: color.withValues(alpha: 0.2),
                     labelStyle: TextStyle(color: color),
                   ),
                   onTap: () {
@@ -758,10 +784,12 @@ class _EidasTrustRegistryScreenState
                           children: [
                             Text('${l10n.countryLabel}: ${issuer.country}'),
                             Text(
-                                '${l10n.serviceTypeLabel}: ${issuer.serviceType}'),
+                              '${l10n.serviceTypeLabel}: ${issuer.serviceType}',
+                            ),
                             Text('${l10n.didLabel}: ${issuer.did}'),
                             Text(
-                                '${l10n.trustLevelLabel}: ${issuer.trustLevel.name}'),
+                              '${l10n.trustLevelLabel}: ${issuer.trustLevel.name}',
+                            ),
                           ],
                         ),
                         actions: [
@@ -838,7 +866,9 @@ class _EidasTrustRegistryScreenState
                 _buildInfoItem(l10n.transparency, l10n.transparencyDescription),
                 const SizedBox(height: 12),
                 _buildInfoItem(
-                    l10n.transfrontalier, l10n.transfrontalierDescription),
+                  l10n.transfrontalier,
+                  l10n.transfrontalierDescription,
+                ),
               ],
             ),
           ),
@@ -890,8 +920,8 @@ class _EidasTrustRegistryScreenState
 
 /// Bannière d'information sur le registre de confiance eIDAS
 class _EidasTrustInfoBanner extends StatefulWidget {
-  final AppLocalizations l10n;
   const _EidasTrustInfoBanner({required this.l10n});
+  final AppLocalizations l10n;
 
   @override
   State<_EidasTrustInfoBanner> createState() => _EidasTrustInfoBannerState();

@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:did_app/application/verification/providers.dart';
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Generic document upload step component for verification process
 class DocumentUploadStep extends ConsumerStatefulWidget {
@@ -149,7 +149,7 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
                 : const Icon(Icons.send),
             label: Text(_isUploading
                 ? l10n.submittingButton
-                : l10n.submitDocumentsButton),
+                : l10n.submitDocumentsButton,),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),

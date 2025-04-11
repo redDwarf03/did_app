@@ -11,13 +11,6 @@ enum CredentialType {
 
 /// Model class for a verifiable credential
 class Credential {
-  final String id;
-  final CredentialType type;
-  final String issuer;
-  final DateTime issuanceDate;
-  final DateTime expirationDate;
-  final Map<String, dynamic> attributes;
-  final bool isVerified;
 
   Credential({
     required this.id,
@@ -28,6 +21,13 @@ class Credential {
     required this.attributes,
     this.isVerified = false,
   });
+  final String id;
+  final CredentialType type;
+  final String issuer;
+  final DateTime issuanceDate;
+  final DateTime expirationDate;
+  final Map<String, dynamic> attributes;
+  final bool isVerified;
 
   /// Check if the credential is expired
   bool get isExpired => DateTime.now().isAfter(expirationDate);

@@ -10,6 +10,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Service de synchronisation des statuts d'attestation en arrière-plan
 class CredentialSyncService {
+
+  CredentialSyncService({
+    required this.statusNotifier,
+    required this.statusService,
+    required this.credentialNotifier,
+    FlutterLocalNotificationsPlugin? notificationsPlugin,
+    this.syncInterval = const Duration(hours: 1),
+  }) : _notificationsPlugin =
+            notificationsPlugin ?? FlutterLocalNotificationsPlugin();
   /// Référence au notifier de statut
   final CredentialStatusNotifier statusNotifier;
 
@@ -30,15 +39,6 @@ class CredentialSyncService {
 
   /// Indique si le service est en cours d'exécution
   bool _isRunning = false;
-
-  CredentialSyncService({
-    required this.statusNotifier,
-    required this.statusService,
-    required this.credentialNotifier,
-    FlutterLocalNotificationsPlugin? notificationsPlugin,
-    this.syncInterval = const Duration(hours: 1),
-  }) : _notificationsPlugin =
-            notificationsPlugin ?? FlutterLocalNotificationsPlugin();
 
   /// Initialise le service de notifications
   Future<void> initNotifications() async {
@@ -125,7 +125,7 @@ class CredentialSyncService {
     const androidDetails = AndroidNotificationDetails(
       'revocation_channel',
       'Révocations',
-      channelDescription: 'Notifications de révocation d\'attestations',
+      channelDescription: "Notifications de révocation d'attestations",
       importance: Importance.high,
       priority: Priority.high,
     );
@@ -151,7 +151,7 @@ class CredentialSyncService {
     const androidDetails = AndroidNotificationDetails(
       'expiration_channel',
       'Expirations',
-      channelDescription: 'Notifications d\'expiration d\'attestations',
+      channelDescription: "Notifications d'expiration d'attestations",
       importance: Importance.high,
       priority: Priority.high,
     );
@@ -194,7 +194,7 @@ class CredentialSyncService {
     // À implémenter: navigation vers l'écran de détail de l'attestation
     final credentialId = response.payload;
     if (credentialId != null) {
-      log('Notification tappée pour l\'attestation: $credentialId');
+      log("Notification tappée pour l'attestation: $credentialId");
       // Navigator.push(...) - À implémenter via un callback
     }
   }

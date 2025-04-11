@@ -12,7 +12,7 @@ class ResponsiveWidthContainer extends StatelessWidget {
   final Widget child;
 
   // Largeur d'un iPhone Pro Max
-  static const double _maxMobileWidth = 430.0;
+  static const double _maxMobileWidth = 430;
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +31,19 @@ class ResponsiveWidthContainer extends StatelessWidget {
             color: Theme.of(context).scaffoldBackgroundColor,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 10,
-                offset: const Offset(0, 0),
               ),
             ],
           ),
           height: double.infinity,
-          child: child,
+          child: GestureDetector(
+            onHorizontalDragUpdate: (details) {
+              // On ignore le défilement horizontal sur le web
+              // pour permettre le swipe comme sur mobile
+            },
+            child: child,
+          ),
         ),
       ),
     );

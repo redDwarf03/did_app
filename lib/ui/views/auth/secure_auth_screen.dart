@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:did_app/application/auth/biometric_auth_provider.dart';
 import 'package:did_app/domain/auth/biometric_auth_model.dart';
 import 'package:did_app/ui/common/app_card.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Screen for configuring and managing secure authentication methods
 class SecureAuthScreen extends ConsumerStatefulWidget {
@@ -84,7 +84,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+        color: Colors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.red),
       ),
@@ -104,7 +104,9 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
   }
 
   Widget _buildBiometricSection(
-      BiometricAuthState state, AppLocalizations l10n) {
+    BiometricAuthState state,
+    AppLocalizations l10n,
+  ) {
     final biometricType = state.currentBiometricType;
     final isEnabled = state.isBiometricEnabled;
     final isAvailable = state.status != AuthStatus.unavailable &&
@@ -116,25 +118,25 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
     switch (biometricType) {
       case BiometricType.fingerprint:
         biometricIcon = Icons.fingerprint;
-        biometricLabel = "Fingerprint";
+        biometricLabel = 'Fingerprint';
         break;
       case BiometricType.faceId:
         biometricIcon = Icons.face;
-        biometricLabel = "Face ID";
+        biometricLabel = 'Face ID';
         break;
       case BiometricType.iris:
         biometricIcon = Icons.visibility;
-        biometricLabel = "Iris Scan";
+        biometricLabel = 'Iris Scan';
         break;
       case BiometricType.none:
       default:
         biometricIcon = Icons.security;
-        biometricLabel = "Biometrics";
+        biometricLabel = 'Biometrics';
         break;
     }
 
     return AppCard(
-      title: "Biometric Authentication",
+      title: 'Biometric Authentication',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -143,26 +145,25 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
             title: Text(biometricLabel),
             subtitle: Text(
               isAvailable
-                  ? "Unlock with $biometricLabel for quick and secure access"
-                  : "Biometric authentication is not available on this device",
+                  ? 'Unlock with $biometricLabel for quick and secure access'
+                  : 'Biometric authentication is not available on this device',
             ),
             trailing: Switch(
               value: isEnabled && isAvailable,
-              onChanged:
-                  isAvailable ? (value) => _toggleBiometricAuth(value) : null,
+              onChanged: isAvailable ? _toggleBiometricAuth : null,
             ),
           ),
           if (state.status == AuthStatus.notSetUp) ...[
             const Divider(),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   const Icon(Icons.info, color: Colors.amber),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text(
-                      "Biometrics are not set up on your device. Please configure them in your device settings.",
+                      'Biometrics are not set up on your device. Please configure them in your device settings.',
                       style: TextStyle(color: Colors.amber.shade900),
                     ),
                   ),
@@ -176,19 +177,21 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
   }
 
   Widget _buildTwoFactorSection(
-      BiometricAuthState state, AppLocalizations l10n) {
+    BiometricAuthState state,
+    AppLocalizations l10n,
+  ) {
     final isEnabled = state.isTwoFactorEnabled;
 
     return AppCard(
-      title: "Two-Factor Authentication",
+      title: 'Two-Factor Authentication',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
             leading: const Icon(Icons.security, size: 32),
-            title: const Text("Two-Factor Authentication"),
+            title: const Text('Two-Factor Authentication'),
             subtitle: const Text(
-              "Add an extra layer of security to your account",
+              'Add an extra layer of security to your account',
             ),
             trailing: Switch(
               value: isEnabled,
@@ -198,12 +201,12 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
           if (isEnabled) ...[
             const Divider(),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: TextField(
                 controller: _emailController,
                 decoration: const InputDecoration(
-                  labelText: "Email for Verification",
-                  hintText: "Enter your email address",
+                  labelText: 'Email for Verification',
+                  hintText: 'Enter your email address',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.email),
                 ),
@@ -211,10 +214,10 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: ElevatedButton(
                 onPressed: () => _configureMagicLink(l10n),
-                child: const Text("Save Email"),
+                child: const Text('Save Email'),
               ),
             ),
           ],
@@ -224,19 +227,21 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
   }
 
   Widget _buildPasswordlessSection(
-      BiometricAuthState state, AppLocalizations l10n) {
+    BiometricAuthState state,
+    AppLocalizations l10n,
+  ) {
     final isEnabled = state.isPasswordlessEnabled;
 
     return AppCard(
-      title: "Passwordless Login",
+      title: 'Passwordless Login',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
             leading: const Icon(Icons.lock_open, size: 32),
-            title: const Text("Passwordless Login"),
+            title: const Text('Passwordless Login'),
             subtitle: const Text(
-              "Sign in without passwords using secure alternatives",
+              'Sign in without passwords using secure alternatives',
             ),
             trailing: Switch(
               value: isEnabled,
@@ -246,14 +251,14 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
           if (isEnabled) ...[
             const Divider(),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () => _configureMagicLink(l10n),
                       icon: const Icon(Icons.email),
-                      label: const Text("Configure Magic Link"),
+                      label: const Text('Configure Magic Link'),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -261,7 +266,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () => _configureNotifications(l10n),
                       icon: const Icon(Icons.notifications),
-                      label: const Text("Configure Notifications"),
+                      label: const Text('Configure Notifications'),
                     ),
                   ),
                 ],
@@ -278,7 +283,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
       child: ElevatedButton.icon(
         onPressed: () => _testAuthentication(l10n),
         icon: const Icon(Icons.security),
-        label: const Text("Test Authentication"),
+        label: const Text('Test Authentication'),
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(200, 50),
         ),
@@ -289,7 +294,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
   Widget _buildTestingAuthentication(AppLocalizations l10n) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -300,7 +305,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
             ),
             const SizedBox(height: 24),
             const Text(
-              "Please Authenticate",
+              'Please Authenticate',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -308,23 +313,23 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              "Authentication is required to proceed. Please verify your identity using one of the configured methods.",
+              'Authentication is required to proceed. Please verify your identity using one of the configured methods.',
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: () => _authenticateWithBiometrics(l10n),
               icon: const Icon(Icons.fingerprint),
-              label: const Text("Authenticate with Biometrics"),
+              label: const Text('Authenticate with Biometrics'),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(250, 50),
               ),
             ),
             const SizedBox(height: 16),
             OutlinedButton.icon(
-              onPressed: () => _cancelAuthentication(),
+              onPressed: _cancelAuthentication,
               icon: const Icon(Icons.cancel),
-              label: const Text("Cancel"),
+              label: const Text('Cancel'),
             ),
           ],
         ),
@@ -353,7 +358,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
     final email = _emailController.text;
     if (email.isEmpty) {
       setState(() {
-        _errorMessage = "Please enter a valid email address";
+        _errorMessage = 'Please enter a valid email address';
       });
       return;
     }
@@ -365,7 +370,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text("Magic link configuration complete"),
+        content: Text('Magic link configuration complete'),
         backgroundColor: Colors.green,
       ),
     );
@@ -381,7 +386,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text("Notification configuration complete"),
+        content: Text('Notification configuration complete'),
         backgroundColor: Colors.green,
       ),
     );
@@ -401,7 +406,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
         !authState.isPasswordlessEnabled) {
       setState(() {
         _isTesting = false;
-        _errorMessage = "Please enable at least one authentication method";
+        _errorMessage = 'Please enable at least one authentication method';
       });
       return;
     }
@@ -417,14 +422,14 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
       final success = await ref
           .read(biometricAuthStateProvider.notifier)
           .authenticateWithBiometrics(
-            reason: "Authenticate to access the application",
+            reason: 'Authenticate to access the application',
           );
 
       if (success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text("Authentication successful"),
+              content: Text('Authentication successful'),
               backgroundColor: Colors.green,
             ),
           );
@@ -435,13 +440,13 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
       } else {
         final authState = ref.read(biometricAuthStateProvider);
         setState(() {
-          _errorMessage = authState.errorMessage ?? "Authentication failed";
+          _errorMessage = authState.errorMessage ?? 'Authentication failed';
           _isTesting = false;
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = "Authentication error: ${e.toString()}";
+        _errorMessage = 'Authentication error: $e';
         _isTesting = false;
       });
     }

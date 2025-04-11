@@ -1,5 +1,5 @@
+import 'package:did_app/domain/credential/credential.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'credential.dart';
 
 part 'qualified_credential.freezed.dart';
 part 'qualified_credential.g.dart';

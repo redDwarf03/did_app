@@ -1,8 +1,8 @@
 import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/domain/identity/digital_identity.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Screen to display and manage details of a digital identity
 class IdentityDetailsScreen extends ConsumerWidget {
@@ -405,7 +405,7 @@ class IdentityDetailsScreen extends ConsumerWidget {
   }
 
   String _getVerificationLabel(
-      IdentityVerificationStatus status, AppLocalizations l10n) {
+      IdentityVerificationStatus status, AppLocalizations l10n,) {
     switch (status) {
       case IdentityVerificationStatus.fullyVerified:
         return l10n.identityVerificationStatusFullyVerified;
@@ -436,7 +436,7 @@ class IdentityDetailsScreen extends ConsumerWidget {
   }
 
   String _getVerificationMessage(
-      IdentityVerificationStatus status, AppLocalizations l10n) {
+      IdentityVerificationStatus status, AppLocalizations l10n,) {
     switch (status) {
       case IdentityVerificationStatus.fullyVerified:
         return l10n.verificationMessageFullyVerified;

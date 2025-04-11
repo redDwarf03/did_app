@@ -4,11 +4,11 @@ import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/ui/common/app_card.dart';
 import 'package:did_app/ui/common/section_title.dart';
 import 'package:did_app/ui/views/credential/credential_detail_screen.dart';
-import 'package:did_app/ui/views/credential/eidas_verification_screen.dart';
 import 'package:did_app/ui/views/credential/eidas_trust_registry_screen.dart';
+import 'package:did_app/ui/views/credential/eidas_verification_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Écran pour gérer l'interopérabilité avec eIDAS et l'EUDI Wallet
 class EidasInteropScreen extends ConsumerStatefulWidget {
@@ -36,16 +36,20 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
 
     // Liste des attestations compatibles eIDAS
     final eidasCompatibleCredentials = credentialState.credentials
-        .where((credential) => ref
-            .read(eidasNotifierProvider.notifier)
-            .isEidasCompatible(credential))
+        .where(
+          (credential) => ref
+              .read(eidasNotifierProvider.notifier)
+              .isEidasCompatible(credential),
+        )
         .toList();
 
     // Liste des attestations qui peuvent être rendues compatibles
     final convertibleCredentials = credentialState.credentials
-        .where((credential) => !ref
-            .read(eidasNotifierProvider.notifier)
-            .isEidasCompatible(credential))
+        .where(
+          (credential) => !ref
+              .read(eidasNotifierProvider.notifier)
+              .isEidasCompatible(credential),
+        )
         .toList();
 
     return Scaffold(
@@ -77,10 +81,14 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
                     _buildEudiWalletSection(eidasCompatibleCredentials, l10n),
                   const SizedBox(height: 24),
                   _buildEidasCompatibleCredentialsSection(
-                      eidasCompatibleCredentials, l10n),
+                    eidasCompatibleCredentials,
+                    l10n,
+                  ),
                   const SizedBox(height: 24),
                   _buildConvertibleCredentialsSection(
-                      convertibleCredentials, l10n),
+                    convertibleCredentials,
+                    l10n,
+                  ),
                   const SizedBox(height: 24),
                   _buildImportExportSection(l10n),
                 ],
@@ -113,7 +121,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+        color: Colors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.red),
       ),
@@ -133,13 +141,15 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
   }
 
   Widget _buildRegistryAndSyncSection(
-      EidasState eidasState, AppLocalizations l10n) {
+    EidasState eidasState,
+    AppLocalizations l10n,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionTitle(title: l10n.eidasTrustRegistryTitle),
         Padding(
-          padding: const EdgeInsets.only(bottom: 8.0, left: 4.0, right: 4.0),
+          padding: const EdgeInsets.only(bottom: 8, left: 4, right: 4),
           child: Text(
             // TODO: Localize
             'Synchronize with the official EU trust registry to verify issuers.',
@@ -156,7 +166,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
                 title: Text(l10n.eidasTrustRegistryTitle),
                 subtitle: Text(
                   eidasState.lastSyncDate != null
-                      ? "${l10n.lastSynchronization}: ${_formatDate(eidasState.lastSyncDate!)}"
+                      ? '${l10n.lastSynchronization}: ${_formatDate(eidasState.lastSyncDate!)}'
                       : l10n.neverSynchronized,
                 ),
                 trailing: const Icon(Icons.chevron_right),
@@ -164,7 +174,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
               ),
               const Divider(),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     Expanded(
@@ -173,7 +183,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
                         icon: const Icon(Icons.sync),
                         label: Text(l10n.synchronizeWithEuRegistry),
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                       ),
                     ),
@@ -192,15 +202,17 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
   }
 
   Widget _buildEudiWalletSection(
-      List<Credential> compatibleCredentials, AppLocalizations l10n) {
+    List<Credential> compatibleCredentials,
+    AppLocalizations l10n,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionTitle(
-            title:
-                'EUDI Wallet'), // TODO: Localize (l10n.eudiWalletSectionTitle)
+        const SectionTitle(
+          title: 'EUDI Wallet',
+        ), // TODO: Localize (l10n.eudiWalletSectionTitle)
         Padding(
-          padding: const EdgeInsets.only(bottom: 8.0, left: 4.0, right: 4.0),
+          padding: const EdgeInsets.only(bottom: 8, left: 4, right: 4),
           child: Text(
             // TODO: Localize
             'Interact with your European Digital Identity Wallet (EUDI Wallet). Note: Simulated functionality.',
@@ -212,12 +224,14 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ListTile(
-                leading: const Icon(Icons.wallet),
+              const ListTile(
+                leading: Icon(Icons.wallet),
                 title: Text(
-                    'EUDI Wallet Interaction'), // TODO: Localize (l10n.eudiWalletInteractionTitle)
+                  'EUDI Wallet Interaction',
+                ), // TODO: Localize (l10n.eudiWalletInteractionTitle)
                 subtitle: Text(
-                    'Import from or share credentials with the EUDI Wallet.'), // TODO: Localize (l10n.eudiWalletInteractionDesc)
+                  'Import from or share credentials with the EUDI Wallet.',
+                ), // TODO: Localize (l10n.eudiWalletInteractionDesc)
               ),
               const Divider(),
               Padding(
@@ -248,15 +262,17 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
   }
 
   Widget _buildEidasCompatibleCredentialsSection(
-      List<Credential> compatibleCredentials, AppLocalizations l10n) {
+    List<Credential> compatibleCredentials,
+    AppLocalizations l10n,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionTitle(
-            title:
-                'eIDAS Compatible Credentials'), // TODO: Localize (l10n.eidasCompatibleCredentialsTitle)
+        const SectionTitle(
+          title: 'eIDAS Compatible Credentials',
+        ), // TODO: Localize (l10n.eidasCompatibleCredentialsTitle)
         Padding(
-          padding: const EdgeInsets.only(bottom: 8.0, left: 4.0, right: 4.0),
+          padding: const EdgeInsets.only(bottom: 8, left: 4, right: 4),
           child: Text(
             // TODO: Localize
             'These credentials are already in a format recognized by the eIDAS framework.',
@@ -292,7 +308,8 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
                             color: Theme.of(context).primaryColor,
                           ),
                           title: Text(
-                              credential.name ?? l10n.defaultCredentialName),
+                            credential.name ?? l10n.defaultCredentialName,
+                          ),
                           subtitle: Text(
                             l10n.issuedByPrefix + credential.issuer,
                             maxLines: 1,
@@ -337,7 +354,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
                 ),
                 const Divider(),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -345,7 +362,8 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
                         onPressed: compatibleCredentials.isNotEmpty
                             ? () {
                                 _verifyCredentialCompatibility(
-                                    compatibleCredentials.first);
+                                  compatibleCredentials.first,
+                                );
                               }
                             : null,
                         icon: const Icon(Icons.security),
@@ -362,15 +380,17 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
   }
 
   Widget _buildConvertibleCredentialsSection(
-      List<Credential> convertibleCredentials, AppLocalizations l10n) {
+    List<Credential> convertibleCredentials,
+    AppLocalizations l10n,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionTitle(
-            title:
-                'Convertible Credentials'), // TODO: Localize (l10n.eidasConvertibleCredentialsTitle)
+        const SectionTitle(
+          title: 'Convertible Credentials',
+        ), // TODO: Localize (l10n.eidasConvertibleCredentialsTitle)
         Padding(
-          padding: const EdgeInsets.only(bottom: 8.0, left: 4.0, right: 4.0),
+          padding: const EdgeInsets.only(bottom: 8, left: 4, right: 4),
           child: Text(
             // TODO: Localize
             'These credentials can be converted to the eIDAS format for better interoperability.',
@@ -416,18 +436,19 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
                   },
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16),
                   child: ElevatedButton.icon(
                     onPressed: _selectedCredential != null
                         ? () {
                             _verifyCredentialCompatibility(
-                                _selectedCredential!);
+                              _selectedCredential!,
+                            );
                           }
                         : null,
                     icon: const Icon(Icons.verified_user),
                     label: Text(l10n.verifyStatusButton),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
@@ -442,11 +463,11 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionTitle(
-            title:
-                'Manual Import/Export'), // TODO: Localize (l10n.importExportSectionTitle)
+        const SectionTitle(
+          title: 'Manual Import/Export',
+        ), // TODO: Localize (l10n.importExportSectionTitle)
         Padding(
-          padding: const EdgeInsets.only(bottom: 8.0, left: 4.0, right: 4.0),
+          padding: const EdgeInsets.only(bottom: 8, left: 4, right: 4),
           child: Text(
             // TODO: Localize
             'Manually import or export credentials in eIDAS-compatible JSON format.',
@@ -481,7 +502,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
                   icon: const Icon(Icons.sync),
                   label: Text(l10n.synchronizeWithEuRegistry),
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
               ],
@@ -501,7 +522,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
   Future<void> _verifyCredentialCompatibility(Credential credential) async {
     try {
       if (mounted) {
-        Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) =>

@@ -1,18 +1,19 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:did_app/infrastructure/credential/eidas_trust_list.dart';
+import 'package:http/http.dart' as http;
 
 /// Service pour l'intégration avec le registre de confiance européen (EU Trust Registry)
 /// Implémente les fonctionnalités d'interopérabilité avec l'infrastructure officielle eIDAS 2.0
 class EuTrustRegistryService {
+
+  // Constructeur privé pour le singleton
+  EuTrustRegistryService._();
   // URLs des APIs du registre de confiance (à remplacer par les URLs officielles)
   static const String _baseUrl = 'https://eu-trust-registry.europa.eu/api/v1';
   static const String _trustListEndpoint = '$_baseUrl/trusted-issuers';
   static const String _trustSchemeEndpoint = '$_baseUrl/trust-schemes';
   static const String _verificationEndpoint = '$_baseUrl/verify';
-
-  // Constructeur privé pour le singleton
-  EuTrustRegistryService._();
   static final EuTrustRegistryService instance = EuTrustRegistryService._();
 
   // Client HTTP avec timeout
@@ -29,7 +30,7 @@ class EuTrustRegistryService {
       // Gestion des erreurs HTTP
       if (response.statusCode != 200) {
         throw Exception(
-            'Erreur lors de la récupération des émetteurs de confiance: ${response.statusCode}');
+            'Erreur lors de la récupération des émetteurs de confiance: ${response.statusCode}',);
       }
 
       // Pour la démo, on simule une réponse
@@ -44,18 +45,18 @@ class EuTrustRegistryService {
 
   /// Récupère les émetteurs de confiance d'un pays spécifique
   Future<List<TrustedIssuer>> fetchTrustedIssuersByCountry(
-      String countryCode) async {
+      String countryCode,) async {
     try {
       final uri = Uri.parse('$_trustListEndpoint?country=$countryCode');
       final response = await _client.get(uri).timeout(_timeout);
 
       if (response.statusCode != 200) {
         throw Exception(
-            'Erreur lors de la récupération des émetteurs pour $countryCode: ${response.statusCode}');
+            'Erreur lors de la récupération des émetteurs pour $countryCode: ${response.statusCode}',);
       }
 
       // Pour la démo, on filtre manuellement
-      final allIssuers = await _simulateTrustedIssuersResponse();
+      final allIssuers = _simulateTrustedIssuersResponse();
       return allIssuers
           .where((issuer) => issuer.country == countryCode)
           .toList();
@@ -73,7 +74,7 @@ class EuTrustRegistryService {
 
       if (response.statusCode != 200) {
         throw Exception(
-            'Erreur lors de la récupération des schémas de confiance: ${response.statusCode}');
+            'Erreur lors de la récupération des schémas de confiance: ${response.statusCode}',);
       }
 
       // Pour la démo, on simule une réponse
@@ -84,7 +85,7 @@ class EuTrustRegistryService {
             'name': 'eIDAS Low',
             'description':
                 'Low level of assurance according to eIDAS regulation',
-            'requirements': ['Basic identity verification']
+            'requirements': ['Basic identity verification'],
           },
           {
             'id': 'eidas-substantial',
@@ -93,8 +94,8 @@ class EuTrustRegistryService {
                 'Substantial level of assurance according to eIDAS regulation',
             'requirements': [
               'Strong identity verification',
-              'Multi-factor authentication'
-            ]
+              'Multi-factor authentication',
+            ],
           },
           {
             'id': 'eidas-high',
@@ -104,10 +105,10 @@ class EuTrustRegistryService {
             'requirements': [
               'In-person identity verification',
               'Strong cryptographic keys',
-              'Secure hardware storage'
-            ]
+              'Secure hardware storage',
+            ],
           }
-        ]
+        ],
       };
     } catch (e) {
       print('Erreur lors de la récupération des schémas de confiance: $e');
@@ -129,11 +130,11 @@ class EuTrustRegistryService {
 
       if (response.statusCode != 200) {
         throw Exception(
-            'Erreur lors de la vérification de l\'émetteur: ${response.statusCode}');
+            "Erreur lors de la vérification de l'émetteur: ${response.statusCode}",);
       }
 
       // Pour la démo, on simule une réponse de vérification
-      final allIssuers = await _simulateTrustedIssuersResponse();
+      final allIssuers = _simulateTrustedIssuersResponse();
       final isTrusted = allIssuers.any((issuer) => issuer.did == issuerId);
 
       return {
@@ -144,17 +145,17 @@ class EuTrustRegistryService {
           'inRegistry': isTrusted,
           'trustLevel':
               isTrusted ? _getTrustLevelForIssuer(issuerId, allIssuers) : null,
-        }
+        },
       };
     } catch (e) {
-      print('Erreur lors de la vérification de l\'émetteur: $e');
+      print("Erreur lors de la vérification de l'émetteur: $e");
       return {
         'isValid': false,
         'verification': {
           'timestamp': DateTime.now().toIso8601String(),
           'status': 'ERROR',
           'error': e.toString(),
-        }
+        },
       };
     }
   }
@@ -185,7 +186,7 @@ class EuTrustRegistryService {
 
       return response.statusCode == 201 || response.statusCode == 202;
     } catch (e) {
-      print('Erreur lors de la soumission de l\'émetteur: $e');
+      print("Erreur lors de la soumission de l'émetteur: $e");
       return false;
     }
   }
@@ -226,7 +227,7 @@ class EuTrustRegistryService {
         'status': 'UP_TO_DATE',
       };
     } catch (e) {
-      print('Erreur lors de la génération du rapport d\'interopérabilité: $e');
+      print("Erreur lors de la génération du rapport d'interopérabilité: $e");
       return {
         'timestamp': DateTime.now().toIso8601String(),
         'error': e.toString(),
@@ -330,7 +331,7 @@ class EuTrustRegistryService {
 
   /// Récupère le niveau de confiance d'un émetteur
   String? _getTrustLevelForIssuer(
-      String issuerId, List<TrustedIssuer> issuers) {
+      String issuerId, List<TrustedIssuer> issuers,) {
     final issuer = issuers.firstWhere(
       (i) => i.did == issuerId,
       orElse: () => issuers.first,

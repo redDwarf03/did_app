@@ -1,49 +1,40 @@
-import 'dart:async';
-
-import 'package:archethic_dapp_framework_flutter/archethic_dapp_framework_flutter.dart'
-    as aedappfm;
+import 'package:did_app/application/credential/providers.dart';
+import 'package:did_app/application/document/providers.dart';
+import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/application/session/provider.dart';
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:did_app/ui/common/responsive_width_container.dart';
+import 'package:did_app/ui/views/auth/login_screen.dart';
+import 'package:did_app/ui/views/auth/secure_auth_screen.dart';
+import 'package:did_app/ui/views/credential/credential_detail_screen.dart'
+    as credential_detail;
 import 'package:did_app/ui/views/credential/credential_list_screen.dart';
+import 'package:did_app/ui/views/credential/credential_status_verification_screen.dart';
+import 'package:did_app/ui/views/credential/status_list_dashboard_screen.dart';
+import 'package:did_app/ui/views/credential/status_list_info_screen.dart';
 import 'package:did_app/ui/views/document/document_detail_screen.dart';
 import 'package:did_app/ui/views/document/document_list_screen.dart';
 import 'package:did_app/ui/views/document/document_versions_screen.dart';
+import 'package:did_app/ui/views/home_screen.dart';
 import 'package:did_app/ui/views/identity/create_identity_screen.dart';
 import 'package:did_app/ui/views/identity/identity_details_screen.dart';
 import 'package:did_app/ui/views/identity/identity_screen.dart';
 import 'package:did_app/ui/views/main/main_screen.dart';
+import 'package:did_app/ui/views/splash_screen.dart';
 import 'package:did_app/ui/views/verification/certificate_details_screen.dart';
 import 'package:did_app/ui/views/verification/certificate_renewal_screen.dart';
 import 'package:did_app/ui/views/verification/certificates_dashboard_screen.dart';
+import 'package:did_app/ui/views/verification/verification_process_screen.dart';
 import 'package:did_app/ui/views/verification/verification_screen.dart';
 import 'package:did_app/ui/views/verification/verification_start_screen.dart';
 import 'package:did_app/ui/views/verification/verification_success_screen.dart';
 import 'package:did_app/ui/views/welcome/welcome_screen.dart';
-import 'package:did_app/util/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:did_app/ui/views/verification/verification_process_screen.dart';
-import 'package:did_app/application/credential/providers.dart';
-import 'package:did_app/application/document/providers.dart';
-import 'package:did_app/application/identity/providers.dart';
-import 'package:did_app/application/verification/providers.dart';
-import 'package:did_app/application/session/provider.dart';
-import 'package:did_app/ui/views/credential/credential_detail_screen.dart'
-    as credential_detail;
-import 'package:did_app/ui/views/credential/eidas_interop_screen.dart';
-import 'package:did_app/ui/views/splash_screen.dart';
-import 'package:did_app/ui/views/auth/login_screen.dart';
-import 'package:did_app/ui/views/auth/secure_auth_screen.dart';
-import 'package:did_app/ui/views/home_screen.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:did_app/ui/views/credential/status_list_dashboard_screen.dart';
-import 'package:did_app/ui/views/credential/credential_status_verification_screen.dart';
-import 'package:did_app/ui/views/credential/status_list_info_screen.dart';
 
 void main() async {
   // Initialize app-wide services
@@ -58,14 +49,14 @@ void main() async {
 
   // Run the app
   runApp(
-    ProviderScope(
+    const ProviderScope(
       child: MainApp(),
     ),
   );
 }
 
 class MainApp extends ConsumerWidget {
-  MainApp({super.key});
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -162,7 +153,7 @@ class MainApp extends ConsumerWidget {
                         ),
                         SizedBox(height: 16),
                         Text(
-                          'Votre portefeuille d\'identité numérique',
+                          "Votre portefeuille d'identité numérique",
                           style: TextStyle(fontSize: 16),
                         ),
                       ],

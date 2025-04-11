@@ -15,6 +15,36 @@ class EidasCredential {
     this.evidence,
   });
 
+  /// Crée une attestation eIDAS à partir d'un JSON
+  factory EidasCredential.fromJson(Map<String, dynamic> json) {
+    return EidasCredential(
+      id: json['id'] as String,
+      type: (json['type'] as List).map((e) => e as String).toList(),
+      issuer: EidasIssuer.fromJson(json['issuer']),
+      issuanceDate: DateTime.parse(json['issuanceDate'] as String),
+      expirationDate: json['expirationDate'] != null
+          ? DateTime.parse(json['expirationDate'] as String)
+          : null,
+      credentialSubject: json['credentialSubject'] as Map<String, dynamic>,
+      credentialSchema: json['credentialSchema'] != null
+          ? EidasCredentialSchema.fromJson(
+              json['credentialSchema'] as Map<String, dynamic>,)
+          : null,
+      credentialStatus: json['credentialStatus'] != null
+          ? EidasCredentialStatus.fromJson(
+              json['credentialStatus'] as Map<String, dynamic>,)
+          : null,
+      proof: json['proof'] != null
+          ? EidasProof.fromJson(json['proof'] as Map<String, dynamic>)
+          : null,
+      evidence: json['evidence'] != null
+          ? (json['evidence'] as List)
+              .map((e) => EidasEvidence.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+    );
+  }
+
   /// Identifiant unique de l'attestation
   final String id;
 
@@ -51,7 +81,7 @@ class EidasCredential {
       id: id,
       context: [
         'https://www.w3.org/2018/credentials/v1',
-        'https://ec.europa.eu/2023/credentials/eidas/v1'
+        'https://ec.europa.eu/2023/credentials/eidas/v1',
       ],
       type: type,
       issuanceDate: issuanceDate,
@@ -60,9 +90,9 @@ class EidasCredential {
       credentialSubject: credentialSubject,
       expirationDate: expirationDate,
       proof: proof != null ? proof!.toJson() : {},
-      status: credentialStatus != null ? credentialStatus!.toJson() : null,
+      status: credentialStatus?.toJson(),
       credentialSchema:
-          credentialSchema != null ? credentialSchema!.toJson() : null,
+          credentialSchema?.toJson(),
       name: _getReadableName(),
       supportsZkp:
           true, // Les attestations eIDAS 2.0 supportent nativement les ZKP
@@ -89,7 +119,7 @@ class EidasCredential {
           ? EidasCredentialStatus.fromJson(credential.status!)
           : null,
       proof: credential.proof != null
-          ? EidasProof.fromJson(credential.proof!)
+          ? EidasProof.fromJson(credential.proof)
           : null,
     );
   }
@@ -113,7 +143,7 @@ class EidasCredential {
     return {
       '@context': [
         'https://www.w3.org/2018/credentials/v1',
-        'https://ec.europa.eu/2023/credentials/eidas/v1'
+        'https://ec.europa.eu/2023/credentials/eidas/v1',
       ],
       'id': id,
       'type': type,
@@ -131,36 +161,6 @@ class EidasCredential {
         'evidence': evidence!.map((e) => e.toJson()).toList(),
     };
   }
-
-  /// Crée une attestation eIDAS à partir d'un JSON
-  factory EidasCredential.fromJson(Map<String, dynamic> json) {
-    return EidasCredential(
-      id: json['id'] as String,
-      type: (json['type'] as List).map((e) => e as String).toList(),
-      issuer: EidasIssuer.fromJson(json['issuer']),
-      issuanceDate: DateTime.parse(json['issuanceDate'] as String),
-      expirationDate: json['expirationDate'] != null
-          ? DateTime.parse(json['expirationDate'] as String)
-          : null,
-      credentialSubject: json['credentialSubject'] as Map<String, dynamic>,
-      credentialSchema: json['credentialSchema'] != null
-          ? EidasCredentialSchema.fromJson(
-              json['credentialSchema'] as Map<String, dynamic>)
-          : null,
-      credentialStatus: json['credentialStatus'] != null
-          ? EidasCredentialStatus.fromJson(
-              json['credentialStatus'] as Map<String, dynamic>)
-          : null,
-      proof: json['proof'] != null
-          ? EidasProof.fromJson(json['proof'] as Map<String, dynamic>)
-          : null,
-      evidence: json['evidence'] != null
-          ? (json['evidence'] as List)
-              .map((e) => EidasEvidence.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-    );
-  }
 }
 
 /// Représente l'émetteur d'une attestation eIDAS
@@ -174,6 +174,27 @@ class EidasIssuer {
     this.registrationNumber,
     this.address,
   });
+
+  /// Crée un émetteur à partir d'un JSON
+  factory EidasIssuer.fromJson(dynamic json) {
+    if (json is String) {
+      return EidasIssuer(id: json);
+    }
+
+    if (json is Map<String, dynamic>) {
+      return EidasIssuer(
+        id: json['id'] as String,
+        name: json['name'] as String?,
+        image: json['image'] as String?,
+        url: json['url'] as String?,
+        organizationType: json['organizationType'] as String?,
+        registrationNumber: json['registrationNumber'] as String?,
+        address: json['address'] as Map<String, dynamic>?,
+      );
+    }
+
+    throw FormatException("Format d'émetteur non pris en charge: $json");
+  }
 
   /// Identifiant de l'émetteur (DID)
   final String id;
@@ -206,32 +227,12 @@ class EidasIssuer {
     if (image != null) result['image'] = image;
     if (url != null) result['url'] = url;
     if (organizationType != null) result['organizationType'] = organizationType;
-    if (registrationNumber != null)
+    if (registrationNumber != null) {
       result['registrationNumber'] = registrationNumber;
+    }
     if (address != null) result['address'] = address;
 
     return result;
-  }
-
-  /// Crée un émetteur à partir d'un JSON
-  factory EidasIssuer.fromJson(dynamic json) {
-    if (json is String) {
-      return EidasIssuer(id: json);
-    }
-
-    if (json is Map<String, dynamic>) {
-      return EidasIssuer(
-        id: json['id'] as String,
-        name: json['name'] as String?,
-        image: json['image'] as String?,
-        url: json['url'] as String?,
-        organizationType: json['organizationType'] as String?,
-        registrationNumber: json['registrationNumber'] as String?,
-        address: json['address'] as Map<String, dynamic>?,
-      );
-    }
-
-    throw FormatException('Format d\'émetteur non pris en charge: $json');
   }
 }
 
@@ -241,6 +242,14 @@ class EidasCredentialSchema {
     required this.id,
     required this.type,
   });
+
+  /// Crée un schéma à partir d'un JSON
+  factory EidasCredentialSchema.fromJson(Map<String, dynamic> json) {
+    return EidasCredentialSchema(
+      id: json['id'] as String,
+      type: json['type'] as String,
+    );
+  }
 
   /// Identifiant du schéma
   final String id;
@@ -271,14 +280,6 @@ class EidasCredentialSchema {
       'type': type,
     };
   }
-
-  /// Crée un schéma à partir d'un JSON
-  factory EidasCredentialSchema.fromJson(Map<String, dynamic> json) {
-    return EidasCredentialSchema(
-      id: json['id'] as String,
-      type: json['type'] as String,
-    );
-  }
 }
 
 /// Représente le statut d'une attestation eIDAS
@@ -290,6 +291,17 @@ class EidasCredentialStatus {
     this.statusListIndex,
     this.statusListCredential,
   });
+
+  /// Crée un statut à partir d'un JSON
+  factory EidasCredentialStatus.fromJson(Map<String, dynamic> json) {
+    return EidasCredentialStatus(
+      id: json['id'] as String,
+      type: json['type'] as String,
+      statusPurpose: json['statusPurpose'] as String?,
+      statusListIndex: json['statusListIndex'] as int?,
+      statusListCredential: json['statusListCredential'] as String?,
+    );
+  }
 
   /// Identifiant du statut
   final String id;
@@ -333,21 +345,11 @@ class EidasCredentialStatus {
 
     if (statusPurpose != null) result['statusPurpose'] = statusPurpose;
     if (statusListIndex != null) result['statusListIndex'] = statusListIndex;
-    if (statusListCredential != null)
+    if (statusListCredential != null) {
       result['statusListCredential'] = statusListCredential;
+    }
 
     return result;
-  }
-
-  /// Crée un statut à partir d'un JSON
-  factory EidasCredentialStatus.fromJson(Map<String, dynamic> json) {
-    return EidasCredentialStatus(
-      id: json['id'] as String,
-      type: json['type'] as String,
-      statusPurpose: json['statusPurpose'] as String?,
-      statusListIndex: json['statusListIndex'] as int?,
-      statusListCredential: json['statusListCredential'] as String?,
-    );
   }
 }
 
@@ -363,6 +365,20 @@ class EidasProof {
     this.domain,
     this.jws,
   });
+
+  /// Crée une preuve à partir d'un JSON
+  factory EidasProof.fromJson(Map<String, dynamic> json) {
+    return EidasProof(
+      type: json['type'] as String,
+      created: DateTime.parse(json['created'] as String),
+      verificationMethod: json['verificationMethod'] as String,
+      proofPurpose: json['proofPurpose'] as String,
+      proofValue: json['proofValue'] as String,
+      challenge: json['challenge'] as String?,
+      domain: json['domain'] as String?,
+      jws: json['jws'] as String?,
+    );
+  }
 
   /// Type de preuve
   final String type;
@@ -430,20 +446,6 @@ class EidasProof {
 
     return result;
   }
-
-  /// Crée une preuve à partir d'un JSON
-  factory EidasProof.fromJson(Map<String, dynamic> json) {
-    return EidasProof(
-      type: json['type'] as String,
-      created: DateTime.parse(json['created'] as String),
-      verificationMethod: json['verificationMethod'] as String,
-      proofPurpose: json['proofPurpose'] as String,
-      proofValue: json['proofValue'] as String,
-      challenge: json['challenge'] as String?,
-      domain: json['domain'] as String?,
-      jws: json['jws'] as String?,
-    );
-  }
 }
 
 /// Représente une preuve d'identité utilisée pour délivrer l'attestation
@@ -456,6 +458,21 @@ class EidasEvidence {
     this.documentPresence,
     this.time,
   });
+
+  /// Crée une preuve d'identité à partir d'un JSON
+  factory EidasEvidence.fromJson(Map<String, dynamic> json) {
+    return EidasEvidence(
+      type: json['type'] as String,
+      verifier: json['verifier'] as String,
+      evidenceDocument: json['evidenceDocument'] != null
+          ? (json['evidenceDocument'] as List).map((e) => e as String).toList()
+          : null,
+      subjectPresence: json['subjectPresence'] as String?,
+      documentPresence: json['documentPresence'] as String?,
+      time:
+          json['time'] != null ? DateTime.parse(json['time'] as String) : null,
+    );
+  }
 
   /// Type de preuve d'identité
   final String type;
@@ -488,20 +505,5 @@ class EidasEvidence {
     if (time != null) result['time'] = time!.toIso8601String();
 
     return result;
-  }
-
-  /// Crée une preuve d'identité à partir d'un JSON
-  factory EidasEvidence.fromJson(Map<String, dynamic> json) {
-    return EidasEvidence(
-      type: json['type'] as String,
-      verifier: json['verifier'] as String,
-      evidenceDocument: json['evidenceDocument'] != null
-          ? (json['evidenceDocument'] as List).map((e) => e as String).toList()
-          : null,
-      subjectPresence: json['subjectPresence'] as String?,
-      documentPresence: json['documentPresence'] as String?,
-      time:
-          json['time'] != null ? DateTime.parse(json['time'] as String) : null,
-    );
   }
 }

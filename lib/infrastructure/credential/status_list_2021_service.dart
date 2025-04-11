@@ -1,18 +1,16 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:http/http.dart' as http;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/credential/credential_status.dart';
 import 'package:did_app/domain/credential/status_list_2021.dart';
-import 'package:did_app/domain/credential/credential.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
 
 /// Service d'implémentation du Status List 2021
 /// selon la spécification du W3C: https://w3c.github.io/vc-status-list-2021/
 class StatusList2021Service {
-  final http.Client _httpClient;
-  final Box<Map<dynamic, dynamic>> _cacheBox;
-  final Duration _cacheDuration;
 
   StatusList2021Service({
     required http.Client httpClient,
@@ -21,6 +19,9 @@ class StatusList2021Service {
   })  : _httpClient = httpClient,
         _cacheBox = cacheBox,
         _cacheDuration = cacheDuration ?? const Duration(hours: 1);
+  final http.Client _httpClient;
+  final Box<Map<dynamic, dynamic>> _cacheBox;
+  final Duration _cacheDuration;
 
   /// Vérifie le statut d'une attestation à l'aide de Status List 2021
   Future<StatusCheckResult> checkCredentialStatus(Credential credential) async {
@@ -56,7 +57,7 @@ class StatusList2021Service {
           status: CredentialStatusType.unknown,
           checkedAt: DateTime.now(),
           error:
-              'La finalité de la liste ne correspond pas à celle de l\'entrée',
+              "La finalité de la liste ne correspond pas à celle de l'entrée",
         );
       }
 
@@ -94,7 +95,7 @@ class StatusList2021Service {
         );
       }
 
-      String details = statusType == CredentialStatusType.revoked
+      final details = statusType == CredentialStatusType.revoked
           ? 'Attestation révoquée via Status List 2021'
           : 'Attestation valide selon Status List 2021';
 
@@ -117,7 +118,7 @@ class StatusList2021Service {
   /// Récupère une liste de statut depuis l'URL fournie
   /// avec mise en cache pour les performances
   Future<StatusList2021Credential?> _fetchStatusListCredential(
-      String url) async {
+      String url,) async {
     try {
       // Vérifier le cache d'abord
       final cachedData = _getCachedStatusList(url);
@@ -165,7 +166,7 @@ class StatusList2021Service {
       }
 
       return StatusList2021Credential.fromJson(
-          cachedMap['data'] as Map<String, dynamic>);
+          cachedMap['data'] as Map<String, dynamic>,);
     } catch (e) {
       return null;
     }
@@ -194,7 +195,7 @@ class StatusList2021Service {
   /// Force la mise à jour d'une liste de statut dans le cache
   Future<void> refreshStatusList(String url) async {
     final cacheKey = _getCacheKey(url);
-    _cacheBox.delete(cacheKey);
+    await _cacheBox.delete(cacheKey);
     await _fetchStatusListCredential(url);
   }
 
@@ -215,7 +216,7 @@ class StatusList2021Service {
   /// Décode une liste de statut encodée en base64url
   Uint8List _decodeBitset(String encodedList, String encoding) {
     if (encoding != 'base64url') {
-      throw UnsupportedError('Seul l\'encodage base64url est supporté');
+      throw UnsupportedError("Seul l'encodage base64url est supporté");
     }
 
     return base64Url.decode(encodedList);
@@ -248,7 +249,7 @@ class StatusList2021Service {
       if (isRevoked && index >= 0 && index < size) {
         final byteIndex = index ~/ 8;
         final bitIndex = index % 8;
-        bitset[byteIndex] |= (1 << bitIndex);
+        bitset[byteIndex] |= 1 << bitIndex;
       }
     });
 

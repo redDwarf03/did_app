@@ -1,9 +1,9 @@
 import 'package:did_app/application/session/provider.dart';
 import 'package:did_app/ui/views/welcome/wallet_connection_status.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Welcome screen for the dApp
 class WelcomeScreen extends ConsumerWidget {
@@ -23,10 +23,9 @@ class WelcomeScreen extends ConsumerWidget {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Icon(
                 Icons.fingerprint,
@@ -169,7 +168,7 @@ class WelcomeScreen extends ConsumerWidget {
                   child: Text(
                     l10n.tutorialTitle,
                     style: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.bold),
+                        fontSize: 22, fontWeight: FontWeight.bold,),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -214,7 +213,7 @@ class WelcomeScreen extends ConsumerWidget {
   }
 
   Widget _buildGuideSection(
-      BuildContext context, String title, String content, IconData icon) {
+      BuildContext context, String title, String content, IconData icon,) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -232,7 +231,7 @@ class WelcomeScreen extends ConsumerWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                      fontSize: 18, fontWeight: FontWeight.bold,),
                 ),
                 const SizedBox(height: 5),
                 Text(
@@ -250,15 +249,15 @@ class WelcomeScreen extends ConsumerWidget {
 
 /// Widget d'information avec titre, contenu et icône
 class _WelcomeInfoCard extends StatelessWidget {
-  final String title;
-  final String content;
-  final IconData icon;
 
   const _WelcomeInfoCard({
     required this.title,
     required this.content,
     required this.icon,
   });
+  final String title;
+  final String content;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -352,7 +351,7 @@ class _QuickStartGuide extends StatelessWidget {
       subtitle: Text(subtitle),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: () => context.go(route),
-      contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+      contentPadding: const EdgeInsets.symmetric(vertical: 8),
     );
   }
 }

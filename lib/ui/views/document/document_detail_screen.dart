@@ -1,12 +1,12 @@
 import 'package:did_app/application/document/providers.dart';
 import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/domain/document/document.dart';
+import 'package:did_app/ui/views/document/document_versions_screen.dart';
+import 'package:did_app/ui/views/document/widgets/document_share_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:did_app/ui/views/document/widgets/document_share_dialog.dart';
-import 'package:did_app/ui/views/document/document_versions_screen.dart';
-import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Screen displaying detailed information about a document
 class DocumentDetailScreen extends ConsumerStatefulWidget {
@@ -176,17 +176,17 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
               icon: Icons.description,
               children: [
                 _buildInfoRow(context, l10n.documentTypeLabel,
-                    _getDocumentTypeName(document.type, context)),
+                    _getDocumentTypeName(document.type, context),),
                 _buildInfoRow(
                     context,
                     l10n.documentStatusLabel,
                     _getVerificationStatusText(
-                        document.verificationStatus, context)),
+                        document.verificationStatus, context,),),
                 if (document.description != null)
                   _buildInfoRow(context, l10n.documentDescriptionLabel,
-                      document.description!),
+                      document.description!,),
                 _buildInfoRow(context, l10n.documentVersionLabel,
-                    document.version.toString()),
+                    document.version.toString(),),
               ],
             ),
             const SizedBox(height: 16),
@@ -199,7 +199,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
                 _buildInfoRow(context, l10n.issuerLabelDetail, document.issuer),
                 _buildInfoRow(context, l10n.issueDateLabelDetail, issuedAt),
                 _buildInfoRow(
-                    context, l10n.expirationDateLabelDetail, expiresAt),
+                    context, l10n.expirationDateLabelDetail, expiresAt,),
                 _buildInfoRow(context, l10n.lastUpdatedLabel, updatedAt),
               ],
             ),
@@ -215,12 +215,12 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
                   _buildInfoRow(context, l10n.verifiedLabel, l10n.yesVerified),
                   if (document.issuerAddress != null)
                     _buildInfoRow(context, l10n.issuerAddressLabel,
-                        document.issuerAddress!),
+                        document.issuerAddress!,),
                   if (document.blockchainTxId != null)
                     _buildInfoRow(context, l10n.blockchainTxLabel,
-                        document.blockchainTxId!),
+                        document.blockchainTxId!,),
                   _buildInfoRow(context, l10n.eidasLevelLabelDetail,
-                      _getEidasLevelText(document.eidasLevel, context)),
+                      _getEidasLevelText(document.eidasLevel, context),),
                 ],
               ),
             const SizedBox(height: 16),
@@ -429,7 +429,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
             contentPadding: EdgeInsets.zero,
             title: Text(share.recipientDescription),
             subtitle: Text(
-                '${l10n.expiresShareLabel}: ${dateFormat.format(share.expiresAt)}'),
+                '${l10n.expiresShareLabel}: ${dateFormat.format(share.expiresAt)}',),
             trailing: IconButton(
               icon: const Icon(Icons.delete_outline),
               onPressed: () => _revokeShare(context, share),
@@ -442,7 +442,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   }
 
   Widget _buildMetadataSection(
-      BuildContext context, Map<String, dynamic>? metadata) {
+      BuildContext context, Map<String, dynamic>? metadata,) {
     final l10n = AppLocalizations.of(context)!;
     if (metadata == null || metadata.isEmpty) {
       return const SizedBox.shrink();
@@ -506,7 +506,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
 
   // Actions
   Future<void> _downloadDocument(
-      BuildContext context, Document document) async {
+      BuildContext context, Document document,) async {
     final l10n = AppLocalizations.of(context)!;
     await showDialog(
       context: context,
@@ -578,7 +578,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
             content: Text(
               status != null
                   ? l10n.verificationStatusResult(
-                      _getVerificationStatusText(status, context))
+                      _getVerificationStatusText(status, context),)
                   : l10n.verificationFailedError,
             ),
             actions: [
@@ -622,7 +622,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
       builder: (context) => AlertDialog(
         title: Text(l10n.confirmRevocationDialogTitle),
         content: Text(
-            l10n.confirmRevocationDialogContent(share.recipientDescription)),
+            l10n.confirmRevocationDialogContent(share.recipientDescription),),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -992,7 +992,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   }
 
   String _getVerificationStatusText(
-      DocumentVerificationStatus status, BuildContext context) {
+      DocumentVerificationStatus status, BuildContext context,) {
     final l10n = AppLocalizations.of(context)!;
     switch (status) {
       case DocumentVerificationStatus.unverified:

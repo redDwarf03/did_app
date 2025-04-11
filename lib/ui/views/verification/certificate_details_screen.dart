@@ -1,8 +1,8 @@
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart'; // Import l10n
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Screen to display detailed information about a verification certificate
 class CertificateDetailsScreen extends ConsumerWidget {
@@ -142,7 +142,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
                             l10n.proofSignatureLabel,
                           ),
                           tooltip:
-                              l10n.copySignatureTooltip ?? "Copy Signature",
+                              l10n.copySignatureTooltip ?? 'Copy Signature',
                           constraints: const BoxConstraints(),
                           padding: EdgeInsets.zero,
                         ),
@@ -174,7 +174,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
+                            color: Colors.green.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -260,21 +260,21 @@ class CertificateDetailsScreen extends ConsumerWidget {
     } else if (isExpiringSoon) {
       statusColor = Colors.orange;
       statusText = l10n.notVerifiedStatus;
-      statusDescription = "Expires in $daysRemaining days";
+      statusDescription = 'Expires in $daysRemaining days';
       statusIcon = Icons.access_time;
     } else {
       statusColor = Colors.green;
       statusText = l10n.verifiedStatus;
-      statusDescription = "Valid for $daysRemaining days";
+      statusDescription = 'Valid for $daysRemaining days';
       statusIcon = Icons.check_circle;
     }
 
     return Card(
       elevation: 3,
-      color: statusColor.withOpacity(0.1),
+      color: statusColor.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: statusColor.withOpacity(0.3)),
+        side: BorderSide(color: statusColor.withValues(alpha: 0.3)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -348,7 +348,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
                 value,
                 l10n.identifierLabel,
               ),
-              tooltip: "Copy ID",
+              tooltip: 'Copy ID',
               constraints: const BoxConstraints(),
               padding: EdgeInsets.zero,
             ),
@@ -387,7 +387,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
   void _copyToClipboard(BuildContext context, String text, String message) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("$message copied to clipboard")),
+      SnackBar(content: Text('$message copied to clipboard')),
     );
   }
 
@@ -418,7 +418,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.file_download),
-              title: Text("Export as PDF"),
+              title: const Text('Export as PDF'),
               onTap: () {
                 Navigator.pop(context);
                 // TODO: Export as PDF
@@ -426,7 +426,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.link),
-              title: Text("Generate Link"),
+              title: const Text('Generate Link'),
               onTap: () {
                 Navigator.pop(context);
                 // TODO: Generate and copy link
@@ -477,9 +477,9 @@ class CertificateDetailsScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
               ),
-              child: Center(
+              child: const Center(
                 child: Text(
-                  "QR Code Placeholder",
+                  'QR Code Placeholder',
                   textAlign: TextAlign.center,
                 ),
               ),

@@ -1,8 +1,8 @@
 import 'package:did_app/application/verification/providers.dart';
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Screen that displays all certificates of the user
 class CertificatesDashboardScreen extends ConsumerWidget {
@@ -128,7 +128,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           _getCertificateStatus(
-                              isExpired, isExpiringSoon, l10n),
+                              isExpired, isExpiringSoon, l10n,),
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -165,7 +165,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 12),
                       _buildInfoRow(
-                          l10n.identifierLabel, _truncateId(certificate.id)),
+                          l10n.identifierLabel, _truncateId(certificate.id),),
                       _buildInfoRow(
                         l10n.issuanceDateLabel,
                         _formatDate(certificate.issuedAt),
@@ -194,7 +194,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                           onPressed: () =>
                               _renewCertificate(context, certificate, l10n),
                           icon: const Icon(Icons.refresh, size: 18),
-                          label: Text(l10n.requestButton ?? "Renew"),
+                          label: Text(l10n.requestButton ?? 'Renew'),
                         ),
                     ],
                   ),
@@ -262,7 +262,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
   }
 
   String _getCertificateStatus(
-      bool isExpired, bool isExpiringSoon, AppLocalizations l10n) {
+      bool isExpired, bool isExpiringSoon, AppLocalizations l10n,) {
     if (isExpired) return l10n.expiredStatus;
     if (isExpiringSoon) return l10n.notVerifiedStatus;
     return l10n.verifiedStatus;
@@ -284,11 +284,11 @@ class CertificatesDashboardScreen extends ConsumerWidget {
   String _getEidasLevelText(EidasLevel level, AppLocalizations l10n) {
     switch (level) {
       case EidasLevel.low:
-        return "eIDAS Low";
+        return 'eIDAS Low';
       case EidasLevel.substantial:
-        return "eIDAS Substantial";
+        return 'eIDAS Substantial';
       case EidasLevel.high:
-        return "eIDAS High";
+        return 'eIDAS High';
     }
   }
 
@@ -334,7 +334,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.file_download),
-              title: Text("Export as PDF"),
+              title: const Text('Export as PDF'),
               onTap: () {
                 Navigator.pop(context);
                 // Export as PDF
@@ -342,7 +342,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.link),
-              title: Text("Generate Link"),
+              title: const Text('Generate Link'),
               onTap: () {
                 Navigator.pop(context);
                 // Generate and copy link

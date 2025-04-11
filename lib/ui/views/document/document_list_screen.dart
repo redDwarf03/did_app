@@ -1,16 +1,15 @@
 import 'package:did_app/application/document/providers.dart';
 import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/domain/document/document.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:did_app/ui/views/document/document_detail_screen.dart';
 import 'package:did_app/ui/views/document/document_form_screen.dart';
 import 'package:did_app/ui/views/document/shared_documents_screen.dart';
-import 'package:did_app/ui/views/document/widgets/document_share_dialog.dart';
 import 'package:did_app/ui/views/document/widgets/document_card.dart';
+import 'package:did_app/ui/views/document/widgets/document_share_dialog.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// Screen displaying the user's document list
 class DocumentListScreen extends ConsumerStatefulWidget {
@@ -184,7 +183,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
 
   // Show document add dialog
   Future<void> _showAddDocumentDialog(BuildContext context) async {
-    Navigator.of(context).push(
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const DocumentFormScreen(),
       ),
@@ -283,7 +282,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
             content: Text(
               status != null
                   ? l10n.verificationStatusResult(
-                      _getVerificationStatusText(status))
+                      _getVerificationStatusText(status),)
                   : l10n.verificationFailedError,
             ),
             actions: [
@@ -322,7 +321,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
 
   // Show documents shared with user
   Future<void> _showSharedWithMe(BuildContext context) async {
-    Navigator.of(context).push(
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const SharedDocumentsScreen(),
       ),
