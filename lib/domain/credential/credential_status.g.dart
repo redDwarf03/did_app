@@ -59,19 +59,17 @@ const _$RevocationReasonEnumMap = {
 _$StatusListImpl _$$StatusListImplFromJson(Map<String, dynamic> json) =>
     _$StatusListImpl(
       id: json['id'] as String,
-      url: json['url'] as String,
       lastUpdated: DateTime.parse(json['lastUpdated'] as String),
       statuses: (json['statuses'] as Map<String, dynamic>).map(
         (k, e) => MapEntry(int.parse(k), e as bool),
       ),
       size: (json['size'] as num).toInt(),
-      version: json['version'] as String,
+      version: json['version'] as String?,
     );
 
 Map<String, dynamic> _$$StatusListImplToJson(_$StatusListImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'url': instance.url,
       'lastUpdated': instance.lastUpdated.toIso8601String(),
       'statuses': instance.statuses.map((k, e) => MapEntry(k.toString(), e)),
       'size': instance.size,

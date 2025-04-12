@@ -20,40 +20,47 @@ QualifiedCredential _$QualifiedCredentialFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$QualifiedCredential {
-  /// Attestation de base
+  /// The underlying base Verifiable Credential containing the attested attributes.
   Credential get credential => throw _privateConstructorUsedError;
 
-  /// Niveau d'assurance
+  /// The eIDAS assurance level associated with the identity verification performed
+  /// before issuing this attestation. See [AssuranceLevel]. REQUIRED.
   AssuranceLevel get assuranceLevel => throw _privateConstructorUsedError;
 
-  /// Type de signature qualifiée
+  /// The type of qualified signature or seal used to secure the attestation.
+  /// See [QualifiedSignatureType]. REQUIRED.
   QualifiedSignatureType get signatureType =>
       throw _privateConstructorUsedError;
 
-  /// Identifiant de l'autorité de certification qualifiée
+  /// Identifier (e.g., URI or DID) for the Qualified Trust Service Provider (QTSP) that issued this QEAA. REQUIRED.
   String get qualifiedTrustServiceProviderId =>
       throw _privateConstructorUsedError;
 
-  /// Date de certification
+  /// The date and time when the QTSP certified or issued this attestation. REQUIRED.
   DateTime get certificationDate => throw _privateConstructorUsedError;
 
-  /// Date d'expiration de la certification
+  /// The date and time when the certification or the underlying qualified certificate expires. REQUIRED.
   DateTime get certificationExpiryDate => throw _privateConstructorUsedError;
 
-  /// Pays de l'autorité de certification
+  /// The country (e.g., ISO 3166-1 alpha-2 code) where the QTSP is established and supervised. REQUIRED.
   String get certificationCountry => throw _privateConstructorUsedError;
 
-  /// URL du registre de confiance qualifié
+  /// URL pointing to the official EU Trust List or a national trusted list where the
+  /// QTSP and its qualified status can be verified. REQUIRED.
   String get qualifiedTrustRegistryUrl => throw _privateConstructorUsedError;
 
-  /// Identifiant du certificat qualifié
+  /// Identifier of the specific qualified certificate used for the signature/seal. REQUIRED.
   String get qualifiedCertificateId => throw _privateConstructorUsedError;
 
-  /// Liste des attributs qualifiés
+  /// The specific attributes being attested in a qualified manner.
+  /// The structure might depend on the specific attribute schema.
+  /// This might overlap with `credential.credentialSubject` but specifies the *qualified* subset. REQUIRED.
   Map<String, dynamic> get qualifiedAttributes =>
       throw _privateConstructorUsedError;
 
-  /// Preuve de certification qualifiée
+  /// The qualified electronic signature or seal itself, or a reference to it,
+  /// proving the attestation's authenticity and integrity according to eIDAS.
+  /// The format depends on the `signatureType`. REQUIRED.
   String get qualifiedProof => throw _privateConstructorUsedError;
 
   /// Serializes this QualifiedCredential to a JSON map.
@@ -293,46 +300,53 @@ class _$QualifiedCredentialImpl implements _QualifiedCredential {
   factory _$QualifiedCredentialImpl.fromJson(Map<String, dynamic> json) =>
       _$$QualifiedCredentialImplFromJson(json);
 
-  /// Attestation de base
+  /// The underlying base Verifiable Credential containing the attested attributes.
   @override
   final Credential credential;
 
-  /// Niveau d'assurance
+  /// The eIDAS assurance level associated with the identity verification performed
+  /// before issuing this attestation. See [AssuranceLevel]. REQUIRED.
   @override
   final AssuranceLevel assuranceLevel;
 
-  /// Type de signature qualifiée
+  /// The type of qualified signature or seal used to secure the attestation.
+  /// See [QualifiedSignatureType]. REQUIRED.
   @override
   final QualifiedSignatureType signatureType;
 
-  /// Identifiant de l'autorité de certification qualifiée
+  /// Identifier (e.g., URI or DID) for the Qualified Trust Service Provider (QTSP) that issued this QEAA. REQUIRED.
   @override
   final String qualifiedTrustServiceProviderId;
 
-  /// Date de certification
+  /// The date and time when the QTSP certified or issued this attestation. REQUIRED.
   @override
   final DateTime certificationDate;
 
-  /// Date d'expiration de la certification
+  /// The date and time when the certification or the underlying qualified certificate expires. REQUIRED.
   @override
   final DateTime certificationExpiryDate;
 
-  /// Pays de l'autorité de certification
+  /// The country (e.g., ISO 3166-1 alpha-2 code) where the QTSP is established and supervised. REQUIRED.
   @override
   final String certificationCountry;
 
-  /// URL du registre de confiance qualifié
+  /// URL pointing to the official EU Trust List or a national trusted list where the
+  /// QTSP and its qualified status can be verified. REQUIRED.
   @override
   final String qualifiedTrustRegistryUrl;
 
-  /// Identifiant du certificat qualifié
+  /// Identifier of the specific qualified certificate used for the signature/seal. REQUIRED.
   @override
   final String qualifiedCertificateId;
 
-  /// Liste des attributs qualifiés
+  /// The specific attributes being attested in a qualified manner.
+  /// The structure might depend on the specific attribute schema.
+  /// This might overlap with `credential.credentialSubject` but specifies the *qualified* subset. REQUIRED.
   final Map<String, dynamic> _qualifiedAttributes;
 
-  /// Liste des attributs qualifiés
+  /// The specific attributes being attested in a qualified manner.
+  /// The structure might depend on the specific attribute schema.
+  /// This might overlap with `credential.credentialSubject` but specifies the *qualified* subset. REQUIRED.
   @override
   Map<String, dynamic> get qualifiedAttributes {
     if (_qualifiedAttributes is EqualUnmodifiableMapView)
@@ -341,7 +355,9 @@ class _$QualifiedCredentialImpl implements _QualifiedCredential {
     return EqualUnmodifiableMapView(_qualifiedAttributes);
   }
 
-  /// Preuve de certification qualifiée
+  /// The qualified electronic signature or seal itself, or a reference to it,
+  /// proving the attestation's authenticity and integrity according to eIDAS.
+  /// The format depends on the `signatureType`. REQUIRED.
   @override
   final String qualifiedProof;
 
@@ -433,47 +449,54 @@ abstract class _QualifiedCredential implements QualifiedCredential {
   factory _QualifiedCredential.fromJson(Map<String, dynamic> json) =
       _$QualifiedCredentialImpl.fromJson;
 
-  /// Attestation de base
+  /// The underlying base Verifiable Credential containing the attested attributes.
   @override
   Credential get credential;
 
-  /// Niveau d'assurance
+  /// The eIDAS assurance level associated with the identity verification performed
+  /// before issuing this attestation. See [AssuranceLevel]. REQUIRED.
   @override
   AssuranceLevel get assuranceLevel;
 
-  /// Type de signature qualifiée
+  /// The type of qualified signature or seal used to secure the attestation.
+  /// See [QualifiedSignatureType]. REQUIRED.
   @override
   QualifiedSignatureType get signatureType;
 
-  /// Identifiant de l'autorité de certification qualifiée
+  /// Identifier (e.g., URI or DID) for the Qualified Trust Service Provider (QTSP) that issued this QEAA. REQUIRED.
   @override
   String get qualifiedTrustServiceProviderId;
 
-  /// Date de certification
+  /// The date and time when the QTSP certified or issued this attestation. REQUIRED.
   @override
   DateTime get certificationDate;
 
-  /// Date d'expiration de la certification
+  /// The date and time when the certification or the underlying qualified certificate expires. REQUIRED.
   @override
   DateTime get certificationExpiryDate;
 
-  /// Pays de l'autorité de certification
+  /// The country (e.g., ISO 3166-1 alpha-2 code) where the QTSP is established and supervised. REQUIRED.
   @override
   String get certificationCountry;
 
-  /// URL du registre de confiance qualifié
+  /// URL pointing to the official EU Trust List or a national trusted list where the
+  /// QTSP and its qualified status can be verified. REQUIRED.
   @override
   String get qualifiedTrustRegistryUrl;
 
-  /// Identifiant du certificat qualifié
+  /// Identifier of the specific qualified certificate used for the signature/seal. REQUIRED.
   @override
   String get qualifiedCertificateId;
 
-  /// Liste des attributs qualifiés
+  /// The specific attributes being attested in a qualified manner.
+  /// The structure might depend on the specific attribute schema.
+  /// This might overlap with `credential.credentialSubject` but specifies the *qualified* subset. REQUIRED.
   @override
   Map<String, dynamic> get qualifiedAttributes;
 
-  /// Preuve de certification qualifiée
+  /// The qualified electronic signature or seal itself, or a reference to it,
+  /// proving the attestation's authenticity and integrity according to eIDAS.
+  /// The format depends on the `signatureType`. REQUIRED.
   @override
   String get qualifiedProof;
 
@@ -492,34 +515,35 @@ QualifiedTrustService _$QualifiedTrustServiceFromJson(
 
 /// @nodoc
 mixin _$QualifiedTrustService {
-  /// Identifiant unique du service
+  /// Unique identifier for the QTSP or a specific service it provides (e.g., from the Trust List). REQUIRED.
   String get id => throw _privateConstructorUsedError;
 
-  /// Nom du service
+  /// The official name of the Qualified Trust Service Provider. REQUIRED.
   String get name => throw _privateConstructorUsedError;
 
-  /// Type de service
+  /// The type of qualified trust service provided (e.g., "QCertForESig", "QCertForESeal", "QCForEAttestOfAttr"). REQUIRED.
   String get type => throw _privateConstructorUsedError;
 
-  /// Pays du service
+  /// The country (e.g., ISO 3166-1 alpha-2 code) where the QTSP is established. REQUIRED.
   String get country => throw _privateConstructorUsedError;
 
-  /// Statut du service
+  /// The current status of the service in the Trust List (e.g., "granted", "withdrawn"). REQUIRED.
   String get status => throw _privateConstructorUsedError;
 
-  /// Date de début de validité
+  /// The date from which the qualified status is valid. REQUIRED.
   DateTime get startDate => throw _privateConstructorUsedError;
 
-  /// Date de fin de validité
-  DateTime get endDate => throw _privateConstructorUsedError;
+  /// The date until which the qualified status is valid. OPTIONAL.
+  /// (Note: Made optional as service might be active indefinitely).
+  DateTime? get endDate => throw _privateConstructorUsedError;
 
-  /// URL du service
+  /// URL for more information about the service or QTSP. REQUIRED.
   String get serviceUrl => throw _privateConstructorUsedError;
 
-  /// Liste des certificats qualifiés
+  /// List of identifiers for the qualified certificates associated with this service. REQUIRED.
   List<String> get qualifiedCertificates => throw _privateConstructorUsedError;
 
-  /// Niveau d'assurance
+  /// The assurance level associated with the specific trust service offered. REQUIRED.
   AssuranceLevel get assuranceLevel => throw _privateConstructorUsedError;
 
   /// Serializes this QualifiedTrustService to a JSON map.
@@ -545,7 +569,7 @@ abstract class $QualifiedTrustServiceCopyWith<$Res> {
       String country,
       String status,
       DateTime startDate,
-      DateTime endDate,
+      DateTime? endDate,
       String serviceUrl,
       List<String> qualifiedCertificates,
       AssuranceLevel assuranceLevel});
@@ -573,7 +597,7 @@ class _$QualifiedTrustServiceCopyWithImpl<$Res,
     Object? country = null,
     Object? status = null,
     Object? startDate = null,
-    Object? endDate = null,
+    Object? endDate = freezed,
     Object? serviceUrl = null,
     Object? qualifiedCertificates = null,
     Object? assuranceLevel = null,
@@ -603,10 +627,10 @@ class _$QualifiedTrustServiceCopyWithImpl<$Res,
           ? _value.startDate
           : startDate // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      endDate: null == endDate
+      endDate: freezed == endDate
           ? _value.endDate
           : endDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
       serviceUrl: null == serviceUrl
           ? _value.serviceUrl
           : serviceUrl // ignore: cast_nullable_to_non_nullable
@@ -639,7 +663,7 @@ abstract class _$$QualifiedTrustServiceImplCopyWith<$Res>
       String country,
       String status,
       DateTime startDate,
-      DateTime endDate,
+      DateTime? endDate,
       String serviceUrl,
       List<String> qualifiedCertificates,
       AssuranceLevel assuranceLevel});
@@ -665,7 +689,7 @@ class __$$QualifiedTrustServiceImplCopyWithImpl<$Res>
     Object? country = null,
     Object? status = null,
     Object? startDate = null,
-    Object? endDate = null,
+    Object? endDate = freezed,
     Object? serviceUrl = null,
     Object? qualifiedCertificates = null,
     Object? assuranceLevel = null,
@@ -695,10 +719,10 @@ class __$$QualifiedTrustServiceImplCopyWithImpl<$Res>
           ? _value.startDate
           : startDate // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      endDate: null == endDate
+      endDate: freezed == endDate
           ? _value.endDate
           : endDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
       serviceUrl: null == serviceUrl
           ? _value.serviceUrl
           : serviceUrl // ignore: cast_nullable_to_non_nullable
@@ -725,7 +749,7 @@ class _$QualifiedTrustServiceImpl implements _QualifiedTrustService {
       required this.country,
       required this.status,
       required this.startDate,
-      required this.endDate,
+      this.endDate,
       required this.serviceUrl,
       required final List<String> qualifiedCertificates,
       required this.assuranceLevel})
@@ -734,42 +758,43 @@ class _$QualifiedTrustServiceImpl implements _QualifiedTrustService {
   factory _$QualifiedTrustServiceImpl.fromJson(Map<String, dynamic> json) =>
       _$$QualifiedTrustServiceImplFromJson(json);
 
-  /// Identifiant unique du service
+  /// Unique identifier for the QTSP or a specific service it provides (e.g., from the Trust List). REQUIRED.
   @override
   final String id;
 
-  /// Nom du service
+  /// The official name of the Qualified Trust Service Provider. REQUIRED.
   @override
   final String name;
 
-  /// Type de service
+  /// The type of qualified trust service provided (e.g., "QCertForESig", "QCertForESeal", "QCForEAttestOfAttr"). REQUIRED.
   @override
   final String type;
 
-  /// Pays du service
+  /// The country (e.g., ISO 3166-1 alpha-2 code) where the QTSP is established. REQUIRED.
   @override
   final String country;
 
-  /// Statut du service
+  /// The current status of the service in the Trust List (e.g., "granted", "withdrawn"). REQUIRED.
   @override
   final String status;
 
-  /// Date de début de validité
+  /// The date from which the qualified status is valid. REQUIRED.
   @override
   final DateTime startDate;
 
-  /// Date de fin de validité
+  /// The date until which the qualified status is valid. OPTIONAL.
+  /// (Note: Made optional as service might be active indefinitely).
   @override
-  final DateTime endDate;
+  final DateTime? endDate;
 
-  /// URL du service
+  /// URL for more information about the service or QTSP. REQUIRED.
   @override
   final String serviceUrl;
 
-  /// Liste des certificats qualifiés
+  /// List of identifiers for the qualified certificates associated with this service. REQUIRED.
   final List<String> _qualifiedCertificates;
 
-  /// Liste des certificats qualifiés
+  /// List of identifiers for the qualified certificates associated with this service. REQUIRED.
   @override
   List<String> get qualifiedCertificates {
     if (_qualifiedCertificates is EqualUnmodifiableListView)
@@ -778,7 +803,7 @@ class _$QualifiedTrustServiceImpl implements _QualifiedTrustService {
     return EqualUnmodifiableListView(_qualifiedCertificates);
   }
 
-  /// Niveau d'assurance
+  /// The assurance level associated with the specific trust service offered. REQUIRED.
   @override
   final AssuranceLevel assuranceLevel;
 
@@ -848,7 +873,7 @@ abstract class _QualifiedTrustService implements QualifiedTrustService {
           required final String country,
           required final String status,
           required final DateTime startDate,
-          required final DateTime endDate,
+          final DateTime? endDate,
           required final String serviceUrl,
           required final List<String> qualifiedCertificates,
           required final AssuranceLevel assuranceLevel}) =
@@ -857,43 +882,44 @@ abstract class _QualifiedTrustService implements QualifiedTrustService {
   factory _QualifiedTrustService.fromJson(Map<String, dynamic> json) =
       _$QualifiedTrustServiceImpl.fromJson;
 
-  /// Identifiant unique du service
+  /// Unique identifier for the QTSP or a specific service it provides (e.g., from the Trust List). REQUIRED.
   @override
   String get id;
 
-  /// Nom du service
+  /// The official name of the Qualified Trust Service Provider. REQUIRED.
   @override
   String get name;
 
-  /// Type de service
+  /// The type of qualified trust service provided (e.g., "QCertForESig", "QCertForESeal", "QCForEAttestOfAttr"). REQUIRED.
   @override
   String get type;
 
-  /// Pays du service
+  /// The country (e.g., ISO 3166-1 alpha-2 code) where the QTSP is established. REQUIRED.
   @override
   String get country;
 
-  /// Statut du service
+  /// The current status of the service in the Trust List (e.g., "granted", "withdrawn"). REQUIRED.
   @override
   String get status;
 
-  /// Date de début de validité
+  /// The date from which the qualified status is valid. REQUIRED.
   @override
   DateTime get startDate;
 
-  /// Date de fin de validité
+  /// The date until which the qualified status is valid. OPTIONAL.
+  /// (Note: Made optional as service might be active indefinitely).
   @override
-  DateTime get endDate;
+  DateTime? get endDate;
 
-  /// URL du service
+  /// URL for more information about the service or QTSP. REQUIRED.
   @override
   String get serviceUrl;
 
-  /// Liste des certificats qualifiés
+  /// List of identifiers for the qualified certificates associated with this service. REQUIRED.
   @override
   List<String> get qualifiedCertificates;
 
-  /// Niveau d'assurance
+  /// The assurance level associated with the specific trust service offered. REQUIRED.
   @override
   AssuranceLevel get assuranceLevel;
 

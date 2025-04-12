@@ -20,68 +20,78 @@ Document _$DocumentFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Document {
-  /// Identifiant unique du document
+  /// A unique identifier for this specific document instance within the system.
   String get id => throw _privateConstructorUsedError;
 
-  /// Type du document (carte d'identité, passeport, diplôme, etc.)
+  /// The type or category of the document. See [DocumentType].
   DocumentType get type => throw _privateConstructorUsedError;
 
-  /// Titre du document
+  /// A user-friendly title or name for the document (e.g., "My Passport", "Bachelor's Degree").
   String get title => throw _privateConstructorUsedError;
 
-  /// Description du document
+  /// An optional description providing more context about the document.
   String? get description => throw _privateConstructorUsedError;
 
-  /// Émetteur du document (autorité, institution, etc.)
+  /// The entity (authority, institution, organization) that issued the document.
+  /// (e.g., "Government of Exampleland", "University of Knowledge").
   String get issuer => throw _privateConstructorUsedError;
 
-  /// Date d'émission du document
+  /// The date and time when the document was officially issued.
   DateTime get issuedAt => throw _privateConstructorUsedError;
 
-  /// Date d'expiration du document (si applicable)
+  /// The date and time when the document expires, if applicable (e.g., for passports, licenses).
   DateTime? get expiresAt => throw _privateConstructorUsedError;
 
-  /// Version actuelle du document
+  /// The current version number of the document, used for tracking updates.
   int get version => throw _privateConstructorUsedError;
 
-  /// Métadonnées du document (format JSON)
+  /// Optional additional metadata associated with the document, stored as a JSON-like map.
+  /// Could include details specific to the document type (e.g., grade for a diploma).
   Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
 
-  /// État de vérification du document
+  /// The current verification status of the document. See [DocumentVerificationStatus].
   DocumentVerificationStatus get verificationStatus =>
       throw _privateConstructorUsedError;
 
-  /// Chemin de stockage du document chiffré
+  /// The path or reference indicating where the encrypted document file is stored.
+  /// **Security Note:** The actual document content should always be stored encrypted.
   String get encryptedStoragePath => throw _privateConstructorUsedError;
 
-  /// Hash du document pour vérification d'intégrité
+  /// A cryptographic hash (e.g., SHA-256) of the original document file.
+  /// Used to verify the integrity and ensure the document hasn't been tampered with.
   String get documentHash => throw _privateConstructorUsedError;
 
-  /// Vecteur d'initialisation pour le déchiffrement
+  /// The Initialization Vector (IV) used for the symmetric encryption (e.g., AES) of the document.
+  /// Required alongside the key to decrypt the document content.
   String get encryptionIV => throw _privateConstructorUsedError;
 
-  /// Signature numérique de l'émetteur
+  /// A digital signature created by the issuer using their private key.
+  /// Can be verified using the issuer's public key (potentially linked via `issuerAddress`)
+  /// to confirm authenticity and integrity.
   String? get issuerSignature => throw _privateConstructorUsedError;
 
-  /// Adresse blockchain de l'émetteur (pour vérification)
+  /// The blockchain address or Decentralized Identifier (DID) of the document issuer.
+  /// Used to retrieve the issuer's public key for verifying the `issuerSignature`.
   String? get issuerAddress => throw _privateConstructorUsedError;
 
-  /// Identifiant de transaction blockchain (pour preuve d'existence)
+  /// The transaction ID on a blockchain where an event related to this document
+  /// (e.g., issuance, revocation) was recorded. Provides a proof of existence/anchoring.
   String? get blockchainTxId => throw _privateConstructorUsedError;
 
-  /// Timestamp de la dernière mise à jour
+  /// The timestamp of the last update made to this document record.
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
-  /// Identifiant du propriétaire du document
+  /// The unique identifier ([DigitalIdentity.identityAddress]) of the identity that owns this document.
   String get ownerIdentityId => throw _privateConstructorUsedError;
 
-  /// Tags pour la recherche et le classement
+  /// Optional list of tags or keywords for easier searching and categorization.
   List<String>? get tags => throw _privateConstructorUsedError;
 
-  /// Indique si le document est partageable
+  /// Flag indicating if the owner permits this document to be shared with others.
   bool get isShareable => throw _privateConstructorUsedError;
 
-  /// Niveau eIDAS du document (pour conformité européenne)
+  /// The assessed eIDAS assurance level for this document, relevant for EU contexts.
+  /// See [EidasLevel] and the eIDAS regulation (Regulation (EU) No 910/2014).
   EidasLevel get eidasLevel => throw _privateConstructorUsedError;
 
   /// Serializes this Document to a JSON map.
@@ -436,42 +446,45 @@ class _$DocumentImpl implements _Document {
   factory _$DocumentImpl.fromJson(Map<String, dynamic> json) =>
       _$$DocumentImplFromJson(json);
 
-  /// Identifiant unique du document
+  /// A unique identifier for this specific document instance within the system.
   @override
   final String id;
 
-  /// Type du document (carte d'identité, passeport, diplôme, etc.)
+  /// The type or category of the document. See [DocumentType].
   @override
   final DocumentType type;
 
-  /// Titre du document
+  /// A user-friendly title or name for the document (e.g., "My Passport", "Bachelor's Degree").
   @override
   final String title;
 
-  /// Description du document
+  /// An optional description providing more context about the document.
   @override
   final String? description;
 
-  /// Émetteur du document (autorité, institution, etc.)
+  /// The entity (authority, institution, organization) that issued the document.
+  /// (e.g., "Government of Exampleland", "University of Knowledge").
   @override
   final String issuer;
 
-  /// Date d'émission du document
+  /// The date and time when the document was officially issued.
   @override
   final DateTime issuedAt;
 
-  /// Date d'expiration du document (si applicable)
+  /// The date and time when the document expires, if applicable (e.g., for passports, licenses).
   @override
   final DateTime? expiresAt;
 
-  /// Version actuelle du document
+  /// The current version number of the document, used for tracking updates.
   @override
   final int version;
 
-  /// Métadonnées du document (format JSON)
+  /// Optional additional metadata associated with the document, stored as a JSON-like map.
+  /// Could include details specific to the document type (e.g., grade for a diploma).
   final Map<String, dynamic>? _metadata;
 
-  /// Métadonnées du document (format JSON)
+  /// Optional additional metadata associated with the document, stored as a JSON-like map.
+  /// Could include details specific to the document type (e.g., grade for a diploma).
   @override
   Map<String, dynamic>? get metadata {
     final value = _metadata;
@@ -481,46 +494,53 @@ class _$DocumentImpl implements _Document {
     return EqualUnmodifiableMapView(value);
   }
 
-  /// État de vérification du document
+  /// The current verification status of the document. See [DocumentVerificationStatus].
   @override
   final DocumentVerificationStatus verificationStatus;
 
-  /// Chemin de stockage du document chiffré
+  /// The path or reference indicating where the encrypted document file is stored.
+  /// **Security Note:** The actual document content should always be stored encrypted.
   @override
   final String encryptedStoragePath;
 
-  /// Hash du document pour vérification d'intégrité
+  /// A cryptographic hash (e.g., SHA-256) of the original document file.
+  /// Used to verify the integrity and ensure the document hasn't been tampered with.
   @override
   final String documentHash;
 
-  /// Vecteur d'initialisation pour le déchiffrement
+  /// The Initialization Vector (IV) used for the symmetric encryption (e.g., AES) of the document.
+  /// Required alongside the key to decrypt the document content.
   @override
   final String encryptionIV;
 
-  /// Signature numérique de l'émetteur
+  /// A digital signature created by the issuer using their private key.
+  /// Can be verified using the issuer's public key (potentially linked via `issuerAddress`)
+  /// to confirm authenticity and integrity.
   @override
   final String? issuerSignature;
 
-  /// Adresse blockchain de l'émetteur (pour vérification)
+  /// The blockchain address or Decentralized Identifier (DID) of the document issuer.
+  /// Used to retrieve the issuer's public key for verifying the `issuerSignature`.
   @override
   final String? issuerAddress;
 
-  /// Identifiant de transaction blockchain (pour preuve d'existence)
+  /// The transaction ID on a blockchain where an event related to this document
+  /// (e.g., issuance, revocation) was recorded. Provides a proof of existence/anchoring.
   @override
   final String? blockchainTxId;
 
-  /// Timestamp de la dernière mise à jour
+  /// The timestamp of the last update made to this document record.
   @override
   final DateTime updatedAt;
 
-  /// Identifiant du propriétaire du document
+  /// The unique identifier ([DigitalIdentity.identityAddress]) of the identity that owns this document.
   @override
   final String ownerIdentityId;
 
-  /// Tags pour la recherche et le classement
+  /// Optional list of tags or keywords for easier searching and categorization.
   final List<String>? _tags;
 
-  /// Tags pour la recherche et le classement
+  /// Optional list of tags or keywords for easier searching and categorization.
   @override
   List<String>? get tags {
     final value = _tags;
@@ -530,12 +550,13 @@ class _$DocumentImpl implements _Document {
     return EqualUnmodifiableListView(value);
   }
 
-  /// Indique si le document est partageable
+  /// Flag indicating if the owner permits this document to be shared with others.
   @override
   @JsonKey()
   final bool isShareable;
 
-  /// Niveau eIDAS du document (pour conformité européenne)
+  /// The assessed eIDAS assurance level for this document, relevant for EU contexts.
+  /// See [EidasLevel] and the eIDAS regulation (Regulation (EU) No 910/2014).
   @override
   @JsonKey()
   final EidasLevel eidasLevel;
@@ -657,87 +678,97 @@ abstract class _Document implements Document {
   factory _Document.fromJson(Map<String, dynamic> json) =
       _$DocumentImpl.fromJson;
 
-  /// Identifiant unique du document
+  /// A unique identifier for this specific document instance within the system.
   @override
   String get id;
 
-  /// Type du document (carte d'identité, passeport, diplôme, etc.)
+  /// The type or category of the document. See [DocumentType].
   @override
   DocumentType get type;
 
-  /// Titre du document
+  /// A user-friendly title or name for the document (e.g., "My Passport", "Bachelor's Degree").
   @override
   String get title;
 
-  /// Description du document
+  /// An optional description providing more context about the document.
   @override
   String? get description;
 
-  /// Émetteur du document (autorité, institution, etc.)
+  /// The entity (authority, institution, organization) that issued the document.
+  /// (e.g., "Government of Exampleland", "University of Knowledge").
   @override
   String get issuer;
 
-  /// Date d'émission du document
+  /// The date and time when the document was officially issued.
   @override
   DateTime get issuedAt;
 
-  /// Date d'expiration du document (si applicable)
+  /// The date and time when the document expires, if applicable (e.g., for passports, licenses).
   @override
   DateTime? get expiresAt;
 
-  /// Version actuelle du document
+  /// The current version number of the document, used for tracking updates.
   @override
   int get version;
 
-  /// Métadonnées du document (format JSON)
+  /// Optional additional metadata associated with the document, stored as a JSON-like map.
+  /// Could include details specific to the document type (e.g., grade for a diploma).
   @override
   Map<String, dynamic>? get metadata;
 
-  /// État de vérification du document
+  /// The current verification status of the document. See [DocumentVerificationStatus].
   @override
   DocumentVerificationStatus get verificationStatus;
 
-  /// Chemin de stockage du document chiffré
+  /// The path or reference indicating where the encrypted document file is stored.
+  /// **Security Note:** The actual document content should always be stored encrypted.
   @override
   String get encryptedStoragePath;
 
-  /// Hash du document pour vérification d'intégrité
+  /// A cryptographic hash (e.g., SHA-256) of the original document file.
+  /// Used to verify the integrity and ensure the document hasn't been tampered with.
   @override
   String get documentHash;
 
-  /// Vecteur d'initialisation pour le déchiffrement
+  /// The Initialization Vector (IV) used for the symmetric encryption (e.g., AES) of the document.
+  /// Required alongside the key to decrypt the document content.
   @override
   String get encryptionIV;
 
-  /// Signature numérique de l'émetteur
+  /// A digital signature created by the issuer using their private key.
+  /// Can be verified using the issuer's public key (potentially linked via `issuerAddress`)
+  /// to confirm authenticity and integrity.
   @override
   String? get issuerSignature;
 
-  /// Adresse blockchain de l'émetteur (pour vérification)
+  /// The blockchain address or Decentralized Identifier (DID) of the document issuer.
+  /// Used to retrieve the issuer's public key for verifying the `issuerSignature`.
   @override
   String? get issuerAddress;
 
-  /// Identifiant de transaction blockchain (pour preuve d'existence)
+  /// The transaction ID on a blockchain where an event related to this document
+  /// (e.g., issuance, revocation) was recorded. Provides a proof of existence/anchoring.
   @override
   String? get blockchainTxId;
 
-  /// Timestamp de la dernière mise à jour
+  /// The timestamp of the last update made to this document record.
   @override
   DateTime get updatedAt;
 
-  /// Identifiant du propriétaire du document
+  /// The unique identifier ([DigitalIdentity.identityAddress]) of the identity that owns this document.
   @override
   String get ownerIdentityId;
 
-  /// Tags pour la recherche et le classement
+  /// Optional list of tags or keywords for easier searching and categorization.
   @override
   List<String>? get tags;
 
-  /// Indique si le document est partageable
+  /// Flag indicating if the owner permits this document to be shared with others.
   @override
   bool get isShareable;
 
-  /// Niveau eIDAS du document (pour conformité européenne)
+  /// The assessed eIDAS assurance level for this document, relevant for EU contexts.
+  /// See [EidasLevel] and the eIDAS regulation (Regulation (EU) No 910/2014).
   @override
   EidasLevel get eidasLevel;
 
@@ -755,28 +786,28 @@ DocumentVersion _$DocumentVersionFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$DocumentVersion {
-  /// Identifiant de version
+  /// Unique identifier for this specific version entry.
   String get id => throw _privateConstructorUsedError;
 
-  /// Numéro de version
+  /// The sequential version number (corresponds to [Document.version] at the time).
   int get versionNumber => throw _privateConstructorUsedError;
 
-  /// Date de création de cette version
+  /// Timestamp indicating when this version was created (i.e., when the update occurred).
   DateTime get createdAt => throw _privateConstructorUsedError;
 
-  /// Hash du document pour vérification d'intégrité
+  /// The cryptographic hash of the document file as it existed in this version.
   String get documentHash => throw _privateConstructorUsedError;
 
-  /// Chemin de stockage du document chiffré
+  /// The storage path of the encrypted document file for this version.
   String get encryptedStoragePath => throw _privateConstructorUsedError;
 
-  /// Vecteur d'initialisation pour le déchiffrement
+  /// The Initialization Vector (IV) used for encrypting this version of the document.
   String get encryptionIV => throw _privateConstructorUsedError;
 
-  /// Identifiant de transaction blockchain (pour preuve d'existence)
+  /// Optional blockchain transaction ID anchoring this specific version.
   String? get blockchainTxId => throw _privateConstructorUsedError;
 
-  /// Note sur la modification apportée
+  /// An optional note describing the changes made in this version.
   String? get changeNote => throw _privateConstructorUsedError;
 
   /// Serializes this DocumentVersion to a JSON map.
@@ -961,35 +992,35 @@ class _$DocumentVersionImpl implements _DocumentVersion {
   factory _$DocumentVersionImpl.fromJson(Map<String, dynamic> json) =>
       _$$DocumentVersionImplFromJson(json);
 
-  /// Identifiant de version
+  /// Unique identifier for this specific version entry.
   @override
   final String id;
 
-  /// Numéro de version
+  /// The sequential version number (corresponds to [Document.version] at the time).
   @override
   final int versionNumber;
 
-  /// Date de création de cette version
+  /// Timestamp indicating when this version was created (i.e., when the update occurred).
   @override
   final DateTime createdAt;
 
-  /// Hash du document pour vérification d'intégrité
+  /// The cryptographic hash of the document file as it existed in this version.
   @override
   final String documentHash;
 
-  /// Chemin de stockage du document chiffré
+  /// The storage path of the encrypted document file for this version.
   @override
   final String encryptedStoragePath;
 
-  /// Vecteur d'initialisation pour le déchiffrement
+  /// The Initialization Vector (IV) used for encrypting this version of the document.
   @override
   final String encryptionIV;
 
-  /// Identifiant de transaction blockchain (pour preuve d'existence)
+  /// Optional blockchain transaction ID anchoring this specific version.
   @override
   final String? blockchainTxId;
 
-  /// Note sur la modification apportée
+  /// An optional note describing the changes made in this version.
   @override
   final String? changeNote;
 
@@ -1064,35 +1095,35 @@ abstract class _DocumentVersion implements DocumentVersion {
   factory _DocumentVersion.fromJson(Map<String, dynamic> json) =
       _$DocumentVersionImpl.fromJson;
 
-  /// Identifiant de version
+  /// Unique identifier for this specific version entry.
   @override
   String get id;
 
-  /// Numéro de version
+  /// The sequential version number (corresponds to [Document.version] at the time).
   @override
   int get versionNumber;
 
-  /// Date de création de cette version
+  /// Timestamp indicating when this version was created (i.e., when the update occurred).
   @override
   DateTime get createdAt;
 
-  /// Hash du document pour vérification d'intégrité
+  /// The cryptographic hash of the document file as it existed in this version.
   @override
   String get documentHash;
 
-  /// Chemin de stockage du document chiffré
+  /// The storage path of the encrypted document file for this version.
   @override
   String get encryptedStoragePath;
 
-  /// Vecteur d'initialisation pour le déchiffrement
+  /// The Initialization Vector (IV) used for encrypting this version of the document.
   @override
   String get encryptionIV;
 
-  /// Identifiant de transaction blockchain (pour preuve d'existence)
+  /// Optional blockchain transaction ID anchoring this specific version.
   @override
   String? get blockchainTxId;
 
-  /// Note sur la modification apportée
+  /// An optional note describing the changes made in this version.
   @override
   String? get changeNote;
 
@@ -1110,46 +1141,47 @@ DocumentShare _$DocumentShareFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$DocumentShare {
-  /// Identifiant unique du partage
+  /// Unique identifier for this specific sharing instance.
   String get id => throw _privateConstructorUsedError;
 
-  /// Identifiant du document partagé
+  /// The identifier ([Document.id]) of the document being shared.
   String get documentId => throw _privateConstructorUsedError;
 
-  /// Titre du document (pour affichage au destinataire)
+  /// The title of the document, shown to the recipient for context.
   String get documentTitle => throw _privateConstructorUsedError;
 
-  /// Identifiant du destinataire (si connu)
+  /// The identifier of the recipient, if they are a known user in the system.
   String? get recipientId => throw _privateConstructorUsedError;
 
-  /// Description ou nom du destinataire
+  /// A description or name identifying the recipient (e.g., "Bank XYZ", "HR Department").
   String get recipientDescription => throw _privateConstructorUsedError;
 
-  /// Date de création du partage
+  /// Timestamp when the share was created.
   DateTime get createdAt => throw _privateConstructorUsedError;
 
-  /// Date d'expiration du partage
+  /// Timestamp when the access granted by this share expires.
   DateTime get expiresAt => throw _privateConstructorUsedError;
 
-  /// URL de partage (pour accès externe)
+  /// A unique URL that the recipient can use to access the shared document.
   String get shareUrl => throw _privateConstructorUsedError;
 
-  /// Code d'accès ou PIN (optionnel, pour sécurité supplémentaire)
+  /// An optional access code or PIN required by the recipient to view the document,
+  /// providing an extra layer of security.
   String? get accessCode => throw _privateConstructorUsedError;
 
-  /// Indique si le partage est actif
+  /// Flag indicating whether this share is currently active and usable.
   bool get isActive => throw _privateConstructorUsedError;
 
-  /// Nombre maximal d'accès autorisés
+  /// Optional limit on the total number of times the document can be accessed via this share.
   int? get maxAccessCount => throw _privateConstructorUsedError;
 
-  /// Nombre d'accès effectués
+  /// The number of times the document has been accessed through this share so far.
   int get accessCount => throw _privateConstructorUsedError;
 
-  /// Type d'accès accordé
+  /// The type of access granted to the recipient. See [DocumentShareAccessType].
   DocumentShareAccessType get accessType => throw _privateConstructorUsedError;
 
-  /// Dernier accès au document partagé
+  /// Timestamp of the most recent access by the recipient.
   DateTime? get lastAccessedAt => throw _privateConstructorUsedError;
 
   /// Serializes this DocumentShare to a JSON map.
@@ -1412,61 +1444,62 @@ class _$DocumentShareImpl implements _DocumentShare {
   factory _$DocumentShareImpl.fromJson(Map<String, dynamic> json) =>
       _$$DocumentShareImplFromJson(json);
 
-  /// Identifiant unique du partage
+  /// Unique identifier for this specific sharing instance.
   @override
   final String id;
 
-  /// Identifiant du document partagé
+  /// The identifier ([Document.id]) of the document being shared.
   @override
   final String documentId;
 
-  /// Titre du document (pour affichage au destinataire)
+  /// The title of the document, shown to the recipient for context.
   @override
   final String documentTitle;
 
-  /// Identifiant du destinataire (si connu)
+  /// The identifier of the recipient, if they are a known user in the system.
   @override
   final String? recipientId;
 
-  /// Description ou nom du destinataire
+  /// A description or name identifying the recipient (e.g., "Bank XYZ", "HR Department").
   @override
   final String recipientDescription;
 
-  /// Date de création du partage
+  /// Timestamp when the share was created.
   @override
   final DateTime createdAt;
 
-  /// Date d'expiration du partage
+  /// Timestamp when the access granted by this share expires.
   @override
   final DateTime expiresAt;
 
-  /// URL de partage (pour accès externe)
+  /// A unique URL that the recipient can use to access the shared document.
   @override
   final String shareUrl;
 
-  /// Code d'accès ou PIN (optionnel, pour sécurité supplémentaire)
+  /// An optional access code or PIN required by the recipient to view the document,
+  /// providing an extra layer of security.
   @override
   final String? accessCode;
 
-  /// Indique si le partage est actif
+  /// Flag indicating whether this share is currently active and usable.
   @override
   @JsonKey()
   final bool isActive;
 
-  /// Nombre maximal d'accès autorisés
+  /// Optional limit on the total number of times the document can be accessed via this share.
   @override
   final int? maxAccessCount;
 
-  /// Nombre d'accès effectués
+  /// The number of times the document has been accessed through this share so far.
   @override
   @JsonKey()
   final int accessCount;
 
-  /// Type d'accès accordé
+  /// The type of access granted to the recipient. See [DocumentShareAccessType].
   @override
   final DocumentShareAccessType accessType;
 
-  /// Dernier accès au document partagé
+  /// Timestamp of the most recent access by the recipient.
   @override
   final DateTime? lastAccessedAt;
 
@@ -1564,59 +1597,60 @@ abstract class _DocumentShare implements DocumentShare {
   factory _DocumentShare.fromJson(Map<String, dynamic> json) =
       _$DocumentShareImpl.fromJson;
 
-  /// Identifiant unique du partage
+  /// Unique identifier for this specific sharing instance.
   @override
   String get id;
 
-  /// Identifiant du document partagé
+  /// The identifier ([Document.id]) of the document being shared.
   @override
   String get documentId;
 
-  /// Titre du document (pour affichage au destinataire)
+  /// The title of the document, shown to the recipient for context.
   @override
   String get documentTitle;
 
-  /// Identifiant du destinataire (si connu)
+  /// The identifier of the recipient, if they are a known user in the system.
   @override
   String? get recipientId;
 
-  /// Description ou nom du destinataire
+  /// A description or name identifying the recipient (e.g., "Bank XYZ", "HR Department").
   @override
   String get recipientDescription;
 
-  /// Date de création du partage
+  /// Timestamp when the share was created.
   @override
   DateTime get createdAt;
 
-  /// Date d'expiration du partage
+  /// Timestamp when the access granted by this share expires.
   @override
   DateTime get expiresAt;
 
-  /// URL de partage (pour accès externe)
+  /// A unique URL that the recipient can use to access the shared document.
   @override
   String get shareUrl;
 
-  /// Code d'accès ou PIN (optionnel, pour sécurité supplémentaire)
+  /// An optional access code or PIN required by the recipient to view the document,
+  /// providing an extra layer of security.
   @override
   String? get accessCode;
 
-  /// Indique si le partage est actif
+  /// Flag indicating whether this share is currently active and usable.
   @override
   bool get isActive;
 
-  /// Nombre maximal d'accès autorisés
+  /// Optional limit on the total number of times the document can be accessed via this share.
   @override
   int? get maxAccessCount;
 
-  /// Nombre d'accès effectués
+  /// The number of times the document has been accessed through this share so far.
   @override
   int get accessCount;
 
-  /// Type d'accès accordé
+  /// The type of access granted to the recipient. See [DocumentShareAccessType].
   @override
   DocumentShareAccessType get accessType;
 
-  /// Dernier accès au document partagé
+  /// Timestamp of the most recent access by the recipient.
   @override
   DateTime? get lastAccessedAt;
 

@@ -47,11 +47,6 @@ _$StatusList2021SubjectImpl _$$StatusList2021SubjectImplFromJson(
       statusPurpose: $enumDecode(_$StatusPurposeEnumMap, json['statusPurpose']),
       encoding: json['encoding'] as String? ?? 'base64url',
       encodedList: json['encodedList'] as String,
-      validFrom: json['validFrom'] == null
-          ? null
-          : StatusList2021Validity.fromJson(
-              json['validFrom'] as Map<String, dynamic>),
-      statusListSize: (json['statusListSize'] as num?)?.toInt() ?? 100000,
     );
 
 Map<String, dynamic> _$$StatusList2021SubjectImplToJson(
@@ -62,8 +57,6 @@ Map<String, dynamic> _$$StatusList2021SubjectImplToJson(
       'statusPurpose': _$StatusPurposeEnumMap[instance.statusPurpose]!,
       'encoding': instance.encoding,
       'encodedList': instance.encodedList,
-      'validFrom': instance.validFrom,
-      'statusListSize': instance.statusListSize,
     };
 
 const _$StatusPurposeEnumMap = {
@@ -91,27 +84,11 @@ Map<String, dynamic> _$$StatusList2021ProofImplToJson(
       'proofValue': instance.proofValue,
     };
 
-_$StatusList2021ValidityImpl _$$StatusList2021ValidityImplFromJson(
-        Map<String, dynamic> json) =>
-    _$StatusList2021ValidityImpl(
-      validFrom: DateTime.parse(json['validFrom'] as String),
-      validUntil: json['validUntil'] == null
-          ? null
-          : DateTime.parse(json['validUntil'] as String),
-    );
-
-Map<String, dynamic> _$$StatusList2021ValidityImplToJson(
-        _$StatusList2021ValidityImpl instance) =>
-    <String, dynamic>{
-      'validFrom': instance.validFrom.toIso8601String(),
-      'validUntil': instance.validUntil?.toIso8601String(),
-    };
-
 _$StatusList2021EntryImpl _$$StatusList2021EntryImplFromJson(
         Map<String, dynamic> json) =>
     _$StatusList2021EntryImpl(
       id: json['id'] as String,
-      type: json['type'] as String? ?? 'StatusList2021Entry',
+      type: json['type'] as String? ?? 'StatusList2021',
       statusPurpose: $enumDecode(_$StatusPurposeEnumMap, json['statusPurpose']),
       statusListCredential: json['statusListCredential'] as String,
       statusListIndex: (json['statusListIndex'] as num).toInt(),

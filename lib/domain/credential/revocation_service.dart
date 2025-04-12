@@ -1,95 +1,130 @@
 import 'package:did_app/domain/credential/credential_status.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-/// Résultat d'une opération de révocation
-class RevocationResult {
+part 'revocation_service.freezed.dart';
+part 'revocation_service.g.dart';
 
-  const RevocationResult({
-    required this.credentialId,
-    required this.success,
-    this.errorMessage,
-    this.details,
-    required this.timestamp,
-  });
-  /// ID de l'attestation révoquée
-  final String credentialId;
+/// Holds the outcome of a credential revocation or un-revocation operation.
+@freezed
+class RevocationResult with _$RevocationResult {
+  const factory RevocationResult({
+    /// The unique identifier of the credential that was targeted by the operation.
+    required String credentialId,
 
-  /// Succès de l'opération
-  final bool success;
+    /// Indicates whether the revocation or un-revocation operation was successful.
+    required bool success,
 
-  /// Message d'erreur éventuel
-  final String? errorMessage;
+    /// An optional message providing details in case of failure (`success` is false).
+    String? errorMessage,
 
-  /// Détails sur la révocation
-  final String? details;
+    /// Optional additional details about the result of the operation.
+    String? details,
 
-  /// Date de la révocation
-  final DateTime timestamp;
+    /// The timestamp when the revocation or un-revocation operation was processed.
+    required DateTime timestamp,
+  }) = _RevocationResult;
+
+  /// Creates a [RevocationResult] instance from a JSON map.
+  factory RevocationResult.fromJson(Map<String, dynamic> json) =>
+      _$RevocationResultFromJson(json);
 }
 
-/// Interface pour le service de révocation des attestations
+/// Abstract interface defining the contract for a service that manages credential revocation.
+///
+/// This service provides functionalities to revoke credentials, undo revocations (if supported),
+/// check the current status, and retrieve revocation history. This represents an active
+/// management approach, distinct from passive status checking mechanisms like StatusList2021.
+/// Implementations might interact with a dedicated revocation registry, a ledger,
+/// or another backend system.
+/// See also: W3C VC Data Model v2 §4.10 Status
 abstract class RevocationService {
-  /// Révoque une attestation
+  /// Attempts to revoke a specific credential.
+  ///
+  /// - [credentialId]: The ID of the credential to revoke.
+  /// - [reason]: The reason for revocation. See [RevocationReason].
+  /// - [details]: Optional additional details about the revocation.
+  ///
+  /// Returns a [RevocationResult] indicating the outcome of the operation.
   Future<RevocationResult> revokeCredential({
     required String credentialId,
     required RevocationReason reason,
     String? details,
   });
 
-  /// Annule la révocation d'une attestation (si possible)
+  /// Attempts to undo the revocation of a specific credential.
+  ///
+  /// Note: This functionality might not be supported by all revocation systems.
+  ///
+  /// - [credentialId]: The ID of the credential to un-revoke.
+  /// - [details]: Optional additional details about the operation.
+  ///
+  /// Returns a [RevocationResult] indicating the outcome.
   Future<RevocationResult> unrevokeCredential({
     required String credentialId,
     String? details,
   });
 
-  /// Vérifie si l'attestation est révoquée
+  /// Checks if a specific credential is currently considered revoked.
+  ///
+  /// - [credentialId]: The ID of the credential to check.
+  ///
+  /// Returns `true` if the credential is currently revoked, `false` otherwise.
   Future<bool> isRevoked(String credentialId);
 
-  /// Obtient l'historique des révocations d'une attestation
+  /// Retrieves the historical log of revocation-related events for a specific credential.
+  ///
+  /// - [credentialId]: The ID of the credential whose history is requested.
+  ///
+  /// Returns a list of [RevocationHistoryEntry] objects, typically ordered by timestamp.
   Future<List<RevocationHistoryEntry>> getRevocationHistory(
-      String credentialId,);
+    String credentialId,
+  );
 
-  /// Synchronise le statut de révocation avec le serveur
+  /// Synchronizes the local or cached revocation status for a specific credential
+  /// with the authoritative revocation source (e.g., backend service, ledger).
+  ///
+  /// Implementations might use this for proactive updates or cache refreshes.
   Future<void> syncRevocationStatus(String credentialId);
 
-  /// Synchronise tous les statuts de révocation
+  /// Synchronizes the revocation status for all relevant credentials managed locally.
+  ///
+  /// This is likely a more resource-intensive operation than syncing a single credential.
   Future<void> syncAllRevocationStatuses();
 }
 
-/// Entrée d'historique de révocation
-class RevocationHistoryEntry {
+/// Represents a single entry in the revocation history log for a credential.
+@freezed
+class RevocationHistoryEntry with _$RevocationHistoryEntry {
+  const factory RevocationHistoryEntry({
+    /// The ID of the credential this history entry pertains to.
+    required String credentialId,
 
-  const RevocationHistoryEntry({
-    required this.credentialId,
-    required this.timestamp,
-    required this.action,
-    this.reason,
-    this.details,
-    required this.actor,
-  });
-  /// ID de l'attestation
-  final String credentialId;
+    /// The timestamp when the revocation action occurred.
+    required DateTime timestamp,
 
-  /// Date de l'événement
-  final DateTime timestamp;
+    /// The specific action performed (revoke or un-revoke). See [RevocationAction].
+    required RevocationAction action,
 
-  /// Action effectuée (révocation ou annulation)
-  final RevocationAction action;
+    /// The reason provided if the action was a revocation. See [RevocationReason].
+    RevocationReason? reason,
 
-  /// Raison (pour une révocation)
-  final RevocationReason? reason;
+    /// Optional additional details about this specific history event.
+    String? details,
 
-  /// Détails supplémentaires
-  final String? details;
+    /// An identifier for the entity (e.g., issuer DID, administrator ID) that performed the action.
+    required String actor,
+  }) = _RevocationHistoryEntry;
 
-  /// Acteur ayant effectué l'action
-  final String actor;
+  /// Creates a [RevocationHistoryEntry] instance from a JSON map.
+  factory RevocationHistoryEntry.fromJson(Map<String, dynamic> json) =>
+      _$RevocationHistoryEntryFromJson(json);
 }
 
-/// Action de révocation
+/// Enumerates the possible actions recorded in the revocation history.
 enum RevocationAction {
-  /// Révocation de l'attestation
+  /// The credential was revoked.
   revoke,
 
-  /// Annulation de la révocation
+  /// A previous revocation was undone.
   unrevoke
 }

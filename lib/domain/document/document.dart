@@ -3,236 +3,269 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'document.freezed.dart';
 part 'document.g.dart';
 
-/// Représente un document numérique dans le portefeuille d'identité
+/// Represents a digital document stored within the identity wallet.
+///
+/// This class encapsulates the data and metadata associated with a verifiable digital
+/// document, such as an ID card, passport, diploma, or certificate.
+/// It includes details about the document itself, its issuance, verification status,
+/// security parameters (encryption, hashing), and potential blockchain anchoring.
 @freezed
 class Document with _$Document {
   const factory Document({
-    /// Identifiant unique du document
+    /// A unique identifier for this specific document instance within the system.
     required String id,
 
-    /// Type du document (carte d'identité, passeport, diplôme, etc.)
+    /// The type or category of the document. See [DocumentType].
     required DocumentType type,
 
-    /// Titre du document
+    /// A user-friendly title or name for the document (e.g., "My Passport", "Bachelor's Degree").
     required String title,
 
-    /// Description du document
+    /// An optional description providing more context about the document.
     String? description,
 
-    /// Émetteur du document (autorité, institution, etc.)
+    /// The entity (authority, institution, organization) that issued the document.
+    /// (e.g., "Government of Exampleland", "University of Knowledge").
     required String issuer,
 
-    /// Date d'émission du document
+    /// The date and time when the document was officially issued.
     required DateTime issuedAt,
 
-    /// Date d'expiration du document (si applicable)
+    /// The date and time when the document expires, if applicable (e.g., for passports, licenses).
     DateTime? expiresAt,
 
-    /// Version actuelle du document
+    /// The current version number of the document, used for tracking updates.
     required int version,
 
-    /// Métadonnées du document (format JSON)
+    /// Optional additional metadata associated with the document, stored as a JSON-like map.
+    /// Could include details specific to the document type (e.g., grade for a diploma).
     Map<String, dynamic>? metadata,
 
-    /// État de vérification du document
+    /// The current verification status of the document. See [DocumentVerificationStatus].
     required DocumentVerificationStatus verificationStatus,
 
-    /// Chemin de stockage du document chiffré
+    /// The path or reference indicating where the encrypted document file is stored.
+    /// **Security Note:** The actual document content should always be stored encrypted.
     required String encryptedStoragePath,
 
-    /// Hash du document pour vérification d'intégrité
+    /// A cryptographic hash (e.g., SHA-256) of the original document file.
+    /// Used to verify the integrity and ensure the document hasn't been tampered with.
     required String documentHash,
 
-    /// Vecteur d'initialisation pour le déchiffrement
+    /// The Initialization Vector (IV) used for the symmetric encryption (e.g., AES) of the document.
+    /// Required alongside the key to decrypt the document content.
     required String encryptionIV,
 
-    /// Signature numérique de l'émetteur
+    /// A digital signature created by the issuer using their private key.
+    /// Can be verified using the issuer's public key (potentially linked via `issuerAddress`)
+    /// to confirm authenticity and integrity.
     String? issuerSignature,
 
-    /// Adresse blockchain de l'émetteur (pour vérification)
+    /// The blockchain address or Decentralized Identifier (DID) of the document issuer.
+    /// Used to retrieve the issuer's public key for verifying the `issuerSignature`.
     String? issuerAddress,
 
-    /// Identifiant de transaction blockchain (pour preuve d'existence)
+    /// The transaction ID on a blockchain where an event related to this document
+    /// (e.g., issuance, revocation) was recorded. Provides a proof of existence/anchoring.
     String? blockchainTxId,
 
-    /// Timestamp de la dernière mise à jour
+    /// The timestamp of the last update made to this document record.
     required DateTime updatedAt,
 
-    /// Identifiant du propriétaire du document
+    /// The unique identifier ([DigitalIdentity.identityAddress]) of the identity that owns this document.
     required String ownerIdentityId,
 
-    /// Tags pour la recherche et le classement
+    /// Optional list of tags or keywords for easier searching and categorization.
     List<String>? tags,
 
-    /// Indique si le document est partageable
+    /// Flag indicating if the owner permits this document to be shared with others.
     @Default(false) bool isShareable,
 
-    /// Niveau eIDAS du document (pour conformité européenne)
+    /// The assessed eIDAS assurance level for this document, relevant for EU contexts.
+    /// See [EidasLevel] and the eIDAS regulation (Regulation (EU) No 910/2014).
     @Default(EidasLevel.low) EidasLevel eidasLevel,
   }) = _Document;
 
+  /// Creates a [Document] instance from a JSON map.
   factory Document.fromJson(Map<String, dynamic> json) =>
       _$DocumentFromJson(json);
 }
 
-/// Types de documents pris en charge
+/// Enumerates the supported types of documents.
 enum DocumentType {
-  /// Carte nationale d'identité
+  /// National Identity Card.
   nationalId,
 
-  /// Passeport
+  /// Passport.
   passport,
 
-  /// Permis de conduire
+  /// Driver's License.
   drivingLicense,
 
-  /// Diplôme universitaire
+  /// Academic Diploma (e.g., Bachelor's, Master's).
   diploma,
 
-  /// Certificat professionnel
+  /// Professional or training certificate.
   certificate,
 
-  /// Preuve d'adresse
+  /// Document verifying a residential address (e.g., utility bill).
   addressProof,
 
-  /// Document bancaire
+  /// Document related to banking (e.g., bank statement).
   bankDocument,
 
-  /// Document médical
+  /// Medical record or certificate.
   medicalRecord,
 
-  /// Document d'entreprise
+  /// Document related to a company or business.
   corporateDocument,
 
-  /// Autre type de document
+  /// Any other type of document not listed above.
   other
 }
 
-/// État de vérification du document
+/// Defines the possible verification statuses of a [Document].
 enum DocumentVerificationStatus {
-  /// Non vérifié
+  /// The document has not been verified by any authority or system.
   unverified,
 
-  /// En cours de vérification
+  /// The document is currently undergoing a verification process.
   pending,
 
-  /// Vérifié
+  /// The document has been successfully verified for authenticity and validity.
   verified,
 
-  /// Rejeté
+  /// The document verification process failed or was rejected.
   rejected,
 
-  /// Expiré
+  /// The document was once valid but has now passed its expiration date.
   expired
 }
 
-/// Version du document stockée dans l'historique
+/// Represents a historical version of a [Document].
+///
+/// Used to track changes and maintain an audit trail of document updates.
 @freezed
 class DocumentVersion with _$DocumentVersion {
   const factory DocumentVersion({
-    /// Identifiant de version
+    /// Unique identifier for this specific version entry.
     required String id,
 
-    /// Numéro de version
+    /// The sequential version number (corresponds to [Document.version] at the time).
     required int versionNumber,
 
-    /// Date de création de cette version
+    /// Timestamp indicating when this version was created (i.e., when the update occurred).
     required DateTime createdAt,
 
-    /// Hash du document pour vérification d'intégrité
+    /// The cryptographic hash of the document file as it existed in this version.
     required String documentHash,
 
-    /// Chemin de stockage du document chiffré
+    /// The storage path of the encrypted document file for this version.
     required String encryptedStoragePath,
 
-    /// Vecteur d'initialisation pour le déchiffrement
+    /// The Initialization Vector (IV) used for encrypting this version of the document.
     required String encryptionIV,
 
-    /// Identifiant de transaction blockchain (pour preuve d'existence)
+    /// Optional blockchain transaction ID anchoring this specific version.
     String? blockchainTxId,
 
-    /// Note sur la modification apportée
+    /// An optional note describing the changes made in this version.
     String? changeNote,
   }) = _DocumentVersion;
 
+  /// Creates a [DocumentVersion] instance from a JSON map.
   factory DocumentVersion.fromJson(Map<String, dynamic> json) =>
       _$DocumentVersionFromJson(json);
 }
 
-/// Représente le partage d'un document avec un tiers
+/// Represents the act of sharing a [Document] with a third party.
+///
+/// This manages the permissions, duration, and access control for sharing documents.
 @freezed
 class DocumentShare with _$DocumentShare {
   const factory DocumentShare({
-    /// Identifiant unique du partage
+    /// Unique identifier for this specific sharing instance.
     required String id,
 
-    /// Identifiant du document partagé
+    /// The identifier ([Document.id]) of the document being shared.
     required String documentId,
 
-    /// Titre du document (pour affichage au destinataire)
+    /// The title of the document, shown to the recipient for context.
     required String documentTitle,
 
-    /// Identifiant du destinataire (si connu)
+    /// The identifier of the recipient, if they are a known user in the system.
     String? recipientId,
 
-    /// Description ou nom du destinataire
+    /// A description or name identifying the recipient (e.g., "Bank XYZ", "HR Department").
     required String recipientDescription,
 
-    /// Date de création du partage
+    /// Timestamp when the share was created.
     required DateTime createdAt,
 
-    /// Date d'expiration du partage
+    /// Timestamp when the access granted by this share expires.
     required DateTime expiresAt,
 
-    /// URL de partage (pour accès externe)
+    /// A unique URL that the recipient can use to access the shared document.
     required String shareUrl,
 
-    /// Code d'accès ou PIN (optionnel, pour sécurité supplémentaire)
+    /// An optional access code or PIN required by the recipient to view the document,
+    /// providing an extra layer of security.
     String? accessCode,
 
-    /// Indique si le partage est actif
+    /// Flag indicating whether this share is currently active and usable.
     @Default(true) bool isActive,
 
-    /// Nombre maximal d'accès autorisés
+    /// Optional limit on the total number of times the document can be accessed via this share.
     int? maxAccessCount,
 
-    /// Nombre d'accès effectués
+    /// The number of times the document has been accessed through this share so far.
     @Default(0) int accessCount,
 
-    /// Type d'accès accordé
+    /// The type of access granted to the recipient. See [DocumentShareAccessType].
     required DocumentShareAccessType accessType,
 
-    /// Dernier accès au document partagé
+    /// Timestamp of the most recent access by the recipient.
     DateTime? lastAccessedAt,
   }) = _DocumentShare;
 
+  /// Creates a [DocumentShare] instance from a JSON map.
   factory DocumentShare.fromJson(Map<String, dynamic> json) =>
       _$DocumentShareFromJson(json);
 }
 
-/// Types d'accès pour le partage de documents
+/// Defines the types of access permissions that can be granted when sharing a document.
 enum DocumentShareAccessType {
-  /// Lecture seule
+  /// Recipient can only view the document content.
   readOnly,
 
-  /// Lecture et téléchargement
+  /// Recipient can view and download a copy of the document.
   download,
 
-  /// Lecture et vérification (pour institutions)
+  /// Recipient (typically an institution) can view the document and potentially trigger
+  /// a verification process based on it.
   verify,
 
-  /// Accès complet (incluant possibilité de copie)
+  /// Recipient has comprehensive access, potentially including viewing, downloading,
+  /// and using the document data.
   fullAccess
 }
 
-/// Niveaux de garantie eIDAS (correspondant à eIDAS 2.0)
+/// Represents the levels of assurance defined by the eIDAS regulation (EU No 910/2014).
+///
+/// These levels indicate the degree of confidence in the claimed identity or the
+/// authenticity/integrity of an electronic document or signature.
+/// Relevant primarily within the European Union for cross-border electronic transactions.
 enum EidasLevel {
-  /// Niveau faible
+  /// Provides a limited degree of confidence.
+  /// Suitable for low-risk scenarios.
   low,
 
-  /// Niveau substantiel
+  /// Provides a substantial degree of confidence.
+  /// Suitable for moderate-risk scenarios requiring higher assurance than 'low'.
   substantial,
 
-  /// Niveau élevé
+  /// Provides the highest degree of confidence.
+  /// Suitable for high-risk scenarios and legally binding transactions requiring
+  /// the equivalent of face-to-face identification.
   high
 }

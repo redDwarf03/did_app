@@ -30,7 +30,7 @@ _$CredentialImpl _$$CredentialImplFromJson(Map<String, dynamic> json) =>
       context: (json['@context'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
-          const [],
+          const <String>['https://www.w3.org/ns/credentials/v2'],
       proof: json['proof'] as Map<String, dynamic>,
     );
 
@@ -129,14 +129,64 @@ const _$PredicateTypeEnumMap = {
 _$ProofImpl _$$ProofImplFromJson(Map<String, dynamic> json) => _$ProofImpl(
       type: json['type'] as String,
       created: DateTime.parse(json['created'] as String),
+      proofPurpose: json['proofPurpose'] as String,
       verificationMethod: json['verificationMethod'] as String,
       proofValue: json['proofValue'] as String,
+      domain: json['domain'] as String?,
+      challenge: json['challenge'] as String?,
     );
 
 Map<String, dynamic> _$$ProofImplToJson(_$ProofImpl instance) =>
     <String, dynamic>{
       'type': instance.type,
       'created': instance.created.toIso8601String(),
+      'proofPurpose': instance.proofPurpose,
       'verificationMethod': instance.verificationMethod,
       'proofValue': instance.proofValue,
+      'domain': instance.domain,
+      'challenge': instance.challenge,
+    };
+
+_$CredentialStatusImpl _$$CredentialStatusImplFromJson(
+        Map<String, dynamic> json) =>
+    _$CredentialStatusImpl(
+      id: json['id'] as String,
+      type: json['type'] as String,
+    );
+
+Map<String, dynamic> _$$CredentialStatusImplToJson(
+        _$CredentialStatusImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'type': instance.type,
+    };
+
+_$CredentialSchemaImpl _$$CredentialSchemaImplFromJson(
+        Map<String, dynamic> json) =>
+    _$CredentialSchemaImpl(
+      id: json['id'] as String,
+      type: json['type'] as String,
+    );
+
+Map<String, dynamic> _$$CredentialSchemaImplToJson(
+        _$CredentialSchemaImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'type': instance.type,
+    };
+
+_$CredentialPredicateValueImpl _$$CredentialPredicateValueImplFromJson(
+        Map<String, dynamic> json) =>
+    _$CredentialPredicateValueImpl(
+      attributeName: json['attributeName'] as String,
+      predicateType: $enumDecode(_$PredicateTypeEnumMap, json['predicateType']),
+      value: json['value'],
+    );
+
+Map<String, dynamic> _$$CredentialPredicateValueImplToJson(
+        _$CredentialPredicateValueImpl instance) =>
+    <String, dynamic>{
+      'attributeName': instance.attributeName,
+      'predicateType': _$PredicateTypeEnumMap[instance.predicateType]!,
+      'value': instance.value,
     };

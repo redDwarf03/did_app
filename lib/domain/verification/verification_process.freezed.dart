@@ -20,31 +20,34 @@ VerificationProcess _$VerificationProcessFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$VerificationProcess {
-  /// Unique identifier for the verification process
+  /// Unique identifier for this specific instance of the verification process.
   String get id => throw _privateConstructorUsedError;
 
-  /// Address of the identity being verified
+  /// The identifier (e.g., DID or blockchain address) of the digital identity
+  /// undergoing this verification process.
   String get identityAddress => throw _privateConstructorUsedError;
 
-  /// Current status of the verification
+  /// The overall current status of the verification process. See [VerificationStatus].
   VerificationStatus get status => throw _privateConstructorUsedError;
 
-  /// List of verification steps required
+  /// An ordered list of the individual steps required to complete the verification.
+  /// See [VerificationStep].
   List<VerificationStep> get steps => throw _privateConstructorUsedError;
 
-  /// Creation timestamp
+  /// Timestamp indicating when this verification process was initiated.
   DateTime get createdAt => throw _privateConstructorUsedError;
 
-  /// Last update timestamp
+  /// Timestamp indicating the last time the process state or any of its steps were updated.
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
-  /// Rejection reason if the verification was rejected
+  /// If the status is [VerificationStatus.rejected], this field may contain the reason.
   String? get rejectionReason => throw _privateConstructorUsedError;
 
-  /// Timestamp when the verification was completed
+  /// Timestamp indicating when the process reached a final state ([completed] or [rejected]).
   DateTime? get completedAt => throw _privateConstructorUsedError;
 
-  /// Certificate data if fully verified
+  /// If the process completed successfully ([VerificationStatus.completed]), this may hold
+  /// the resulting certificate. See [VerificationCertificate].
   VerificationCertificate? get certificate =>
       throw _privateConstructorUsedError;
 
@@ -263,22 +266,25 @@ class _$VerificationProcessImpl implements _VerificationProcess {
   factory _$VerificationProcessImpl.fromJson(Map<String, dynamic> json) =>
       _$$VerificationProcessImplFromJson(json);
 
-  /// Unique identifier for the verification process
+  /// Unique identifier for this specific instance of the verification process.
   @override
   final String id;
 
-  /// Address of the identity being verified
+  /// The identifier (e.g., DID or blockchain address) of the digital identity
+  /// undergoing this verification process.
   @override
   final String identityAddress;
 
-  /// Current status of the verification
+  /// The overall current status of the verification process. See [VerificationStatus].
   @override
   final VerificationStatus status;
 
-  /// List of verification steps required
+  /// An ordered list of the individual steps required to complete the verification.
+  /// See [VerificationStep].
   final List<VerificationStep> _steps;
 
-  /// List of verification steps required
+  /// An ordered list of the individual steps required to complete the verification.
+  /// See [VerificationStep].
   @override
   List<VerificationStep> get steps {
     if (_steps is EqualUnmodifiableListView) return _steps;
@@ -286,23 +292,24 @@ class _$VerificationProcessImpl implements _VerificationProcess {
     return EqualUnmodifiableListView(_steps);
   }
 
-  /// Creation timestamp
+  /// Timestamp indicating when this verification process was initiated.
   @override
   final DateTime createdAt;
 
-  /// Last update timestamp
+  /// Timestamp indicating the last time the process state or any of its steps were updated.
   @override
   final DateTime updatedAt;
 
-  /// Rejection reason if the verification was rejected
+  /// If the status is [VerificationStatus.rejected], this field may contain the reason.
   @override
   final String? rejectionReason;
 
-  /// Timestamp when the verification was completed
+  /// Timestamp indicating when the process reached a final state ([completed] or [rejected]).
   @override
   final DateTime? completedAt;
 
-  /// Certificate data if fully verified
+  /// If the process completed successfully ([VerificationStatus.completed]), this may hold
+  /// the resulting certificate. See [VerificationCertificate].
   @override
   final VerificationCertificate? certificate;
 
@@ -379,39 +386,42 @@ abstract class _VerificationProcess implements VerificationProcess {
   factory _VerificationProcess.fromJson(Map<String, dynamic> json) =
       _$VerificationProcessImpl.fromJson;
 
-  /// Unique identifier for the verification process
+  /// Unique identifier for this specific instance of the verification process.
   @override
   String get id;
 
-  /// Address of the identity being verified
+  /// The identifier (e.g., DID or blockchain address) of the digital identity
+  /// undergoing this verification process.
   @override
   String get identityAddress;
 
-  /// Current status of the verification
+  /// The overall current status of the verification process. See [VerificationStatus].
   @override
   VerificationStatus get status;
 
-  /// List of verification steps required
+  /// An ordered list of the individual steps required to complete the verification.
+  /// See [VerificationStep].
   @override
   List<VerificationStep> get steps;
 
-  /// Creation timestamp
+  /// Timestamp indicating when this verification process was initiated.
   @override
   DateTime get createdAt;
 
-  /// Last update timestamp
+  /// Timestamp indicating the last time the process state or any of its steps were updated.
   @override
   DateTime get updatedAt;
 
-  /// Rejection reason if the verification was rejected
+  /// If the status is [VerificationStatus.rejected], this field may contain the reason.
   @override
   String? get rejectionReason;
 
-  /// Timestamp when the verification was completed
+  /// Timestamp indicating when the process reached a final state ([completed] or [rejected]).
   @override
   DateTime? get completedAt;
 
-  /// Certificate data if fully verified
+  /// If the process completed successfully ([VerificationStatus.completed]), this may hold
+  /// the resulting certificate. See [VerificationCertificate].
   @override
   VerificationCertificate? get certificate;
 
@@ -429,31 +439,33 @@ VerificationStep _$VerificationStepFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$VerificationStep {
-  /// Unique identifier for this step
+  /// Unique identifier for this specific step instance within the process.
   String get id => throw _privateConstructorUsedError;
 
-  /// Type of verification step
+  /// The type of verification being performed in this step. See [VerificationStepType].
   VerificationStepType get type => throw _privateConstructorUsedError;
 
-  /// Current status of this step
+  /// The current status of this individual step. See [VerificationStepStatus].
   VerificationStepStatus get status => throw _privateConstructorUsedError;
 
-  /// Order of this step in the verification process
+  /// The sequential order of this step within the overall [VerificationProcess].
   int get order => throw _privateConstructorUsedError;
 
-  /// Description of what this step verifies
+  /// A brief description of the purpose or goal of this verification step.
   String get description => throw _privateConstructorUsedError;
 
-  /// Instructions for the user
+  /// Instructions provided to the user on how to complete this step.
   String get instructions => throw _privateConstructorUsedError;
 
-  /// Last update timestamp
+  /// Timestamp indicating the last time the status or data associated with this step was updated.
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
-  /// Rejection reason if this step was rejected
+  /// If the status is [VerificationStepStatus.rejected], this may contain the reason.
   String? get rejectionReason => throw _privateConstructorUsedError;
 
-  /// Paths to uploaded documents or proofs if applicable
+  /// Optional list of paths or references to documents uploaded by the user
+  /// as evidence for this step (e.g., ID scan, proof of address).
+  /// **Note:** Handling these documents must comply with GDPR.
   List<String>? get documentPaths => throw _privateConstructorUsedError;
 
   /// Serializes this VerificationStep to a JSON map.
@@ -652,42 +664,46 @@ class _$VerificationStepImpl implements _VerificationStep {
   factory _$VerificationStepImpl.fromJson(Map<String, dynamic> json) =>
       _$$VerificationStepImplFromJson(json);
 
-  /// Unique identifier for this step
+  /// Unique identifier for this specific step instance within the process.
   @override
   final String id;
 
-  /// Type of verification step
+  /// The type of verification being performed in this step. See [VerificationStepType].
   @override
   final VerificationStepType type;
 
-  /// Current status of this step
+  /// The current status of this individual step. See [VerificationStepStatus].
   @override
   final VerificationStepStatus status;
 
-  /// Order of this step in the verification process
+  /// The sequential order of this step within the overall [VerificationProcess].
   @override
   final int order;
 
-  /// Description of what this step verifies
+  /// A brief description of the purpose or goal of this verification step.
   @override
   final String description;
 
-  /// Instructions for the user
+  /// Instructions provided to the user on how to complete this step.
   @override
   final String instructions;
 
-  /// Last update timestamp
+  /// Timestamp indicating the last time the status or data associated with this step was updated.
   @override
   final DateTime updatedAt;
 
-  /// Rejection reason if this step was rejected
+  /// If the status is [VerificationStepStatus.rejected], this may contain the reason.
   @override
   final String? rejectionReason;
 
-  /// Paths to uploaded documents or proofs if applicable
+  /// Optional list of paths or references to documents uploaded by the user
+  /// as evidence for this step (e.g., ID scan, proof of address).
+  /// **Note:** Handling these documents must comply with GDPR.
   final List<String>? _documentPaths;
 
-  /// Paths to uploaded documents or proofs if applicable
+  /// Optional list of paths or references to documents uploaded by the user
+  /// as evidence for this step (e.g., ID scan, proof of address).
+  /// **Note:** Handling these documents must comply with GDPR.
   @override
   List<String>? get documentPaths {
     final value = _documentPaths;
@@ -769,39 +785,41 @@ abstract class _VerificationStep implements VerificationStep {
   factory _VerificationStep.fromJson(Map<String, dynamic> json) =
       _$VerificationStepImpl.fromJson;
 
-  /// Unique identifier for this step
+  /// Unique identifier for this specific step instance within the process.
   @override
   String get id;
 
-  /// Type of verification step
+  /// The type of verification being performed in this step. See [VerificationStepType].
   @override
   VerificationStepType get type;
 
-  /// Current status of this step
+  /// The current status of this individual step. See [VerificationStepStatus].
   @override
   VerificationStepStatus get status;
 
-  /// Order of this step in the verification process
+  /// The sequential order of this step within the overall [VerificationProcess].
   @override
   int get order;
 
-  /// Description of what this step verifies
+  /// A brief description of the purpose or goal of this verification step.
   @override
   String get description;
 
-  /// Instructions for the user
+  /// Instructions provided to the user on how to complete this step.
   @override
   String get instructions;
 
-  /// Last update timestamp
+  /// Timestamp indicating the last time the status or data associated with this step was updated.
   @override
   DateTime get updatedAt;
 
-  /// Rejection reason if this step was rejected
+  /// If the status is [VerificationStepStatus.rejected], this may contain the reason.
   @override
   String? get rejectionReason;
 
-  /// Paths to uploaded documents or proofs if applicable
+  /// Optional list of paths or references to documents uploaded by the user
+  /// as evidence for this step (e.g., ID scan, proof of address).
+  /// **Note:** Handling these documents must comply with GDPR.
   @override
   List<String>? get documentPaths;
 
@@ -820,22 +838,26 @@ VerificationCertificate _$VerificationCertificateFromJson(
 
 /// @nodoc
 mixin _$VerificationCertificate {
-  /// Unique identifier for this certificate
+  /// Unique identifier for this verification certificate.
   String get id => throw _privateConstructorUsedError;
 
-  /// Timestamp when the certificate was issued
+  /// Timestamp indicating when the certificate was issued (i.e., verification completed).
   DateTime get issuedAt => throw _privateConstructorUsedError;
 
-  /// Timestamp when the certificate expires
+  /// Timestamp indicating when the verification or certificate expires and may need renewal.
+  /// (Note: Currently required, but could potentially be made optional depending on use case).
   DateTime get expiresAt => throw _privateConstructorUsedError;
 
-  /// Issuer of the certificate
+  /// Identifier of the entity (e.g., verification service provider) that issued the certificate.
   String get issuer => throw _privateConstructorUsedError;
 
-  /// Digital signature of the issuer
+  /// A digital signature from the issuer, ensuring the certificate's authenticity and integrity.
+  /// Verification would require the issuer's public key.
   String get signature => throw _privateConstructorUsedError;
 
-  /// eIDAS compliance level
+  /// The level of assurance achieved through the verification process, aligned with eIDAS standards.
+  /// See [EidasLevel] for definitions (Low, Substantial, High).
+  /// See: Regulation (EU) No 910/2014.
   EidasLevel get eidasLevel => throw _privateConstructorUsedError;
 
   /// Serializes this VerificationCertificate to a JSON map.
@@ -998,27 +1020,31 @@ class _$VerificationCertificateImpl implements _VerificationCertificate {
   factory _$VerificationCertificateImpl.fromJson(Map<String, dynamic> json) =>
       _$$VerificationCertificateImplFromJson(json);
 
-  /// Unique identifier for this certificate
+  /// Unique identifier for this verification certificate.
   @override
   final String id;
 
-  /// Timestamp when the certificate was issued
+  /// Timestamp indicating when the certificate was issued (i.e., verification completed).
   @override
   final DateTime issuedAt;
 
-  /// Timestamp when the certificate expires
+  /// Timestamp indicating when the verification or certificate expires and may need renewal.
+  /// (Note: Currently required, but could potentially be made optional depending on use case).
   @override
   final DateTime expiresAt;
 
-  /// Issuer of the certificate
+  /// Identifier of the entity (e.g., verification service provider) that issued the certificate.
   @override
   final String issuer;
 
-  /// Digital signature of the issuer
+  /// A digital signature from the issuer, ensuring the certificate's authenticity and integrity.
+  /// Verification would require the issuer's public key.
   @override
   final String signature;
 
-  /// eIDAS compliance level
+  /// The level of assurance achieved through the verification process, aligned with eIDAS standards.
+  /// See [EidasLevel] for definitions (Low, Substantial, High).
+  /// See: Regulation (EU) No 910/2014.
   @override
   @JsonKey()
   final EidasLevel eidasLevel;
@@ -1079,27 +1105,31 @@ abstract class _VerificationCertificate implements VerificationCertificate {
   factory _VerificationCertificate.fromJson(Map<String, dynamic> json) =
       _$VerificationCertificateImpl.fromJson;
 
-  /// Unique identifier for this certificate
+  /// Unique identifier for this verification certificate.
   @override
   String get id;
 
-  /// Timestamp when the certificate was issued
+  /// Timestamp indicating when the certificate was issued (i.e., verification completed).
   @override
   DateTime get issuedAt;
 
-  /// Timestamp when the certificate expires
+  /// Timestamp indicating when the verification or certificate expires and may need renewal.
+  /// (Note: Currently required, but could potentially be made optional depending on use case).
   @override
   DateTime get expiresAt;
 
-  /// Issuer of the certificate
+  /// Identifier of the entity (e.g., verification service provider) that issued the certificate.
   @override
   String get issuer;
 
-  /// Digital signature of the issuer
+  /// A digital signature from the issuer, ensuring the certificate's authenticity and integrity.
+  /// Verification would require the issuer's public key.
   @override
   String get signature;
 
-  /// eIDAS compliance level
+  /// The level of assurance achieved through the verification process, aligned with eIDAS standards.
+  /// See [EidasLevel] for definitions (Low, Substantial, High).
+  /// See: Regulation (EU) No 910/2014.
   @override
   EidasLevel get eidasLevel;
 

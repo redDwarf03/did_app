@@ -20,34 +20,38 @@ CredentialStatus _$CredentialStatusFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$CredentialStatus {
-  /// ID unique de l'attestation
+  /// The unique ID of the credential whose status this object represents.
   String get credentialId => throw _privateConstructorUsedError;
 
-  /// Type de statut
+  /// The determined status of the credential. See [CredentialStatusType].
   CredentialStatusType get status => throw _privateConstructorUsedError;
 
-  /// Date de la dernière vérification
+  /// The timestamp when the credential's status was last successfully checked
+  /// against its status mechanism (e.g., StatusList2021).
   DateTime get lastChecked => throw _privateConstructorUsedError;
 
-  /// Date de révocation (si applicable)
+  /// If the status is [CredentialStatusType.revoked], the timestamp when the revocation occurred.
   DateTime? get revokedAt => throw _privateConstructorUsedError;
 
-  /// Raison de la révocation (si applicable)
+  /// If the status is [CredentialStatusType.revoked], the reason for revocation.
+  /// See [RevocationReason].
   RevocationReason? get revocationReason => throw _privateConstructorUsedError;
 
-  /// Détails supplémentaires sur la révocation
+  /// Optional additional details regarding the revocation.
   String? get revocationDetails => throw _privateConstructorUsedError;
 
-  /// URL de la liste de statut
+  /// The URL of the status list credential (e.g., a StatusList2021Credential)
+  /// used to determine the status.
   String get statusListUrl => throw _privateConstructorUsedError;
 
-  /// Index dans la liste de statut
+  /// The index within the referenced status list that corresponds to this credential.
   int get statusListIndex => throw _privateConstructorUsedError;
 
-  /// Date d'expiration de l'attestation
+  /// The expiration date of the credential itself, if applicable.
   DateTime? get expiresAt => throw _privateConstructorUsedError;
 
-  /// Date de la prochaine vérification
+  /// The timestamp when the status of this credential should be checked again.
+  /// Useful for managing cache validity or polling frequency.
   DateTime get nextCheck => throw _privateConstructorUsedError;
 
   /// Serializes this CredentialStatus to a JSON map.
@@ -258,43 +262,47 @@ class _$CredentialStatusImpl implements _CredentialStatus {
   factory _$CredentialStatusImpl.fromJson(Map<String, dynamic> json) =>
       _$$CredentialStatusImplFromJson(json);
 
-  /// ID unique de l'attestation
+  /// The unique ID of the credential whose status this object represents.
   @override
   final String credentialId;
 
-  /// Type de statut
+  /// The determined status of the credential. See [CredentialStatusType].
   @override
   final CredentialStatusType status;
 
-  /// Date de la dernière vérification
+  /// The timestamp when the credential's status was last successfully checked
+  /// against its status mechanism (e.g., StatusList2021).
   @override
   final DateTime lastChecked;
 
-  /// Date de révocation (si applicable)
+  /// If the status is [CredentialStatusType.revoked], the timestamp when the revocation occurred.
   @override
   final DateTime? revokedAt;
 
-  /// Raison de la révocation (si applicable)
+  /// If the status is [CredentialStatusType.revoked], the reason for revocation.
+  /// See [RevocationReason].
   @override
   final RevocationReason? revocationReason;
 
-  /// Détails supplémentaires sur la révocation
+  /// Optional additional details regarding the revocation.
   @override
   final String? revocationDetails;
 
-  /// URL de la liste de statut
+  /// The URL of the status list credential (e.g., a StatusList2021Credential)
+  /// used to determine the status.
   @override
   final String statusListUrl;
 
-  /// Index dans la liste de statut
+  /// The index within the referenced status list that corresponds to this credential.
   @override
   final int statusListIndex;
 
-  /// Date d'expiration de l'attestation
+  /// The expiration date of the credential itself, if applicable.
   @override
   final DateTime? expiresAt;
 
-  /// Date de la prochaine vérification
+  /// The timestamp when the status of this credential should be checked again.
+  /// Useful for managing cache validity or polling frequency.
   @override
   final DateTime nextCheck;
 
@@ -377,43 +385,47 @@ abstract class _CredentialStatus implements CredentialStatus {
   factory _CredentialStatus.fromJson(Map<String, dynamic> json) =
       _$CredentialStatusImpl.fromJson;
 
-  /// ID unique de l'attestation
+  /// The unique ID of the credential whose status this object represents.
   @override
   String get credentialId;
 
-  /// Type de statut
+  /// The determined status of the credential. See [CredentialStatusType].
   @override
   CredentialStatusType get status;
 
-  /// Date de la dernière vérification
+  /// The timestamp when the credential's status was last successfully checked
+  /// against its status mechanism (e.g., StatusList2021).
   @override
   DateTime get lastChecked;
 
-  /// Date de révocation (si applicable)
+  /// If the status is [CredentialStatusType.revoked], the timestamp when the revocation occurred.
   @override
   DateTime? get revokedAt;
 
-  /// Raison de la révocation (si applicable)
+  /// If the status is [CredentialStatusType.revoked], the reason for revocation.
+  /// See [RevocationReason].
   @override
   RevocationReason? get revocationReason;
 
-  /// Détails supplémentaires sur la révocation
+  /// Optional additional details regarding the revocation.
   @override
   String? get revocationDetails;
 
-  /// URL de la liste de statut
+  /// The URL of the status list credential (e.g., a StatusList2021Credential)
+  /// used to determine the status.
   @override
   String get statusListUrl;
 
-  /// Index dans la liste de statut
+  /// The index within the referenced status list that corresponds to this credential.
   @override
   int get statusListIndex;
 
-  /// Date d'expiration de l'attestation
+  /// The expiration date of the credential itself, if applicable.
   @override
   DateTime? get expiresAt;
 
-  /// Date de la prochaine vérification
+  /// The timestamp when the status of this credential should be checked again.
+  /// Useful for managing cache validity or polling frequency.
   @override
   DateTime get nextCheck;
 
@@ -431,23 +443,24 @@ StatusList _$StatusListFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$StatusList {
-  /// ID de la liste de statut
-  String get id => throw _privateConstructorUsedError;
-
-  /// URL de la liste de statut
-  String get url => throw _privateConstructorUsedError;
-
-  /// Date de la dernière mise à jour
+  /// The identifier (usually the URL) of the source StatusList2021Credential.
+  String get id =>
+      throw _privateConstructorUsedError; // Corresponds to statusListUrl in CredentialStatus
+// /// The URL of the status list (potentially redundant with id).
+// required String url,
+  /// Timestamp indicating when this local representation of the list was last updated
+  /// from the source.
   DateTime get lastUpdated => throw _privateConstructorUsedError;
 
-  /// Liste des statuts indexés
+  /// The decoded status information, mapping the status index to its boolean status
+  /// (e.g., true might mean revoked/suspended, false means active).
   Map<int, bool> get statuses => throw _privateConstructorUsedError;
 
-  /// Taille de la liste
+  /// The total number of status entries (bits) in the list.
   int get size => throw _privateConstructorUsedError;
 
-  /// Version de la liste
-  String get version => throw _privateConstructorUsedError;
+  /// Optional version identifier for the status list, if provided by the source.
+  String? get version => throw _privateConstructorUsedError;
 
   /// Serializes this StatusList to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -467,11 +480,10 @@ abstract class $StatusListCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      String url,
       DateTime lastUpdated,
       Map<int, bool> statuses,
       int size,
-      String version});
+      String? version});
 }
 
 /// @nodoc
@@ -490,20 +502,15 @@ class _$StatusListCopyWithImpl<$Res, $Val extends StatusList>
   @override
   $Res call({
     Object? id = null,
-    Object? url = null,
     Object? lastUpdated = null,
     Object? statuses = null,
     Object? size = null,
-    Object? version = null,
+    Object? version = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      url: null == url
-          ? _value.url
-          : url // ignore: cast_nullable_to_non_nullable
               as String,
       lastUpdated: null == lastUpdated
           ? _value.lastUpdated
@@ -517,10 +524,10 @@ class _$StatusListCopyWithImpl<$Res, $Val extends StatusList>
           ? _value.size
           : size // ignore: cast_nullable_to_non_nullable
               as int,
-      version: null == version
+      version: freezed == version
           ? _value.version
           : version // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ) as $Val);
   }
 }
@@ -535,11 +542,10 @@ abstract class _$$StatusListImplCopyWith<$Res>
   @useResult
   $Res call(
       {String id,
-      String url,
       DateTime lastUpdated,
       Map<int, bool> statuses,
       int size,
-      String version});
+      String? version});
 }
 
 /// @nodoc
@@ -556,20 +562,15 @@ class __$$StatusListImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? url = null,
     Object? lastUpdated = null,
     Object? statuses = null,
     Object? size = null,
-    Object? version = null,
+    Object? version = freezed,
   }) {
     return _then(_$StatusListImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      url: null == url
-          ? _value.url
-          : url // ignore: cast_nullable_to_non_nullable
               as String,
       lastUpdated: null == lastUpdated
           ? _value.lastUpdated
@@ -583,10 +584,10 @@ class __$$StatusListImplCopyWithImpl<$Res>
           ? _value.size
           : size // ignore: cast_nullable_to_non_nullable
               as int,
-      version: null == version
+      version: freezed == version
           ? _value.version
           : version // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ));
   }
 }
@@ -596,32 +597,32 @@ class __$$StatusListImplCopyWithImpl<$Res>
 class _$StatusListImpl implements _StatusList {
   const _$StatusListImpl(
       {required this.id,
-      required this.url,
       required this.lastUpdated,
       required final Map<int, bool> statuses,
       required this.size,
-      required this.version})
+      this.version})
       : _statuses = statuses;
 
   factory _$StatusListImpl.fromJson(Map<String, dynamic> json) =>
       _$$StatusListImplFromJson(json);
 
-  /// ID de la liste de statut
+  /// The identifier (usually the URL) of the source StatusList2021Credential.
   @override
   final String id;
-
-  /// URL de la liste de statut
-  @override
-  final String url;
-
-  /// Date de la dernière mise à jour
+// Corresponds to statusListUrl in CredentialStatus
+// /// The URL of the status list (potentially redundant with id).
+// required String url,
+  /// Timestamp indicating when this local representation of the list was last updated
+  /// from the source.
   @override
   final DateTime lastUpdated;
 
-  /// Liste des statuts indexés
+  /// The decoded status information, mapping the status index to its boolean status
+  /// (e.g., true might mean revoked/suspended, false means active).
   final Map<int, bool> _statuses;
 
-  /// Liste des statuts indexés
+  /// The decoded status information, mapping the status index to its boolean status
+  /// (e.g., true might mean revoked/suspended, false means active).
   @override
   Map<int, bool> get statuses {
     if (_statuses is EqualUnmodifiableMapView) return _statuses;
@@ -629,17 +630,17 @@ class _$StatusListImpl implements _StatusList {
     return EqualUnmodifiableMapView(_statuses);
   }
 
-  /// Taille de la liste
+  /// The total number of status entries (bits) in the list.
   @override
   final int size;
 
-  /// Version de la liste
+  /// Optional version identifier for the status list, if provided by the source.
   @override
-  final String version;
+  final String? version;
 
   @override
   String toString() {
-    return 'StatusList(id: $id, url: $url, lastUpdated: $lastUpdated, statuses: $statuses, size: $size, version: $version)';
+    return 'StatusList(id: $id, lastUpdated: $lastUpdated, statuses: $statuses, size: $size, version: $version)';
   }
 
   @override
@@ -648,7 +649,6 @@ class _$StatusListImpl implements _StatusList {
         (other.runtimeType == runtimeType &&
             other is _$StatusListImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.url, url) || other.url == url) &&
             (identical(other.lastUpdated, lastUpdated) ||
                 other.lastUpdated == lastUpdated) &&
             const DeepCollectionEquality().equals(other._statuses, _statuses) &&
@@ -658,7 +658,7 @@ class _$StatusListImpl implements _StatusList {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, url, lastUpdated,
+  int get hashCode => Object.hash(runtimeType, id, lastUpdated,
       const DeepCollectionEquality().hash(_statuses), size, version);
 
   /// Create a copy of StatusList
@@ -680,38 +680,36 @@ class _$StatusListImpl implements _StatusList {
 abstract class _StatusList implements StatusList {
   const factory _StatusList(
       {required final String id,
-      required final String url,
       required final DateTime lastUpdated,
       required final Map<int, bool> statuses,
       required final int size,
-      required final String version}) = _$StatusListImpl;
+      final String? version}) = _$StatusListImpl;
 
   factory _StatusList.fromJson(Map<String, dynamic> json) =
       _$StatusListImpl.fromJson;
 
-  /// ID de la liste de statut
+  /// The identifier (usually the URL) of the source StatusList2021Credential.
   @override
-  String get id;
-
-  /// URL de la liste de statut
-  @override
-  String get url;
-
-  /// Date de la dernière mise à jour
+  String get id; // Corresponds to statusListUrl in CredentialStatus
+// /// The URL of the status list (potentially redundant with id).
+// required String url,
+  /// Timestamp indicating when this local representation of the list was last updated
+  /// from the source.
   @override
   DateTime get lastUpdated;
 
-  /// Liste des statuts indexés
+  /// The decoded status information, mapping the status index to its boolean status
+  /// (e.g., true might mean revoked/suspended, false means active).
   @override
   Map<int, bool> get statuses;
 
-  /// Taille de la liste
+  /// The total number of status entries (bits) in the list.
   @override
   int get size;
 
-  /// Version de la liste
+  /// Optional version identifier for the status list, if provided by the source.
   @override
-  String get version;
+  String? get version;
 
   /// Create a copy of StatusList
   /// with the given fields replaced by the non-null parameter values.
@@ -727,19 +725,19 @@ StatusCheckResult _$StatusCheckResultFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$StatusCheckResult {
-  /// ID de l'attestation vérifiée
+  /// The ID of the credential that was checked.
   String get credentialId => throw _privateConstructorUsedError;
 
-  /// Statut de l'attestation
+  /// The status determined during the check. See [CredentialStatusType].
   CredentialStatusType get status => throw _privateConstructorUsedError;
 
-  /// Date de la vérification
+  /// The timestamp when the check was performed.
   DateTime get checkedAt => throw _privateConstructorUsedError;
 
-  /// Détails de la vérification
+  /// Optional details about the verification process or the result.
   String? get details => throw _privateConstructorUsedError;
 
-  /// Erreur éventuelle
+  /// Optional error message if the status check failed.
   String? get error => throw _privateConstructorUsedError;
 
   /// Serializes this StatusCheckResult to a JSON map.
@@ -885,23 +883,23 @@ class _$StatusCheckResultImpl implements _StatusCheckResult {
   factory _$StatusCheckResultImpl.fromJson(Map<String, dynamic> json) =>
       _$$StatusCheckResultImplFromJson(json);
 
-  /// ID de l'attestation vérifiée
+  /// The ID of the credential that was checked.
   @override
   final String credentialId;
 
-  /// Statut de l'attestation
+  /// The status determined during the check. See [CredentialStatusType].
   @override
   final CredentialStatusType status;
 
-  /// Date de la vérification
+  /// The timestamp when the check was performed.
   @override
   final DateTime checkedAt;
 
-  /// Détails de la vérification
+  /// Optional details about the verification process or the result.
   @override
   final String? details;
 
-  /// Erreur éventuelle
+  /// Optional error message if the status check failed.
   @override
   final String? error;
 
@@ -957,23 +955,23 @@ abstract class _StatusCheckResult implements StatusCheckResult {
   factory _StatusCheckResult.fromJson(Map<String, dynamic> json) =
       _$StatusCheckResultImpl.fromJson;
 
-  /// ID de l'attestation vérifiée
+  /// The ID of the credential that was checked.
   @override
   String get credentialId;
 
-  /// Statut de l'attestation
+  /// The status determined during the check. See [CredentialStatusType].
   @override
   CredentialStatusType get status;
 
-  /// Date de la vérification
+  /// The timestamp when the check was performed.
   @override
   DateTime get checkedAt;
 
-  /// Détails de la vérification
+  /// Optional details about the verification process or the result.
   @override
   String? get details;
 
-  /// Erreur éventuelle
+  /// Optional error message if the status check failed.
   @override
   String? get error;
 

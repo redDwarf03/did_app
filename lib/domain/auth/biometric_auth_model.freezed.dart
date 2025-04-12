@@ -20,26 +20,28 @@ BiometricAuthState _$BiometricAuthStateFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$BiometricAuthState {
-  /// Types de biométrie disponibles sur l'appareil
+  /// A list of biometric types supported by the current device.
   List<BiometricType> get availableBiometrics =>
       throw _privateConstructorUsedError;
 
-  /// Type de biométrie actuellement utilisé
+  /// The specific biometric type currently configured or used for authentication.
   BiometricType get currentBiometricType => throw _privateConstructorUsedError;
 
-  /// Statut de l'authentification
+  /// The current status of the authentication process. See [AuthStatus].
   AuthStatus get status => throw _privateConstructorUsedError;
 
-  /// Message d'erreur éventuel
+  /// An optional message providing details about an authentication failure or error.
   String? get errorMessage => throw _privateConstructorUsedError;
 
-  /// Si l'authentification biométrique est activée
+  /// Indicates whether the user has enabled biometric authentication for the application.
   bool get isBiometricEnabled => throw _privateConstructorUsedError;
 
-  /// Si l'authentification à deux facteurs est activée
+  /// Indicates whether Two-Factor Authentication (2FA), potentially involving biometrics
+  /// as one factor, is enabled.
   bool get isTwoFactorEnabled => throw _privateConstructorUsedError;
 
-  /// Si l'authentification sans mot de passe est activée
+  /// Indicates whether a passwordless authentication flow (potentially relying solely
+  /// on biometrics after initial setup) is enabled.
   bool get isPasswordlessEnabled => throw _privateConstructorUsedError;
 
   /// Serializes this BiometricAuthState to a JSON map.
@@ -212,10 +214,10 @@ class _$BiometricAuthStateImpl implements _BiometricAuthState {
   factory _$BiometricAuthStateImpl.fromJson(Map<String, dynamic> json) =>
       _$$BiometricAuthStateImplFromJson(json);
 
-  /// Types de biométrie disponibles sur l'appareil
+  /// A list of biometric types supported by the current device.
   final List<BiometricType> _availableBiometrics;
 
-  /// Types de biométrie disponibles sur l'appareil
+  /// A list of biometric types supported by the current device.
   @override
   @JsonKey()
   List<BiometricType> get availableBiometrics {
@@ -225,31 +227,33 @@ class _$BiometricAuthStateImpl implements _BiometricAuthState {
     return EqualUnmodifiableListView(_availableBiometrics);
   }
 
-  /// Type de biométrie actuellement utilisé
+  /// The specific biometric type currently configured or used for authentication.
   @override
   @JsonKey()
   final BiometricType currentBiometricType;
 
-  /// Statut de l'authentification
+  /// The current status of the authentication process. See [AuthStatus].
   @override
   @JsonKey()
   final AuthStatus status;
 
-  /// Message d'erreur éventuel
+  /// An optional message providing details about an authentication failure or error.
   @override
   final String? errorMessage;
 
-  /// Si l'authentification biométrique est activée
+  /// Indicates whether the user has enabled biometric authentication for the application.
   @override
   @JsonKey()
   final bool isBiometricEnabled;
 
-  /// Si l'authentification à deux facteurs est activée
+  /// Indicates whether Two-Factor Authentication (2FA), potentially involving biometrics
+  /// as one factor, is enabled.
   @override
   @JsonKey()
   final bool isTwoFactorEnabled;
 
-  /// Si l'authentification sans mot de passe est activée
+  /// Indicates whether a passwordless authentication flow (potentially relying solely
+  /// on biometrics after initial setup) is enabled.
   @override
   @JsonKey()
   final bool isPasswordlessEnabled;
@@ -321,31 +325,33 @@ abstract class _BiometricAuthState implements BiometricAuthState {
   factory _BiometricAuthState.fromJson(Map<String, dynamic> json) =
       _$BiometricAuthStateImpl.fromJson;
 
-  /// Types de biométrie disponibles sur l'appareil
+  /// A list of biometric types supported by the current device.
   @override
   List<BiometricType> get availableBiometrics;
 
-  /// Type de biométrie actuellement utilisé
+  /// The specific biometric type currently configured or used for authentication.
   @override
   BiometricType get currentBiometricType;
 
-  /// Statut de l'authentification
+  /// The current status of the authentication process. See [AuthStatus].
   @override
   AuthStatus get status;
 
-  /// Message d'erreur éventuel
+  /// An optional message providing details about an authentication failure or error.
   @override
   String? get errorMessage;
 
-  /// Si l'authentification biométrique est activée
+  /// Indicates whether the user has enabled biometric authentication for the application.
   @override
   bool get isBiometricEnabled;
 
-  /// Si l'authentification à deux facteurs est activée
+  /// Indicates whether Two-Factor Authentication (2FA), potentially involving biometrics
+  /// as one factor, is enabled.
   @override
   bool get isTwoFactorEnabled;
 
-  /// Si l'authentification sans mot de passe est activée
+  /// Indicates whether a passwordless authentication flow (potentially relying solely
+  /// on biometrics after initial setup) is enabled.
   @override
   bool get isPasswordlessEnabled;
 

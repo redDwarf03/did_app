@@ -66,7 +66,9 @@ _$QualifiedTrustServiceImpl _$$QualifiedTrustServiceImplFromJson(
       country: json['country'] as String,
       status: json['status'] as String,
       startDate: DateTime.parse(json['startDate'] as String),
-      endDate: DateTime.parse(json['endDate'] as String),
+      endDate: json['endDate'] == null
+          ? null
+          : DateTime.parse(json['endDate'] as String),
       serviceUrl: json['serviceUrl'] as String,
       qualifiedCertificates: (json['qualifiedCertificates'] as List<dynamic>)
           .map((e) => e as String)
@@ -84,7 +86,7 @@ Map<String, dynamic> _$$QualifiedTrustServiceImplToJson(
       'country': instance.country,
       'status': instance.status,
       'startDate': instance.startDate.toIso8601String(),
-      'endDate': instance.endDate.toIso8601String(),
+      'endDate': instance.endDate?.toIso8601String(),
       'serviceUrl': instance.serviceUrl,
       'qualifiedCertificates': instance.qualifiedCertificates,
       'assuranceLevel': _$AssuranceLevelEnumMap[instance.assuranceLevel]!,

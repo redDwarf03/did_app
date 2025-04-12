@@ -3,69 +3,80 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'biometric_auth_model.freezed.dart';
 part 'biometric_auth_model.g.dart';
 
-/// Types d'authentification biométrique disponibles
+/// Enumerates the types of biometric authentication methods available on a device.
+///
+/// Biometric authentication can contribute to achieving higher Levels of Assurance (LOA)
+/// as defined in frameworks like NIST 800-63-3, eIDAS, and ISO/IEC 29115,
+/// and can be a factor in Strong Customer Authentication (SCA) under PSD2.
+/// See: W3C DID Spec §9.17 Level of Assurance.
 enum BiometricType {
-  /// Empreinte digitale
+  /// Authentication using fingerprint recognition.
   fingerprint,
 
-  /// Reconnaissance faciale
+  /// Authentication using facial recognition (e.g., Apple's Face ID).
   faceId,
 
-  /// Scan de l'iris
+  /// Authentication using iris scanning.
   iris,
 
-  /// Non disponible
+  /// No biometric authentication method is available or selected.
   none
 }
 
-/// Statut du processus d'authentification
+/// Represents the status of a biometric authentication attempt or configuration.
 enum AuthStatus {
-  /// Authentification non initiée
+  /// Authentication has not been initiated or attempted yet.
   notAuthenticated,
 
-  /// Authentification en cours
+  /// Authentication process is currently in progress.
   authenticating,
 
-  /// Authentification réussie
+  /// Authentication was successful.
   authenticated,
 
-  /// Authentification échouée
+  /// Authentication attempt failed (e.g., biometric mismatch, timeout, user cancellation).
   failed,
 
-  /// Authentification non disponible sur l'appareil
+  /// Biometric authentication is not available on this device.
   unavailable,
 
-  /// Authentification non configurée
+  /// Biometric authentication is available but has not been set up by the user.
   notSetUp
 }
 
-/// Modèle pour l'authentification biométrique
+/// Represents the state related to biometric authentication settings and status.
+///
+/// This model holds information about available biometric methods on the device,
+/// the current authentication status, configuration settings (like whether biometrics
+/// are enabled), and potential multi-factor or passwordless configurations.
 @freezed
 class BiometricAuthState with _$BiometricAuthState {
   const factory BiometricAuthState({
-    /// Types de biométrie disponibles sur l'appareil
+    /// A list of biometric types supported by the current device.
     @Default([]) List<BiometricType> availableBiometrics,
 
-    /// Type de biométrie actuellement utilisé
+    /// The specific biometric type currently configured or used for authentication.
     @Default(BiometricType.none) BiometricType currentBiometricType,
 
-    /// Statut de l'authentification
+    /// The current status of the authentication process. See [AuthStatus].
     @Default(AuthStatus.notAuthenticated) AuthStatus status,
 
-    /// Message d'erreur éventuel
+    /// An optional message providing details about an authentication failure or error.
     String? errorMessage,
 
-    /// Si l'authentification biométrique est activée
+    /// Indicates whether the user has enabled biometric authentication for the application.
     @Default(false) bool isBiometricEnabled,
 
-    /// Si l'authentification à deux facteurs est activée
+    /// Indicates whether Two-Factor Authentication (2FA), potentially involving biometrics
+    /// as one factor, is enabled.
     @Default(false) bool isTwoFactorEnabled,
 
-    /// Si l'authentification sans mot de passe est activée
+    /// Indicates whether a passwordless authentication flow (potentially relying solely
+    /// on biometrics after initial setup) is enabled.
     @Default(false) bool isPasswordlessEnabled,
   }) = _BiometricAuthState;
 
-  /// Création depuis un JSON
+  /// Creates a [BiometricAuthState] instance from a JSON map.
   factory BiometricAuthState.fromJson(Map<String, dynamic> json) =>
       _$BiometricAuthStateFromJson(json);
 }

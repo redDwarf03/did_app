@@ -3,176 +3,215 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'verification_process.freezed.dart';
 part 'verification_process.g.dart';
 
-/// Represents a verification process for KYC/AML compliance
+/// Represents a comprehensive verification process, typically used for Know Your Customer (KYC)
+/// or Anti-Money Laundering (AML) compliance checks.
+///
+/// This process orchestrates multiple [VerificationStep]s required to establish
+/// a certain level of trust or assurance for a digital identity, identified by
+/// [identityAddress] (which could be a DID).
+/// The overall outcome can influence the [IdentityVerificationStatus] in the main
+/// [DigitalIdentity] model and might result in the issuance of a [VerificationCertificate].
 @freezed
 class VerificationProcess with _$VerificationProcess {
   const factory VerificationProcess({
-    /// Unique identifier for the verification process
+    /// Unique identifier for this specific instance of the verification process.
     required String id,
 
-    /// Address of the identity being verified
+    /// The identifier (e.g., DID or blockchain address) of the digital identity
+    /// undergoing this verification process.
     required String identityAddress,
 
-    /// Current status of the verification
+    /// The overall current status of the verification process. See [VerificationStatus].
     required VerificationStatus status,
 
-    /// List of verification steps required
+    /// An ordered list of the individual steps required to complete the verification.
+    /// See [VerificationStep].
     required List<VerificationStep> steps,
 
-    /// Creation timestamp
+    /// Timestamp indicating when this verification process was initiated.
     required DateTime createdAt,
 
-    /// Last update timestamp
+    /// Timestamp indicating the last time the process state or any of its steps were updated.
     required DateTime updatedAt,
 
-    /// Rejection reason if the verification was rejected
+    /// If the status is [VerificationStatus.rejected], this field may contain the reason.
     String? rejectionReason,
 
-    /// Timestamp when the verification was completed
+    /// Timestamp indicating when the process reached a final state ([completed] or [rejected]).
     DateTime? completedAt,
 
-    /// Certificate data if fully verified
+    /// If the process completed successfully ([VerificationStatus.completed]), this may hold
+    /// the resulting certificate. See [VerificationCertificate].
     VerificationCertificate? certificate,
   }) = _VerificationProcess;
 
+  /// Creates a [VerificationProcess] instance from a JSON map.
   factory VerificationProcess.fromJson(Map<String, dynamic> json) =>
       _$VerificationProcessFromJson(json);
 }
 
-/// Represents a verification step in the KYC/AML process
+/// Represents a single, distinct step within a larger [VerificationProcess].
+///
+/// Each step targets a specific piece of evidence or check (e.g., email verification,
+/// ID document check, liveness detection) required for KYC/AML.
 @freezed
 class VerificationStep with _$VerificationStep {
   const factory VerificationStep({
-    /// Unique identifier for this step
+    /// Unique identifier for this specific step instance within the process.
     required String id,
 
-    /// Type of verification step
+    /// The type of verification being performed in this step. See [VerificationStepType].
     required VerificationStepType type,
 
-    /// Current status of this step
+    /// The current status of this individual step. See [VerificationStepStatus].
     required VerificationStepStatus status,
 
-    /// Order of this step in the verification process
+    /// The sequential order of this step within the overall [VerificationProcess].
     required int order,
 
-    /// Description of what this step verifies
+    /// A brief description of the purpose or goal of this verification step.
     required String description,
 
-    /// Instructions for the user
+    /// Instructions provided to the user on how to complete this step.
     required String instructions,
 
-    /// Last update timestamp
+    /// Timestamp indicating the last time the status or data associated with this step was updated.
     required DateTime updatedAt,
 
-    /// Rejection reason if this step was rejected
+    /// If the status is [VerificationStepStatus.rejected], this may contain the reason.
     String? rejectionReason,
 
-    /// Paths to uploaded documents or proofs if applicable
+    /// Optional list of paths or references to documents uploaded by the user
+    /// as evidence for this step (e.g., ID scan, proof of address).
+    /// **Note:** Handling these documents must comply with GDPR.
     List<String>? documentPaths,
   }) = _VerificationStep;
 
+  /// Creates a [VerificationStep] instance from a JSON map.
   factory VerificationStep.fromJson(Map<String, dynamic> json) =>
       _$VerificationStepFromJson(json);
 }
 
-/// Represents a verification certificate for a fully verified identity
+/// Represents a certificate issued upon successful completion of a [VerificationProcess].
+///
+/// This certificate attests to the verification level achieved. Conceptually, this could be
+/// represented as a Verifiable Credential (VC) linked to the user's DID ([VerificationProcess.identityAddress]),
+/// although this model provides a simpler structure.
 @freezed
 class VerificationCertificate with _$VerificationCertificate {
   const factory VerificationCertificate({
-    /// Unique identifier for this certificate
+    /// Unique identifier for this verification certificate.
     required String id,
 
-    /// Timestamp when the certificate was issued
+    /// Timestamp indicating when the certificate was issued (i.e., verification completed).
     required DateTime issuedAt,
 
-    /// Timestamp when the certificate expires
+    /// Timestamp indicating when the verification or certificate expires and may need renewal.
+    /// (Note: Currently required, but could potentially be made optional depending on use case).
     required DateTime expiresAt,
 
-    /// Issuer of the certificate
+    /// Identifier of the entity (e.g., verification service provider) that issued the certificate.
     required String issuer,
 
-    /// Digital signature of the issuer
+    /// A digital signature from the issuer, ensuring the certificate's authenticity and integrity.
+    /// Verification would require the issuer's public key.
     required String signature,
 
-    /// eIDAS compliance level
+    /// The level of assurance achieved through the verification process, aligned with eIDAS standards.
+    /// See [EidasLevel] for definitions (Low, Substantial, High).
+    /// See: Regulation (EU) No 910/2014.
     @Default(EidasLevel.low) EidasLevel eidasLevel,
   }) = _VerificationCertificate;
 
+  /// Creates a [VerificationCertificate] instance from a JSON map.
   factory VerificationCertificate.fromJson(Map<String, dynamic> json) =>
       _$VerificationCertificateFromJson(json);
 }
 
-/// Overall status of the verification process
+/// Enumerates the possible overall statuses of a [VerificationProcess].
 enum VerificationStatus {
-  /// Not started
+  /// The verification process has not yet been started.
   notStarted,
 
-  /// In progress
+  /// The verification process has started but is not yet complete.
   inProgress,
 
-  /// Pending review by verifier
+  /// The process is complete from the user's side and is awaiting review by the verifying entity.
   pendingReview,
 
-  /// Completed successfully
+  /// The verification process was completed successfully, meeting all requirements.
   completed,
 
-  /// Rejected
+  /// The verification process failed or was rejected by the verifying entity.
   rejected,
 
-  /// Expired
+  /// The verification process or its result has expired.
   expired
 }
 
-/// Status of an individual verification step
+/// Enumerates the possible statuses of an individual [VerificationStep].
 enum VerificationStepStatus {
-  /// Not started yet
+  /// This specific step has not been started.
   notStarted,
 
-  /// In progress
+  /// The user is currently working on this step, or it is being processed.
   inProgress,
 
-  /// Completed successfully
+  /// This step was completed successfully.
   completed,
 
-  /// Rejected
+  /// This step failed or was rejected.
   rejected,
 
-  /// Waiting for user action
+  /// The step requires input or action from the user.
   actionRequired
 }
 
-/// Types of verification steps in the KYC/AML process
+/// Defines the different types of verification steps commonly found in KYC/AML processes.
+///
+/// These steps gather evidence to verify different aspects of a user's identity.
+/// Combining multiple steps contributes to the overall Level of Assurance (LOA).
 enum VerificationStepType {
-  /// Email verification
+  /// Verifying control over an email address (e.g., via a confirmation link).
   emailVerification,
 
-  /// Phone verification
+  /// Verifying control over a phone number (e.g., via an SMS code).
   phoneVerification,
 
-  /// ID document upload and verification
+  /// Uploading and verifying a government-issued identification document (e.g., passport, ID card).
+  /// Often involves OCR and authenticity checks.
   idDocumentVerification,
 
-  /// Address proof verification
+  /// Verifying the user's residential address (e.g., via a utility bill, bank statement).
   addressVerification,
 
-  /// Liveness check (selfie or video)
+  /// Verifying that the user is a live person present during the process (e.g., selfie photo/video,
+  /// active challenges). Helps prevent spoofing.
   livenessCheck,
 
-  /// Advanced biometric verification
+  /// Verification using advanced biometric methods beyond a simple liveness check,
+  /// potentially comparing against ID document photos.
   biometricVerification,
 
-  /// Additional documents as required by regulations
+  /// Requesting additional specific documents based on regulatory requirements or risk assessment.
   additionalDocuments
 }
 
-/// eIDAS compliance levels
+/// Represents the levels of assurance defined by the eIDAS regulation (EU No 910/2014).
+///
+/// These levels indicate the degree of confidence in the claimed identity following
+/// an identity proofing and verification process.
+/// - **Low:** Provides a limited degree of confidence, suitable for low-risk scenarios.
+/// - **Substantial:** Provides a substantial degree of confidence, requiring more robust verification.
+/// - **High:** Provides the highest degree of confidence, often equivalent to physical presence.
+/// Achieving higher levels typically requires stronger verification steps (e.g., verified ID documents, liveness).
 enum EidasLevel {
-  /// Low assurance level
+  /// Low assurance level according to eIDAS.
   low,
 
-  /// Substantial assurance level
+  /// Substantial assurance level according to eIDAS.
   substantial,
 
-  /// High assurance level
+  /// High assurance level according to eIDAS.
   high
 }

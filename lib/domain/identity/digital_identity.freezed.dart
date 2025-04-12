@@ -20,22 +20,31 @@ DigitalIdentity _$DigitalIdentityFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$DigitalIdentity {
-  /// Unique identifier of the identity on the blockchain
+  /// The unique identifier for this identity, often a Decentralized Identifier (DID)
+  /// or a blockchain address.
+  /// This serves as the primary key for the identity on the underlying platform.
   String get identityAddress => throw _privateConstructorUsedError;
 
-  /// The public name of the identity
+  /// A user-chosen public name or alias associated with the identity.
+  /// This is typically displayed publicly.
   String get displayName => throw _privateConstructorUsedError;
 
-  /// Personal information (encrypted when stored)
+  /// Contains sensitive Personally Identifiable Information (PII).
+  /// **Security Critical:** This data must be handled with extreme care, typically
+  /// stored encrypted at rest and transmitted securely. Its processing is subject
+  /// to strict privacy regulations like GDPR.
+  /// See [PersonalInfo] for details.
   PersonalInfo get personalInfo => throw _privateConstructorUsedError;
 
-  /// Creation timestamp
+  /// The timestamp when this identity was first created or registered.
   DateTime get createdAt => throw _privateConstructorUsedError;
 
-  /// Last update timestamp
+  /// The timestamp of the last modification to any attribute of this identity.
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
-  /// Verification status of the identity
+  /// The current verification status of the identity, reflecting the level of
+  /// trust and checks performed. See [IdentityVerificationStatus].
+  /// This status is often linked to KYC/AML regulatory requirements.
   IdentityVerificationStatus get verificationStatus =>
       throw _privateConstructorUsedError;
 
@@ -210,27 +219,36 @@ class _$DigitalIdentityImpl implements _DigitalIdentity {
   factory _$DigitalIdentityImpl.fromJson(Map<String, dynamic> json) =>
       _$$DigitalIdentityImplFromJson(json);
 
-  /// Unique identifier of the identity on the blockchain
+  /// The unique identifier for this identity, often a Decentralized Identifier (DID)
+  /// or a blockchain address.
+  /// This serves as the primary key for the identity on the underlying platform.
   @override
   final String identityAddress;
 
-  /// The public name of the identity
+  /// A user-chosen public name or alias associated with the identity.
+  /// This is typically displayed publicly.
   @override
   final String displayName;
 
-  /// Personal information (encrypted when stored)
+  /// Contains sensitive Personally Identifiable Information (PII).
+  /// **Security Critical:** This data must be handled with extreme care, typically
+  /// stored encrypted at rest and transmitted securely. Its processing is subject
+  /// to strict privacy regulations like GDPR.
+  /// See [PersonalInfo] for details.
   @override
   final PersonalInfo personalInfo;
 
-  /// Creation timestamp
+  /// The timestamp when this identity was first created or registered.
   @override
   final DateTime createdAt;
 
-  /// Last update timestamp
+  /// The timestamp of the last modification to any attribute of this identity.
   @override
   final DateTime updatedAt;
 
-  /// Verification status of the identity
+  /// The current verification status of the identity, reflecting the level of
+  /// trust and checks performed. See [IdentityVerificationStatus].
+  /// This status is often linked to KYC/AML regulatory requirements.
   @override
   @JsonKey()
   final IdentityVerificationStatus verificationStatus;
@@ -294,27 +312,36 @@ abstract class _DigitalIdentity implements DigitalIdentity {
   factory _DigitalIdentity.fromJson(Map<String, dynamic> json) =
       _$DigitalIdentityImpl.fromJson;
 
-  /// Unique identifier of the identity on the blockchain
+  /// The unique identifier for this identity, often a Decentralized Identifier (DID)
+  /// or a blockchain address.
+  /// This serves as the primary key for the identity on the underlying platform.
   @override
   String get identityAddress;
 
-  /// The public name of the identity
+  /// A user-chosen public name or alias associated with the identity.
+  /// This is typically displayed publicly.
   @override
   String get displayName;
 
-  /// Personal information (encrypted when stored)
+  /// Contains sensitive Personally Identifiable Information (PII).
+  /// **Security Critical:** This data must be handled with extreme care, typically
+  /// stored encrypted at rest and transmitted securely. Its processing is subject
+  /// to strict privacy regulations like GDPR.
+  /// See [PersonalInfo] for details.
   @override
   PersonalInfo get personalInfo;
 
-  /// Creation timestamp
+  /// The timestamp when this identity was first created or registered.
   @override
   DateTime get createdAt;
 
-  /// Last update timestamp
+  /// The timestamp of the last modification to any attribute of this identity.
   @override
   DateTime get updatedAt;
 
-  /// Verification status of the identity
+  /// The current verification status of the identity, reflecting the level of
+  /// trust and checks performed. See [IdentityVerificationStatus].
+  /// This status is often linked to KYC/AML regulatory requirements.
   @override
   IdentityVerificationStatus get verificationStatus;
 
@@ -332,22 +359,26 @@ PersonalInfo _$PersonalInfoFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PersonalInfo {
-  /// Full legal name
+  /// The user's full legal name. Often required for KYC processes.
   String get fullName => throw _privateConstructorUsedError;
 
-  /// Email address
+  /// The user's primary email address. Commonly used for communication and
+  /// basic verification.
   String get email => throw _privateConstructorUsedError;
 
-  /// Phone number with country code
+  /// The user's phone number, including the country code (e.g., +1, +44).
+  /// Often used for multi-factor authentication or basic verification.
   String? get phoneNumber => throw _privateConstructorUsedError;
 
-  /// Date of birth
+  /// The user's date of birth. Critical for age verification and KYC compliance.
   DateTime? get dateOfBirth => throw _privateConstructorUsedError;
 
-  /// Nationality
+  /// The user's nationality, typically represented by a country name or code (e.g., ISO 3166-1 alpha-2).
+  /// Often required for KYC/AML checks.
   String? get nationality => throw _privateConstructorUsedError;
 
-  /// Physical address
+  /// The user's physical residential address. See [PhysicalAddress].
+  /// Required for higher levels of identity verification (KYC).
   PhysicalAddress? get address => throw _privateConstructorUsedError;
 
   /// Serializes this PersonalInfo to a JSON map.
@@ -525,27 +556,31 @@ class _$PersonalInfoImpl implements _PersonalInfo {
   factory _$PersonalInfoImpl.fromJson(Map<String, dynamic> json) =>
       _$$PersonalInfoImplFromJson(json);
 
-  /// Full legal name
+  /// The user's full legal name. Often required for KYC processes.
   @override
   final String fullName;
 
-  /// Email address
+  /// The user's primary email address. Commonly used for communication and
+  /// basic verification.
   @override
   final String email;
 
-  /// Phone number with country code
+  /// The user's phone number, including the country code (e.g., +1, +44).
+  /// Often used for multi-factor authentication or basic verification.
   @override
   final String? phoneNumber;
 
-  /// Date of birth
+  /// The user's date of birth. Critical for age verification and KYC compliance.
   @override
   final DateTime? dateOfBirth;
 
-  /// Nationality
+  /// The user's nationality, typically represented by a country name or code (e.g., ISO 3166-1 alpha-2).
+  /// Often required for KYC/AML checks.
   @override
   final String? nationality;
 
-  /// Physical address
+  /// The user's physical residential address. See [PhysicalAddress].
+  /// Required for higher levels of identity verification (KYC).
   @override
   final PhysicalAddress? address;
 
@@ -604,27 +639,31 @@ abstract class _PersonalInfo implements PersonalInfo {
   factory _PersonalInfo.fromJson(Map<String, dynamic> json) =
       _$PersonalInfoImpl.fromJson;
 
-  /// Full legal name
+  /// The user's full legal name. Often required for KYC processes.
   @override
   String get fullName;
 
-  /// Email address
+  /// The user's primary email address. Commonly used for communication and
+  /// basic verification.
   @override
   String get email;
 
-  /// Phone number with country code
+  /// The user's phone number, including the country code (e.g., +1, +44).
+  /// Often used for multi-factor authentication or basic verification.
   @override
   String? get phoneNumber;
 
-  /// Date of birth
+  /// The user's date of birth. Critical for age verification and KYC compliance.
   @override
   DateTime? get dateOfBirth;
 
-  /// Nationality
+  /// The user's nationality, typically represented by a country name or code (e.g., ISO 3166-1 alpha-2).
+  /// Often required for KYC/AML checks.
   @override
   String? get nationality;
 
-  /// Physical address
+  /// The user's physical residential address. See [PhysicalAddress].
+  /// Required for higher levels of identity verification (KYC).
   @override
   PhysicalAddress? get address;
 
@@ -642,19 +681,19 @@ PhysicalAddress _$PhysicalAddressFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PhysicalAddress {
-  /// Street address including number
+  /// The street name and number, potentially including apartment or unit details.
   String get street => throw _privateConstructorUsedError;
 
-  /// City name
+  /// The name of the city or town.
   String get city => throw _privateConstructorUsedError;
 
-  /// State/province/region
+  /// The state, province, region, or county, depending on the country's structure.
   String? get state => throw _privateConstructorUsedError;
 
-  /// Postal/ZIP code
+  /// The postal code or ZIP code used for mail delivery.
   String get postalCode => throw _privateConstructorUsedError;
 
-  /// Country
+  /// The country, ideally represented using ISO 3166-1 alpha-2 codes (e.g., "US", "GB", "FR").
   String get country => throw _privateConstructorUsedError;
 
   /// Serializes this PhysicalAddress to a JSON map.
@@ -800,23 +839,23 @@ class _$PhysicalAddressImpl implements _PhysicalAddress {
   factory _$PhysicalAddressImpl.fromJson(Map<String, dynamic> json) =>
       _$$PhysicalAddressImplFromJson(json);
 
-  /// Street address including number
+  /// The street name and number, potentially including apartment or unit details.
   @override
   final String street;
 
-  /// City name
+  /// The name of the city or town.
   @override
   final String city;
 
-  /// State/province/region
+  /// The state, province, region, or county, depending on the country's structure.
   @override
   final String? state;
 
-  /// Postal/ZIP code
+  /// The postal code or ZIP code used for mail delivery.
   @override
   final String postalCode;
 
-  /// Country
+  /// The country, ideally represented using ISO 3166-1 alpha-2 codes (e.g., "US", "GB", "FR").
   @override
   final String country;
 
@@ -871,23 +910,23 @@ abstract class _PhysicalAddress implements PhysicalAddress {
   factory _PhysicalAddress.fromJson(Map<String, dynamic> json) =
       _$PhysicalAddressImpl.fromJson;
 
-  /// Street address including number
+  /// The street name and number, potentially including apartment or unit details.
   @override
   String get street;
 
-  /// City name
+  /// The name of the city or town.
   @override
   String get city;
 
-  /// State/province/region
+  /// The state, province, region, or county, depending on the country's structure.
   @override
   String? get state;
 
-  /// Postal/ZIP code
+  /// The postal code or ZIP code used for mail delivery.
   @override
   String get postalCode;
 
-  /// Country
+  /// The country, ideally represented using ISO 3166-1 alpha-2 codes (e.g., "US", "GB", "FR").
   @override
   String get country;
 

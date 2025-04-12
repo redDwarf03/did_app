@@ -21,33 +21,37 @@ StatusList2021Credential _$StatusList2021CredentialFromJson(
 
 /// @nodoc
 mixin _$StatusList2021Credential {
-  /// Identifiant unique de la liste de statut
+  /// The unique identifier (URI) for this Status List credential.
   String get id => throw _privateConstructorUsedError;
 
-  /// Contexte de l'attestation
+  /// The JSON-LD context(s). Must include the VC context and the StatusList2021 context.
+  /// e.g., ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/vc/status-list/2021/v1"]
   @JsonKey(name: '@context')
   List<String> get context => throw _privateConstructorUsedError;
 
-  /// Type de l'attestation
+  /// The type(s) of the credential. Must include "VerifiableCredential" and "StatusList2021Credential".
   List<String> get type => throw _privateConstructorUsedError;
 
-  /// Émetteur de la liste de statut
+  /// The DID or URI of the issuer of this status list credential.
   String get issuer => throw _privateConstructorUsedError;
 
-  /// Date d'émission
+  /// The date and time when this status list credential was issued.
   DateTime get issuanceDate => throw _privateConstructorUsedError;
 
-  /// Date d'expiration
+  /// An optional date and time after which this status list credential is no longer valid.
   DateTime? get expirationDate => throw _privateConstructorUsedError;
 
-  /// Description de la liste
+  /// An optional human-readable description of the status list.
   String? get description => throw _privateConstructorUsedError;
 
-  /// Sujet de l'attestation (contient les données de la liste)
+  /// The main subject of the credential, containing the actual status list data.
+  /// See [StatusList2021Subject].
   StatusList2021Subject get credentialSubject =>
       throw _privateConstructorUsedError;
 
-  /// Preuve cryptographique
+  /// The cryptographic proof (e.g., digital signature) that binds the credential
+  /// contents to the issuer and ensures integrity.
+  /// See [StatusList2021Proof].
   StatusList2021Proof get proof => throw _privateConstructorUsedError;
 
   /// Serializes this StatusList2021Credential to a JSON map.
@@ -280,14 +284,16 @@ class _$StatusList2021CredentialImpl implements _StatusList2021Credential {
   factory _$StatusList2021CredentialImpl.fromJson(Map<String, dynamic> json) =>
       _$$StatusList2021CredentialImplFromJson(json);
 
-  /// Identifiant unique de la liste de statut
+  /// The unique identifier (URI) for this Status List credential.
   @override
   final String id;
 
-  /// Contexte de l'attestation
+  /// The JSON-LD context(s). Must include the VC context and the StatusList2021 context.
+  /// e.g., ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/vc/status-list/2021/v1"]
   final List<String> _context;
 
-  /// Contexte de l'attestation
+  /// The JSON-LD context(s). Must include the VC context and the StatusList2021 context.
+  /// e.g., ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/vc/status-list/2021/v1"]
   @override
   @JsonKey(name: '@context')
   List<String> get context {
@@ -296,10 +302,10 @@ class _$StatusList2021CredentialImpl implements _StatusList2021Credential {
     return EqualUnmodifiableListView(_context);
   }
 
-  /// Type de l'attestation
+  /// The type(s) of the credential. Must include "VerifiableCredential" and "StatusList2021Credential".
   final List<String> _type;
 
-  /// Type de l'attestation
+  /// The type(s) of the credential. Must include "VerifiableCredential" and "StatusList2021Credential".
   @override
   List<String> get type {
     if (_type is EqualUnmodifiableListView) return _type;
@@ -307,27 +313,30 @@ class _$StatusList2021CredentialImpl implements _StatusList2021Credential {
     return EqualUnmodifiableListView(_type);
   }
 
-  /// Émetteur de la liste de statut
+  /// The DID or URI of the issuer of this status list credential.
   @override
   final String issuer;
 
-  /// Date d'émission
+  /// The date and time when this status list credential was issued.
   @override
   final DateTime issuanceDate;
 
-  /// Date d'expiration
+  /// An optional date and time after which this status list credential is no longer valid.
   @override
   final DateTime? expirationDate;
 
-  /// Description de la liste
+  /// An optional human-readable description of the status list.
   @override
   final String? description;
 
-  /// Sujet de l'attestation (contient les données de la liste)
+  /// The main subject of the credential, containing the actual status list data.
+  /// See [StatusList2021Subject].
   @override
   final StatusList2021Subject credentialSubject;
 
-  /// Preuve cryptographique
+  /// The cryptographic proof (e.g., digital signature) that binds the credential
+  /// contents to the issuer and ensures integrity.
+  /// See [StatusList2021Proof].
   @override
   final StatusList2021Proof proof;
 
@@ -403,40 +412,44 @@ abstract class _StatusList2021Credential implements StatusList2021Credential {
   factory _StatusList2021Credential.fromJson(Map<String, dynamic> json) =
       _$StatusList2021CredentialImpl.fromJson;
 
-  /// Identifiant unique de la liste de statut
+  /// The unique identifier (URI) for this Status List credential.
   @override
   String get id;
 
-  /// Contexte de l'attestation
+  /// The JSON-LD context(s). Must include the VC context and the StatusList2021 context.
+  /// e.g., ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/vc/status-list/2021/v1"]
   @override
   @JsonKey(name: '@context')
   List<String> get context;
 
-  /// Type de l'attestation
+  /// The type(s) of the credential. Must include "VerifiableCredential" and "StatusList2021Credential".
   @override
   List<String> get type;
 
-  /// Émetteur de la liste de statut
+  /// The DID or URI of the issuer of this status list credential.
   @override
   String get issuer;
 
-  /// Date d'émission
+  /// The date and time when this status list credential was issued.
   @override
   DateTime get issuanceDate;
 
-  /// Date d'expiration
+  /// An optional date and time after which this status list credential is no longer valid.
   @override
   DateTime? get expirationDate;
 
-  /// Description de la liste
+  /// An optional human-readable description of the status list.
   @override
   String? get description;
 
-  /// Sujet de l'attestation (contient les données de la liste)
+  /// The main subject of the credential, containing the actual status list data.
+  /// See [StatusList2021Subject].
   @override
   StatusList2021Subject get credentialSubject;
 
-  /// Preuve cryptographique
+  /// The cryptographic proof (e.g., digital signature) that binds the credential
+  /// contents to the issuer and ensures integrity.
+  /// See [StatusList2021Proof].
   @override
   StatusList2021Proof get proof;
 
@@ -455,26 +468,26 @@ StatusList2021Subject _$StatusList2021SubjectFromJson(
 
 /// @nodoc
 mixin _$StatusList2021Subject {
-  /// ID du sujet
+  /// An identifier for the subject, often the same as the credential ID or related.
   String get id => throw _privateConstructorUsedError;
 
-  /// Type de la liste de statut
+  /// The type of the credential subject. Must be "StatusList2021".
   String get type => throw _privateConstructorUsedError;
 
-  /// But de la liste (révocation, suspension, etc.)
+  /// Specifies the purpose of the status entries (e.g., revocation, suspension).
+  /// See [StatusPurpose].
   StatusPurpose get statusPurpose => throw _privateConstructorUsedError;
 
-  /// Encodage utilisé (par défaut base64url)
+  /// The encoding format used for the `encodedList`. Defaults to "base64url".
+  /// Other potential values might include "base64", although "base64url" is common.
   String get encoding => throw _privateConstructorUsedError;
 
-  /// Liste encodée des statuts
+  /// The core status list, represented as a compressed bitstring, encoded according
+  /// to the specified `encoding` (typically base64url).
+  /// Each bit in the decoded list corresponds to a specific `statusListIndex` from a
+  /// [StatusList2021Entry]. A '1' usually indicates the status applies (e.g., revoked),
+  /// while a '0' indicates it does not.
   String get encodedList => throw _privateConstructorUsedError;
-
-  /// Validité dans le temps
-  StatusList2021Validity? get validFrom => throw _privateConstructorUsedError;
-
-  /// Taille de la liste
-  int get statusListSize => throw _privateConstructorUsedError;
 
   /// Serializes this StatusList2021Subject to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -497,11 +510,7 @@ abstract class $StatusList2021SubjectCopyWith<$Res> {
       String type,
       StatusPurpose statusPurpose,
       String encoding,
-      String encodedList,
-      StatusList2021Validity? validFrom,
-      int statusListSize});
-
-  $StatusList2021ValidityCopyWith<$Res>? get validFrom;
+      String encodedList});
 }
 
 /// @nodoc
@@ -525,8 +534,6 @@ class _$StatusList2021SubjectCopyWithImpl<$Res,
     Object? statusPurpose = null,
     Object? encoding = null,
     Object? encodedList = null,
-    Object? validFrom = freezed,
-    Object? statusListSize = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -549,29 +556,7 @@ class _$StatusList2021SubjectCopyWithImpl<$Res,
           ? _value.encodedList
           : encodedList // ignore: cast_nullable_to_non_nullable
               as String,
-      validFrom: freezed == validFrom
-          ? _value.validFrom
-          : validFrom // ignore: cast_nullable_to_non_nullable
-              as StatusList2021Validity?,
-      statusListSize: null == statusListSize
-          ? _value.statusListSize
-          : statusListSize // ignore: cast_nullable_to_non_nullable
-              as int,
     ) as $Val);
-  }
-
-  /// Create a copy of StatusList2021Subject
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $StatusList2021ValidityCopyWith<$Res>? get validFrom {
-    if (_value.validFrom == null) {
-      return null;
-    }
-
-    return $StatusList2021ValidityCopyWith<$Res>(_value.validFrom!, (value) {
-      return _then(_value.copyWith(validFrom: value) as $Val);
-    });
   }
 }
 
@@ -589,12 +574,7 @@ abstract class _$$StatusList2021SubjectImplCopyWith<$Res>
       String type,
       StatusPurpose statusPurpose,
       String encoding,
-      String encodedList,
-      StatusList2021Validity? validFrom,
-      int statusListSize});
-
-  @override
-  $StatusList2021ValidityCopyWith<$Res>? get validFrom;
+      String encodedList});
 }
 
 /// @nodoc
@@ -616,8 +596,6 @@ class __$$StatusList2021SubjectImplCopyWithImpl<$Res>
     Object? statusPurpose = null,
     Object? encoding = null,
     Object? encodedList = null,
-    Object? validFrom = freezed,
-    Object? statusListSize = null,
   }) {
     return _then(_$StatusList2021SubjectImpl(
       id: null == id
@@ -640,14 +618,6 @@ class __$$StatusList2021SubjectImplCopyWithImpl<$Res>
           ? _value.encodedList
           : encodedList // ignore: cast_nullable_to_non_nullable
               as String,
-      validFrom: freezed == validFrom
-          ? _value.validFrom
-          : validFrom // ignore: cast_nullable_to_non_nullable
-              as StatusList2021Validity?,
-      statusListSize: null == statusListSize
-          ? _value.statusListSize
-          : statusListSize // ignore: cast_nullable_to_non_nullable
-              as int,
     ));
   }
 }
@@ -660,46 +630,41 @@ class _$StatusList2021SubjectImpl implements _StatusList2021Subject {
       required this.type,
       required this.statusPurpose,
       this.encoding = 'base64url',
-      required this.encodedList,
-      this.validFrom,
-      this.statusListSize = 100000});
+      required this.encodedList});
 
   factory _$StatusList2021SubjectImpl.fromJson(Map<String, dynamic> json) =>
       _$$StatusList2021SubjectImplFromJson(json);
 
-  /// ID du sujet
+  /// An identifier for the subject, often the same as the credential ID or related.
   @override
   final String id;
 
-  /// Type de la liste de statut
+  /// The type of the credential subject. Must be "StatusList2021".
   @override
   final String type;
 
-  /// But de la liste (révocation, suspension, etc.)
+  /// Specifies the purpose of the status entries (e.g., revocation, suspension).
+  /// See [StatusPurpose].
   @override
   final StatusPurpose statusPurpose;
 
-  /// Encodage utilisé (par défaut base64url)
+  /// The encoding format used for the `encodedList`. Defaults to "base64url".
+  /// Other potential values might include "base64", although "base64url" is common.
   @override
   @JsonKey()
   final String encoding;
 
-  /// Liste encodée des statuts
+  /// The core status list, represented as a compressed bitstring, encoded according
+  /// to the specified `encoding` (typically base64url).
+  /// Each bit in the decoded list corresponds to a specific `statusListIndex` from a
+  /// [StatusList2021Entry]. A '1' usually indicates the status applies (e.g., revoked),
+  /// while a '0' indicates it does not.
   @override
   final String encodedList;
 
-  /// Validité dans le temps
-  @override
-  final StatusList2021Validity? validFrom;
-
-  /// Taille de la liste
-  @override
-  @JsonKey()
-  final int statusListSize;
-
   @override
   String toString() {
-    return 'StatusList2021Subject(id: $id, type: $type, statusPurpose: $statusPurpose, encoding: $encoding, encodedList: $encodedList, validFrom: $validFrom, statusListSize: $statusListSize)';
+    return 'StatusList2021Subject(id: $id, type: $type, statusPurpose: $statusPurpose, encoding: $encoding, encodedList: $encodedList)';
   }
 
   @override
@@ -714,17 +679,13 @@ class _$StatusList2021SubjectImpl implements _StatusList2021Subject {
             (identical(other.encoding, encoding) ||
                 other.encoding == encoding) &&
             (identical(other.encodedList, encodedList) ||
-                other.encodedList == encodedList) &&
-            (identical(other.validFrom, validFrom) ||
-                other.validFrom == validFrom) &&
-            (identical(other.statusListSize, statusListSize) ||
-                other.statusListSize == statusListSize));
+                other.encodedList == encodedList));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, type, statusPurpose,
-      encoding, encodedList, validFrom, statusListSize);
+  int get hashCode =>
+      Object.hash(runtimeType, id, type, statusPurpose, encoding, encodedList);
 
   /// Create a copy of StatusList2021Subject
   /// with the given fields replaced by the non-null parameter values.
@@ -749,40 +710,36 @@ abstract class _StatusList2021Subject implements StatusList2021Subject {
       required final String type,
       required final StatusPurpose statusPurpose,
       final String encoding,
-      required final String encodedList,
-      final StatusList2021Validity? validFrom,
-      final int statusListSize}) = _$StatusList2021SubjectImpl;
+      required final String encodedList}) = _$StatusList2021SubjectImpl;
 
   factory _StatusList2021Subject.fromJson(Map<String, dynamic> json) =
       _$StatusList2021SubjectImpl.fromJson;
 
-  /// ID du sujet
+  /// An identifier for the subject, often the same as the credential ID or related.
   @override
   String get id;
 
-  /// Type de la liste de statut
+  /// The type of the credential subject. Must be "StatusList2021".
   @override
   String get type;
 
-  /// But de la liste (révocation, suspension, etc.)
+  /// Specifies the purpose of the status entries (e.g., revocation, suspension).
+  /// See [StatusPurpose].
   @override
   StatusPurpose get statusPurpose;
 
-  /// Encodage utilisé (par défaut base64url)
+  /// The encoding format used for the `encodedList`. Defaults to "base64url".
+  /// Other potential values might include "base64", although "base64url" is common.
   @override
   String get encoding;
 
-  /// Liste encodée des statuts
+  /// The core status list, represented as a compressed bitstring, encoded according
+  /// to the specified `encoding` (typically base64url).
+  /// Each bit in the decoded list corresponds to a specific `statusListIndex` from a
+  /// [StatusList2021Entry]. A '1' usually indicates the status applies (e.g., revoked),
+  /// while a '0' indicates it does not.
   @override
   String get encodedList;
-
-  /// Validité dans le temps
-  @override
-  StatusList2021Validity? get validFrom;
-
-  /// Taille de la liste
-  @override
-  int get statusListSize;
 
   /// Create a copy of StatusList2021Subject
   /// with the given fields replaced by the non-null parameter values.
@@ -798,19 +755,20 @@ StatusList2021Proof _$StatusList2021ProofFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$StatusList2021Proof {
-  /// Type de preuve
+  /// The type of the cryptographic suite used for the proof (e.g., "Ed25519Signature2020").
   String get type => throw _privateConstructorUsedError;
 
-  /// Date de création
+  /// The timestamp when the proof was generated.
   DateTime get created => throw _privateConstructorUsedError;
 
-  /// Finalité de la vérification
+  /// The DID URL identifying the verification method (e.g., public key) used to create the proof.
+  /// This is used by verifiers to check the signature.
   String get verificationMethod => throw _privateConstructorUsedError;
 
-  /// Finalité de la preuve
+  /// The purpose for which the proof was created (e.g., "assertionMethod").
   String get proofPurpose => throw _privateConstructorUsedError;
 
-  /// Valeur de la preuve (signature)
+  /// The digital signature or proof value itself, typically encoded in base64url or multibase.
   String get proofValue => throw _privateConstructorUsedError;
 
   /// Serializes this StatusList2021Proof to a JSON map.
@@ -956,23 +914,24 @@ class _$StatusList2021ProofImpl implements _StatusList2021Proof {
   factory _$StatusList2021ProofImpl.fromJson(Map<String, dynamic> json) =>
       _$$StatusList2021ProofImplFromJson(json);
 
-  /// Type de preuve
+  /// The type of the cryptographic suite used for the proof (e.g., "Ed25519Signature2020").
   @override
   final String type;
 
-  /// Date de création
+  /// The timestamp when the proof was generated.
   @override
   final DateTime created;
 
-  /// Finalité de la vérification
+  /// The DID URL identifying the verification method (e.g., public key) used to create the proof.
+  /// This is used by verifiers to check the signature.
   @override
   final String verificationMethod;
 
-  /// Finalité de la preuve
+  /// The purpose for which the proof was created (e.g., "assertionMethod").
   @override
   final String proofPurpose;
 
-  /// Valeur de la preuve (signature)
+  /// The digital signature or proof value itself, typically encoded in base64url or multibase.
   @override
   final String proofValue;
 
@@ -1029,23 +988,24 @@ abstract class _StatusList2021Proof implements StatusList2021Proof {
   factory _StatusList2021Proof.fromJson(Map<String, dynamic> json) =
       _$StatusList2021ProofImpl.fromJson;
 
-  /// Type de preuve
+  /// The type of the cryptographic suite used for the proof (e.g., "Ed25519Signature2020").
   @override
   String get type;
 
-  /// Date de création
+  /// The timestamp when the proof was generated.
   @override
   DateTime get created;
 
-  /// Finalité de la vérification
+  /// The DID URL identifying the verification method (e.g., public key) used to create the proof.
+  /// This is used by verifiers to check the signature.
   @override
   String get verificationMethod;
 
-  /// Finalité de la preuve
+  /// The purpose for which the proof was created (e.g., "assertionMethod").
   @override
   String get proofPurpose;
 
-  /// Valeur de la preuve (signature)
+  /// The digital signature or proof value itself, typically encoded in base64url or multibase.
   @override
   String get proofValue;
 
@@ -1057,210 +1017,29 @@ abstract class _StatusList2021Proof implements StatusList2021Proof {
       throw _privateConstructorUsedError;
 }
 
-StatusList2021Validity _$StatusList2021ValidityFromJson(
-    Map<String, dynamic> json) {
-  return _StatusList2021Validity.fromJson(json);
-}
-
-/// @nodoc
-mixin _$StatusList2021Validity {
-  /// Date de début de validité
-  DateTime get validFrom => throw _privateConstructorUsedError;
-
-  /// Date de fin de validité
-  DateTime? get validUntil => throw _privateConstructorUsedError;
-
-  /// Serializes this StatusList2021Validity to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of StatusList2021Validity
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $StatusList2021ValidityCopyWith<StatusList2021Validity> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $StatusList2021ValidityCopyWith<$Res> {
-  factory $StatusList2021ValidityCopyWith(StatusList2021Validity value,
-          $Res Function(StatusList2021Validity) then) =
-      _$StatusList2021ValidityCopyWithImpl<$Res, StatusList2021Validity>;
-  @useResult
-  $Res call({DateTime validFrom, DateTime? validUntil});
-}
-
-/// @nodoc
-class _$StatusList2021ValidityCopyWithImpl<$Res,
-        $Val extends StatusList2021Validity>
-    implements $StatusList2021ValidityCopyWith<$Res> {
-  _$StatusList2021ValidityCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of StatusList2021Validity
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? validFrom = null,
-    Object? validUntil = freezed,
-  }) {
-    return _then(_value.copyWith(
-      validFrom: null == validFrom
-          ? _value.validFrom
-          : validFrom // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      validUntil: freezed == validUntil
-          ? _value.validUntil
-          : validUntil // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$StatusList2021ValidityImplCopyWith<$Res>
-    implements $StatusList2021ValidityCopyWith<$Res> {
-  factory _$$StatusList2021ValidityImplCopyWith(
-          _$StatusList2021ValidityImpl value,
-          $Res Function(_$StatusList2021ValidityImpl) then) =
-      __$$StatusList2021ValidityImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({DateTime validFrom, DateTime? validUntil});
-}
-
-/// @nodoc
-class __$$StatusList2021ValidityImplCopyWithImpl<$Res>
-    extends _$StatusList2021ValidityCopyWithImpl<$Res,
-        _$StatusList2021ValidityImpl>
-    implements _$$StatusList2021ValidityImplCopyWith<$Res> {
-  __$$StatusList2021ValidityImplCopyWithImpl(
-      _$StatusList2021ValidityImpl _value,
-      $Res Function(_$StatusList2021ValidityImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of StatusList2021Validity
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? validFrom = null,
-    Object? validUntil = freezed,
-  }) {
-    return _then(_$StatusList2021ValidityImpl(
-      validFrom: null == validFrom
-          ? _value.validFrom
-          : validFrom // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      validUntil: freezed == validUntil
-          ? _value.validUntil
-          : validUntil // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$StatusList2021ValidityImpl implements _StatusList2021Validity {
-  const _$StatusList2021ValidityImpl(
-      {required this.validFrom, this.validUntil});
-
-  factory _$StatusList2021ValidityImpl.fromJson(Map<String, dynamic> json) =>
-      _$$StatusList2021ValidityImplFromJson(json);
-
-  /// Date de début de validité
-  @override
-  final DateTime validFrom;
-
-  /// Date de fin de validité
-  @override
-  final DateTime? validUntil;
-
-  @override
-  String toString() {
-    return 'StatusList2021Validity(validFrom: $validFrom, validUntil: $validUntil)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$StatusList2021ValidityImpl &&
-            (identical(other.validFrom, validFrom) ||
-                other.validFrom == validFrom) &&
-            (identical(other.validUntil, validUntil) ||
-                other.validUntil == validUntil));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, validFrom, validUntil);
-
-  /// Create a copy of StatusList2021Validity
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$StatusList2021ValidityImplCopyWith<_$StatusList2021ValidityImpl>
-      get copyWith => __$$StatusList2021ValidityImplCopyWithImpl<
-          _$StatusList2021ValidityImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$StatusList2021ValidityImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _StatusList2021Validity implements StatusList2021Validity {
-  const factory _StatusList2021Validity(
-      {required final DateTime validFrom,
-      final DateTime? validUntil}) = _$StatusList2021ValidityImpl;
-
-  factory _StatusList2021Validity.fromJson(Map<String, dynamic> json) =
-      _$StatusList2021ValidityImpl.fromJson;
-
-  /// Date de début de validité
-  @override
-  DateTime get validFrom;
-
-  /// Date de fin de validité
-  @override
-  DateTime? get validUntil;
-
-  /// Create a copy of StatusList2021Validity
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$StatusList2021ValidityImplCopyWith<_$StatusList2021ValidityImpl>
-      get copyWith => throw _privateConstructorUsedError;
-}
-
 StatusList2021Entry _$StatusList2021EntryFromJson(Map<String, dynamic> json) {
   return _StatusList2021Entry.fromJson(json);
 }
 
 /// @nodoc
 mixin _$StatusList2021Entry {
-  /// ID de l'entrée
+  /// The identifier for this status entry, typically the VC ID + '#status-<index>'.
   String get id => throw _privateConstructorUsedError;
 
-  /// Type de l'entrée
+  /// The type of this status entry. Must be "StatusList2021".
+  /// (Note: The spec defines this as "StatusList2021", not "StatusList2021Entry").
   String get type => throw _privateConstructorUsedError;
 
-  /// But du statut
+  /// The purpose of the status check (e.g., "revocation"). Should match the
+  /// `statusPurpose` of the referenced [StatusList2021Credential].
+  /// See [StatusPurpose].
   StatusPurpose get statusPurpose => throw _privateConstructorUsedError;
 
-  /// URL de la liste de statut
+  /// The URL (typically the `id`) of the [StatusList2021Credential] containing the relevant status list.
   String get statusListCredential => throw _privateConstructorUsedError;
 
-  /// Index dans la liste
+  /// The zero-based index of the bit within the `encodedList` (after decoding)
+  /// that represents the status of the credential containing this entry.
   int get statusListIndex => throw _privateConstructorUsedError;
 
   /// Serializes this StatusList2021Entry to a JSON map.
@@ -1398,7 +1177,7 @@ class __$$StatusList2021EntryImplCopyWithImpl<$Res>
 class _$StatusList2021EntryImpl implements _StatusList2021Entry {
   const _$StatusList2021EntryImpl(
       {required this.id,
-      this.type = 'StatusList2021Entry',
+      this.type = 'StatusList2021',
       required this.statusPurpose,
       required this.statusListCredential,
       required this.statusListIndex});
@@ -1406,24 +1185,28 @@ class _$StatusList2021EntryImpl implements _StatusList2021Entry {
   factory _$StatusList2021EntryImpl.fromJson(Map<String, dynamic> json) =>
       _$$StatusList2021EntryImplFromJson(json);
 
-  /// ID de l'entrée
+  /// The identifier for this status entry, typically the VC ID + '#status-<index>'.
   @override
   final String id;
 
-  /// Type de l'entrée
+  /// The type of this status entry. Must be "StatusList2021".
+  /// (Note: The spec defines this as "StatusList2021", not "StatusList2021Entry").
   @override
   @JsonKey()
   final String type;
 
-  /// But du statut
+  /// The purpose of the status check (e.g., "revocation"). Should match the
+  /// `statusPurpose` of the referenced [StatusList2021Credential].
+  /// See [StatusPurpose].
   @override
   final StatusPurpose statusPurpose;
 
-  /// URL de la liste de statut
+  /// The URL (typically the `id`) of the [StatusList2021Credential] containing the relevant status list.
   @override
   final String statusListCredential;
 
-  /// Index dans la liste
+  /// The zero-based index of the bit within the `encodedList` (after decoding)
+  /// that represents the status of the credential containing this entry.
   @override
   final int statusListIndex;
 
@@ -1480,23 +1263,27 @@ abstract class _StatusList2021Entry implements StatusList2021Entry {
   factory _StatusList2021Entry.fromJson(Map<String, dynamic> json) =
       _$StatusList2021EntryImpl.fromJson;
 
-  /// ID de l'entrée
+  /// The identifier for this status entry, typically the VC ID + '#status-<index>'.
   @override
   String get id;
 
-  /// Type de l'entrée
+  /// The type of this status entry. Must be "StatusList2021".
+  /// (Note: The spec defines this as "StatusList2021", not "StatusList2021Entry").
   @override
   String get type;
 
-  /// But du statut
+  /// The purpose of the status check (e.g., "revocation"). Should match the
+  /// `statusPurpose` of the referenced [StatusList2021Credential].
+  /// See [StatusPurpose].
   @override
   StatusPurpose get statusPurpose;
 
-  /// URL de la liste de statut
+  /// The URL (typically the `id`) of the [StatusList2021Credential] containing the relevant status list.
   @override
   String get statusListCredential;
 
-  /// Index dans la liste
+  /// The zero-based index of the bit within the `encodedList` (after decoding)
+  /// that represents the status of the credential containing this entry.
   @override
   int get statusListIndex;
 
