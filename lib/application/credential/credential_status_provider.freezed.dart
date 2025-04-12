@@ -16,20 +16,21 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$CredentialStatusState {
-  /// Liste des résultats de vérification
+  /// Map storing the results of status checks, keyed by credential ID.
+  /// Contains [StatusCheckResult] which includes the status type (valid, revoked, invalid) and details.
   Map<String, StatusCheckResult> get checkResults =>
       throw _privateConstructorUsedError;
 
-  /// Indique si une vérification est en cours
+  /// Indicates if a status check operation is currently in progress.
   bool get isLoading => throw _privateConstructorUsedError;
 
-  /// Erreur éventuelle
+  /// Holds a potential error message from the last status check operation.
   String? get error => throw _privateConstructorUsedError;
 
-  /// Date de la dernière vérification
+  /// Timestamp of the last time any status check was performed.
   DateTime? get lastCheck => throw _privateConstructorUsedError;
 
-  /// Prochaine vérification programmée
+  /// Timestamp indicating when the next scheduled automatic check should occur.
   DateTime? get nextCheck => throw _privateConstructorUsedError;
 
   /// Create a copy of CredentialStatusState
@@ -173,10 +174,12 @@ class _$CredentialStatusStateImpl implements _CredentialStatusState {
       this.nextCheck})
       : _checkResults = checkResults;
 
-  /// Liste des résultats de vérification
+  /// Map storing the results of status checks, keyed by credential ID.
+  /// Contains [StatusCheckResult] which includes the status type (valid, revoked, invalid) and details.
   final Map<String, StatusCheckResult> _checkResults;
 
-  /// Liste des résultats de vérification
+  /// Map storing the results of status checks, keyed by credential ID.
+  /// Contains [StatusCheckResult] which includes the status type (valid, revoked, invalid) and details.
   @override
   Map<String, StatusCheckResult> get checkResults {
     if (_checkResults is EqualUnmodifiableMapView) return _checkResults;
@@ -184,20 +187,20 @@ class _$CredentialStatusStateImpl implements _CredentialStatusState {
     return EqualUnmodifiableMapView(_checkResults);
   }
 
-  /// Indique si une vérification est en cours
+  /// Indicates if a status check operation is currently in progress.
   @override
   @JsonKey()
   final bool isLoading;
 
-  /// Erreur éventuelle
+  /// Holds a potential error message from the last status check operation.
   @override
   final String? error;
 
-  /// Date de la dernière vérification
+  /// Timestamp of the last time any status check was performed.
   @override
   final DateTime? lastCheck;
 
-  /// Prochaine vérification programmée
+  /// Timestamp indicating when the next scheduled automatic check should occur.
   @override
   final DateTime? nextCheck;
 
@@ -249,23 +252,24 @@ abstract class _CredentialStatusState implements CredentialStatusState {
       final DateTime? lastCheck,
       final DateTime? nextCheck}) = _$CredentialStatusStateImpl;
 
-  /// Liste des résultats de vérification
+  /// Map storing the results of status checks, keyed by credential ID.
+  /// Contains [StatusCheckResult] which includes the status type (valid, revoked, invalid) and details.
   @override
   Map<String, StatusCheckResult> get checkResults;
 
-  /// Indique si une vérification est en cours
+  /// Indicates if a status check operation is currently in progress.
   @override
   bool get isLoading;
 
-  /// Erreur éventuelle
+  /// Holds a potential error message from the last status check operation.
   @override
   String? get error;
 
-  /// Date de la dernière vérification
+  /// Timestamp of the last time any status check was performed.
   @override
   DateTime? get lastCheck;
 
-  /// Prochaine vérification programmée
+  /// Timestamp indicating when the next scheduled automatic check should occur.
   @override
   DateTime? get nextCheck;
 

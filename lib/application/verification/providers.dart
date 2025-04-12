@@ -2,104 +2,112 @@ import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:did_app/domain/verification/verification_repository.dart';
 import 'package:did_app/infrastructure/verification/mock_verification_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-/// Provider for the verification repository
+part 'providers.freezed.dart';
+// part 'providers.g.dart'; // Uncomment if serialization needed
+
+/// Provides an instance of [VerificationRepository].
+///
+/// This repository handles interactions with the underlying verification service
+/// (e.g., KYC/AML provider) responsible for verifying user identity according
+/// to specific processes and standards like eIDAS 2.0.
 final verificationRepositoryProvider = Provider<VerificationRepository>((ref) {
   // TODO: Replace mock implementation with real KYC/AML verification service
   // This should integrate with a real verification provider that offers KYC/AML services
-  // and follows eIDAS 2.0 standards for identity verification
+  // and potentially follows eIDAS 2.0 standards for identity verification.
   return MockVerificationRepository();
 });
 
-/// State class for the verification process
-class VerificationState {
-  const VerificationState({
-    this.verificationProcess,
-    this.isLoading = false,
-    this.errorMessage,
-    this.currentStepIndex = 0,
-  });
+/// Represents the state of the user identity verification process.
+@freezed
+class VerificationState with _$VerificationState {
+  /// Creates an instance of [VerificationState].
+  const factory VerificationState({
+    /// The ongoing or completed verification process details.
+    VerificationProcess? verificationProcess,
 
-  /// The current verification process
-  final VerificationProcess? verificationProcess;
+    /// Indicates if a verification operation (load, start, submit) is in progress.
+    @Default(false) bool isLoading,
 
-  /// Loading state
-  final bool isLoading;
+    /// Holds a potential error message from the last verification operation.
+    String? errorMessage,
 
-  /// Error message if any
-  final String? errorMessage;
+    /// The index of the current step within the [verificationProcess.steps] list
+    /// that the user is actively working on or needs to complete.
+    @Default(0) int currentStepIndex,
+  }) = _VerificationState;
 
-  /// Current step being worked on
-  final int currentStepIndex;
+  /// Private constructor for Freezed, enables adding custom getters/methods.
+  const VerificationState._();
 
-  /// Get the current step
+  /// Gets the current [VerificationStep] based on the [currentStepIndex].
+  /// Returns `null` if there's no active process, steps are empty, or the index is out of bounds.
   VerificationStep? get currentStep {
     if (verificationProcess == null ||
         verificationProcess!.steps.isEmpty ||
         currentStepIndex >= verificationProcess!.steps.length) {
       return null;
     }
-
     return verificationProcess!.steps[currentStepIndex];
   }
 
-  /// Check if the verification is completed
+  /// Checks if the overall verification process has reached the 'completed' status.
   bool get isVerificationCompleted {
     return verificationProcess?.status == VerificationStatus.completed;
   }
 
-  /// Get the certificate if verification is completed
+  /// Gets the resulting [VerificationCertificate] if the verification process is completed.
+  /// Returns `null` otherwise.
   VerificationCertificate? get certificate {
     return verificationProcess?.certificate;
   }
 
-  /// Copy with method for immutability
-  VerificationState copyWith({
-    VerificationProcess? verificationProcess,
-    bool? isLoading,
-    String? errorMessage,
-    int? currentStepIndex,
-  }) {
-    return VerificationState(
-      verificationProcess: verificationProcess ?? this.verificationProcess,
-      isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage ?? this.errorMessage,
-      currentStepIndex: currentStepIndex ?? this.currentStepIndex,
-    );
-  }
+  // If serialization is needed:
+  // factory VerificationState.fromJson(Map<String, dynamic> json) =>
+  //     _$VerificationStateFromJson(json);
 }
 
-/// Provider for managing verification processes
+/// Provider for the [VerificationNotifier] which manages the [VerificationState].
 final verificationNotifierProvider =
     StateNotifierProvider<VerificationNotifier, VerificationState>((ref) {
   return VerificationNotifier(ref);
 });
 
-/// Notifier for managing verification states
+/// Manages the state and orchestrates operations related to the user identity
+/// verification process (e.g., KYC/AML).
+///
+/// Interacts with the [VerificationRepository] to load, start, and progress
+/// through verification steps.
 class VerificationNotifier extends StateNotifier<VerificationState> {
+  /// Creates an instance of [VerificationNotifier].
+  /// Requires a [Ref] to access the [verificationRepositoryProvider].
   VerificationNotifier(this.ref) : super(const VerificationState());
 
   final Ref ref;
 
-  /// Load verification process for an identity
+  /// Loads the current or most recent verification process associated with the given [identityAddress].
+  ///
+  /// Determines the `currentStepIndex` based on the first incomplete step found.
+  /// Updates the state with the loaded process or an error message.
   Future<void> loadVerification(String identityAddress) async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
       final repository = ref.read(verificationRepositoryProvider);
       final verification =
           await repository.getVerificationProcess(identityAddress);
 
-      // If there's a verification process, find the current step
-      var currentStepIndex = 0;
+      int currentStepIndex = 0;
       if (verification != null && verification.steps.isNotEmpty) {
-        // Find the first incomplete step
-        for (var i = 0; i < verification.steps.length; i++) {
-          final step = verification.steps[i];
-          if (step.status != VerificationStepStatus.completed) {
-            currentStepIndex = i;
-            break;
-          }
+        // Find the index of the first step not marked as completed.
+        currentStepIndex = verification.steps.indexWhere(
+          (step) => step.status != VerificationStepStatus.completed,
+        );
+        // If all steps are completed, indexWhere returns -1. Set to last step index or 0.
+        if (currentStepIndex == -1) {
+          currentStepIndex =
+              verification.steps.isNotEmpty ? verification.steps.length - 1 : 0;
         }
       }
 
@@ -111,32 +119,36 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to load verification: $e',
+        errorMessage: 'Failed to load verification process: $e',
       );
     }
   }
 
-  /// Start a new verification process
+  /// Starts a new verification process for the given [identityAddress].
+  ///
+  /// Checks if an active process already exists; if so, loads it instead.
+  /// Otherwise, initiates a new process via the repository.
+  /// Updates the state with the new process or an error message.
   Future<void> startVerification(String identityAddress) async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
       final repository = ref.read(verificationRepositoryProvider);
 
-      // Check if there's already a verification
+      // Check if there's already an active verification process
       final hasActive = await repository.hasActiveVerification(identityAddress);
       if (hasActive) {
-        // Load the existing verification
+        // Load the existing one instead of starting anew
         await loadVerification(identityAddress);
         return;
       }
 
-      // Start a new verification
+      // Start a new verification process
       final verification = await repository.startVerification(identityAddress);
 
       state = state.copyWith(
         verificationProcess: verification,
-        currentStepIndex: 0,
+        currentStepIndex: 0, // Start at the first step
         isLoading: false,
       );
     } catch (e) {
@@ -147,101 +159,150 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     }
   }
 
-  /// Start a new verification with a specific level
-  Future<void> startVerificationWithLevel(dynamic verificationLevel) async {
-    state = state.copyWith(isLoading: true);
+  /// Starts a new verification process requesting a specific [eidasLevel].
+  ///
+  /// Similar to [startVerification] but allows specifying the desired level (e.g., Low, Substantial, High).
+  /// **Note:** Requires obtaining the user's `identityAddress` from the current session/wallet.
+  /// The repository interaction might differ based on the level.
+  Future<void> startVerificationWithLevel({
+    required EidasLevel eidasLevel, // Use EidasLevel from domain
+    required String identityAddress, // Explicitly require identity address
+  }) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
       final repository = ref.read(verificationRepositoryProvider);
-      // TODO: Get identity address from session or wallet connection
-      // This is currently hardcoded but should come from the authenticated user's session
-      const identityAddress =
-          'current_user_address'; // In a real app, get from session
 
-      // Check if there's already a verification
+      // Check if there's already an active verification process
       final hasActive = await repository.hasActiveVerification(identityAddress);
       if (hasActive) {
-        // Load the existing verification
-        await loadVerification(identityAddress);
-        return;
+        // Consider if the existing process matches the requested level
+        // If not, cancellation/restart logic might be needed (depends on policy)
+        // Also check if the existing process level matches eidasLevel
+        final existingProcess =
+            await repository.getVerificationProcess(identityAddress);
+        if (existingProcess?.certificate?.eidasLevel == eidasLevel) {
+          await loadVerification(identityAddress);
+          return;
+        } else {
+          // Handle level mismatch - potentially cancel old one?
+          // For now, just load the existing one.
+          await loadVerification(identityAddress);
+          return; // Or throw error, or proceed to create new?
+        }
       }
 
-      // Start a new verification
-      final verification = await repository.startVerification(identityAddress);
+      // Start a new verification process with the specified level
+      // TODO: Update repository interface if `startVerification` needs the level
+      final verification = await repository.startVerification(
+        identityAddress, // Pass level if required by repo method
+        // level: eidasLevel, // Pass the domain level if required
+      );
 
       state = state.copyWith(
         verificationProcess: verification,
-        currentStepIndex: 0,
+        currentStepIndex: 0, // Start at the first step
         isLoading: false,
       );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to start verification: $e',
+        errorMessage: 'Failed to start verification with level: $e',
       );
     }
   }
 
-  /// Start a renewal process
-  Future<void> startRenewal({String? previousCertificateId}) async {
-    state = state.copyWith(isLoading: true);
+  /// Starts a verification process intended for renewing an existing certificate.
+  ///
+  /// **Note:** Requires obtaining the user's `identityAddress` from the current session/wallet.
+  /// May involve passing the [previousCertificateId] to the repository.
+  Future<void> startRenewal({
+    required String identityAddress, // Explicitly require identity address
+    String? previousCertificateId,
+  }) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
       final repository = ref.read(verificationRepositoryProvider);
-      const identityAddress =
-          'current_user_address'; // In a real app, get from session
 
-      // Check if there's already a verification
+      // Check if there's already an active verification process
       final hasActive = await repository.hasActiveVerification(identityAddress);
       if (hasActive) {
-        // Load the existing verification
         await loadVerification(identityAddress);
         return;
       }
 
-      // Start a new verification (for renewal)
-      final verification = await repository.startVerification(identityAddress);
+      // Start a new verification process, potentially marking it as renewal
+      // TODO: Update repository interface if `startVerification` needs renewal info
+      final verification = await repository.startVerification(
+        identityAddress,
+        // isRenewal: true,
+        // previousCertificateId: previousCertificateId,
+      );
 
       state = state.copyWith(
         verificationProcess: verification,
-        currentStepIndex: 0,
+        currentStepIndex: 0, // Start at the first step
         isLoading: false,
       );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to start renewal: $e',
+        errorMessage: 'Failed to start verification renewal: $e',
       );
     }
   }
 
-  /// Submit a verification step
-  Future<void> submitVerificationStep(List<String> documentPaths) async {
+  /// Submits data for the current verification step.
+  ///
+  /// Requires [documentPaths] or other data relevant to the current step's requirements.
+  /// Updates the verification process via the repository and potentially advances the `currentStepIndex`.
+  /// Updates the state with the modified process or an error message.
+  Future<void> submitVerificationStep(
+      {required List<String> documentPaths,
+      Map<String, dynamic>? formData}) async {
+    // Ensure there is an active process and a current step
     if (state.verificationProcess == null || state.currentStep == null) {
       state = state.copyWith(
-        errorMessage: 'No active verification process',
+        errorMessage: 'No active verification process or step to submit',
       );
       return;
     }
 
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
       final repository = ref.read(verificationRepositoryProvider);
       final verificationId = state.verificationProcess!.id;
       final stepId = state.currentStep!.id;
 
-      // Submit the step
+      // Submit the step data to the repository
       final updatedVerification = await repository.submitVerificationStep(
         verificationId: verificationId,
         stepId: stepId,
         documentPaths: documentPaths,
+        // TODO: Pass formData if the repository method accepts it
+        // formData: formData,
       );
 
-      // Move to the next incomplete step if available
-      var nextStepIndex = state.currentStepIndex;
-      if (updatedVerification.steps.length > state.currentStepIndex + 1) {
-        nextStepIndex = state.currentStepIndex + 1;
+      // Determine the next step index after submission
+      int nextStepIndex = state.currentStepIndex;
+      if (updatedVerification.steps.length > state.currentStepIndex) {
+        // Find the first incomplete step starting from the current index
+        final nextIncomplete = updatedVerification.steps.indexWhere(
+          (step) => step.status != VerificationStepStatus.completed,
+          state.currentStepIndex,
+        );
+
+        if (nextIncomplete != -1) {
+          nextStepIndex = nextIncomplete;
+        } else {
+          // If all steps from current onwards are complete, stay on last step
+          // or update based on overall process status
+          nextStepIndex = updatedVerification.steps.isNotEmpty
+              ? updatedVerification.steps.length - 1
+              : 0;
+        }
       }
 
       state = state.copyWith(
@@ -257,57 +318,8 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     }
   }
 
-  /// Move to a specific step
-  void setCurrentStep(int stepIndex) {
-    if (state.verificationProcess == null ||
-        stepIndex < 0 ||
-        stepIndex >= state.verificationProcess!.steps.length) {
-      return;
-    }
-
-    state = state.copyWith(currentStepIndex: stepIndex);
-  }
-
-  /// Cancel an active verification process
-  Future<void> cancelVerification() async {
-    if (state.verificationProcess == null) {
-      return;
-    }
-
-    state = state.copyWith(isLoading: true);
-
-    try {
-      final repository = ref.read(verificationRepositoryProvider);
-      await repository.cancelVerification(state.verificationProcess!.id);
-
-      state = const VerificationState();
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'Failed to cancel verification: $e',
-      );
-    }
-  }
-
-  /// Check if a verification has been updated and refresh if needed
-  Future<void> refreshVerification() async {
-    if (state.verificationProcess == null) {
-      return;
-    }
-
-    final identityAddress = state.verificationProcess!.identityAddress;
-    await loadVerification(identityAddress);
-  }
-
-  /// Get verification certificate for an identity
-  Future<VerificationCertificate?> getVerificationCertificate(
-    String identityAddress,
-  ) async {
-    try {
-      final repository = ref.read(verificationRepositoryProvider);
-      return await repository.getVerificationCertificate(identityAddress);
-    } catch (e) {
-      return null;
-    }
+  /// Resets the provider state to its initial default values.
+  void reset() {
+    state = const VerificationState();
   }
 }

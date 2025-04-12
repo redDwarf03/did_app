@@ -5,135 +5,115 @@ import 'package:did_app/infrastructure/credential/eidas_credential_service.dart'
 import 'package:did_app/infrastructure/credential/eidas_trust_list.dart';
 import 'package:did_app/infrastructure/credential/eu_trust_registry_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-/// Provider pour le service eIDAS
+part 'eidas_provider.freezed.dart';
+// part 'eidas_provider.g.dart'; // Removed as fromJson is not used yet
+
+/// Provides an instance of the [eidas_service.EidasCredentialService].
+///
+/// This service handles eIDAS-specific operations like importing/exporting
+/// credentials in eIDAS format, verifying signatures, and checking revocation status.
 final eidasCredentialServiceProvider =
     Provider<eidas_service.EidasCredentialService>((ref) {
+  // Uses the concrete implementation from the infrastructure layer.
   return eidas_service.EidasCredentialService();
 });
 
-/// État pour la fonctionnalité eIDAS
-class EidasState {
-  const EidasState({
-    this.isLoading = false,
-    this.errorMessage,
-    this.isEudiWalletAvailable = false,
-    this.verificationResult,
-    this.revocationStatus,
-    this.lastSyncDate,
-    this.trustListReport,
-    this.interoperabilityReport,
-    this.trustedIssuers = const [],
-    this.selectedTrustLevel,
-    this.selectedCountry,
-  });
+/// Represents the state for eIDAS-related features within the application.
+@freezed
+class EidasState with _$EidasState {
+  const factory EidasState({
+    /// Indicates if an eIDAS-related operation is currently in progress.
+    @Default(false) bool isLoading,
 
-  /// Indique si une opération est en cours
-  final bool isLoading;
-
-  /// Message d'erreur éventuel
-  final String? errorMessage;
-
-  /// Indique si l'EUDI Wallet est disponible sur l'appareil
-  final bool isEudiWalletAvailable;
-
-  /// Résultat de la dernière vérification de signature
-  final eidas_service.VerificationResult? verificationResult;
-
-  /// Statut de révocation de la dernière attestation vérifiée
-  final eidas_service.RevocationStatus? revocationStatus;
-
-  /// Date de dernière synchronisation avec le registre européen
-  final DateTime? lastSyncDate;
-
-  /// Rapport sur la liste de confiance
-  final Map<String, dynamic>? trustListReport;
-
-  /// Rapport d'interopérabilité
-  final Map<String, dynamic>? interoperabilityReport;
-
-  /// Liste des émetteurs de confiance
-  final List<TrustedIssuer> trustedIssuers;
-
-  /// Niveau de confiance sélectionné pour le filtrage
-  final TrustLevel? selectedTrustLevel;
-
-  /// Pays sélectionné pour le filtrage
-  final String? selectedCountry;
-
-  EidasState copyWith({
-    bool? isLoading,
+    /// Holds a potential error message from the last eIDAS operation.
     String? errorMessage,
-    bool? isEudiWalletAvailable,
+
+    /// Indicates if the EUDI Wallet application is detected as available on the device.
+    /// (Currently simulated).
+    @Default(false) bool isEudiWalletAvailable,
+
+    /// Stores the result of the last eIDAS credential verification attempt.
     eidas_service.VerificationResult? verificationResult,
+
+    /// Stores the revocation status checked during the last verification.
     eidas_service.RevocationStatus? revocationStatus,
+
+    /// Timestamp of the last successful synchronization with the EU Trust Registry.
     DateTime? lastSyncDate,
+
+    /// A report summarizing the current state of the local Trust List cache.
     Map<String, dynamic>? trustListReport,
+
+    /// A report summarizing interoperability status based on the Trust List.
     Map<String, dynamic>? interoperabilityReport,
-    List<TrustedIssuer>? trustedIssuers,
+
+    /// The current list of trusted issuers, potentially filtered by country or trust level.
+    @Default([]) List<TrustedIssuer> trustedIssuers,
+
+    /// The trust level currently selected for filtering issuers (e.g., Qualified).
     TrustLevel? selectedTrustLevel,
+
+    /// The country code currently selected for filtering issuers (e.g., 'FR', 'DE').
     String? selectedCountry,
-  }) {
-    return EidasState(
-      isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage,
-      isEudiWalletAvailable:
-          isEudiWalletAvailable ?? this.isEudiWalletAvailable,
-      verificationResult: verificationResult ?? this.verificationResult,
-      revocationStatus: revocationStatus ?? this.revocationStatus,
-      lastSyncDate: lastSyncDate ?? this.lastSyncDate,
-      trustListReport: trustListReport ?? this.trustListReport,
-      interoperabilityReport:
-          interoperabilityReport ?? this.interoperabilityReport,
-      trustedIssuers: trustedIssuers ?? this.trustedIssuers,
-      selectedTrustLevel: selectedTrustLevel ?? this.selectedTrustLevel,
-      selectedCountry: selectedCountry ?? this.selectedCountry,
-    );
-  }
+  }) = _EidasState;
+
+  // Private constructor needed for Freezed
+  // const EidasState._();
+
+  /// Creates an [EidasState] instance from a JSON map.
+  /// Add .g.dart part file and run build_runner if needed.
+  // factory EidasState.fromJson(Map<String, dynamic> json) => _$EidasStateFromJson(json);
 }
 
-/// Provider pour la gestion de l'interopérabilité eIDAS
+/// Provider for the StateNotifier managing eIDAS-related state and logic.
 final eidasNotifierProvider =
     StateNotifierProvider<EidasNotifier, EidasState>((ref) {
   return EidasNotifier(ref);
 });
 
-/// Notifier pour la gestion des fonctionnalités eIDAS
+/// Manages state and orchestrates operations related to eIDAS compliance
+/// and interoperability features.
+///
+/// Interacts with [eidasCredentialServiceProvider], [EidasTrustList],
+/// and [EuTrustRegistryService] to perform tasks like verification,
+/// synchronization, filtering, and simulated EUDI Wallet interactions.
 class EidasNotifier extends StateNotifier<EidasState> {
+  /// Creates an instance of [EidasNotifier].
+  ///
+  /// Requires a [Ref] to access other providers.
+  /// Immediately triggers checks for EUDI Wallet availability (simulated)
+  /// and loads initial Trust List data.
   EidasNotifier(this._ref) : super(const EidasState()) {
-    // À l'initialisation, vérifier la disponibilité de l'EUDI Wallet
+    // On initialization, check EUDI Wallet availability
     _checkEudiWalletAvailability();
-
-    // Charger les données de la liste de confiance
+    // Load initial Trust List data
     _loadTrustListData();
   }
 
   final Ref _ref;
 
-  /// Vérifie si l'EUDI Wallet est disponible sur l'appareil
+  /// Simulates checking if the EUDI Wallet application is installed/available.
+  /// In a real implementation, this would use platform-specific APIs.
   Future<void> _checkEudiWalletAvailability() async {
-    // Dans une implémentation réelle, cela vérifierait si l'application EUDI Wallet
-    // est installée sur l'appareil via une API du système d'exploitation
-    // Pour la démo, on simule que c'est disponible
-    await Future.delayed(const Duration(seconds: 1));
+    // Simulate check - assumes available for demo purposes.
+    await Future.delayed(const Duration(milliseconds: 500));
     state = state.copyWith(isEudiWalletAvailable: true);
   }
 
-  /// Charge les données initiales de la liste de confiance
+  /// Loads initial data from the local Trust List cache.
+  /// Fetches the last sync date, all issuers, and generates a report.
   Future<void> _loadTrustListData() async {
     state = state.copyWith(isLoading: true);
-
     try {
-      // Récupérer la date de dernière synchronisation
-      final lastSyncDate = await EidasTrustList.instance.getLastSyncDate();
-
-      // Récupérer tous les émetteurs de confiance
-      final trustedIssuers =
-          await EidasTrustList.instance.getAllTrustedIssuers();
-
-      // Générer un rapport sur la liste de confiance
-      final trustListReport =
-          await EidasTrustList.instance.generateTrustListReport();
+      final trustList = EidasTrustList.instance;
+      // Get last sync date from local cache.
+      final lastSyncDate = await trustList.getLastSyncDate();
+      // Get all trusted issuers from local cache.
+      final trustedIssuers = await trustList.getAllTrustedIssuers();
+      // Generate a report based on local cache data.
+      final trustListReport = await trustList.generateTrustListReport();
 
       state = state.copyWith(
         isLoading: false,
@@ -144,356 +124,346 @@ class EidasNotifier extends StateNotifier<EidasState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors du chargement des données: $e',
+        errorMessage: 'Error loading Trust List data: $e',
       );
     }
   }
 
-  /// Charge ou actualise les données de la liste de confiance
+  /// Reloads data from the local Trust List cache.
+  /// Same as the initial load, useful for manual refresh.
   Future<void> loadTrustList() async {
     return _loadTrustListData();
   }
 
-  /// Importe une attestation depuis un JSON au format eIDAS
+  /// Imports a credential from an eIDAS-formatted JSON string.
+  /// Uses the [eidasCredentialServiceProvider].
   Future<Credential?> importFromJson(String jsonString) async {
-    state = state.copyWith(
-      isLoading: true,
-    );
-
+    state = state.copyWith(isLoading: true);
     try {
       final service = _ref.read(eidasCredentialServiceProvider);
       final credential = await service.importFromJson(jsonString);
-
-      state = state.copyWith(
-        isLoading: false,
-      );
-
+      state = state.copyWith(isLoading: false);
+      // Note: Does not automatically add the imported credential to the main
+      // credential list. This should likely be done via credentialNotifierProvider.
       return credential;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: "Erreur lors de l'importation: $e",
+        errorMessage: 'Error importing from JSON: $e',
       );
       return null;
     }
   }
 
-  /// Exporte une attestation au format eIDAS
+  /// Exports a given W3C [Credential] to an eIDAS-formatted JSON string.
+  /// Uses the [eidasCredentialServiceProvider].
   Future<String?> exportToJson(Credential credential) async {
-    state = state.copyWith(
-      isLoading: true,
-    );
-
+    state = state.copyWith(isLoading: true);
     try {
       final service = _ref.read(eidasCredentialServiceProvider);
       final jsonString = await service.exportToJson(credential);
-
-      state = state.copyWith(
-        isLoading: false,
-      );
-
+      state = state.copyWith(isLoading: false);
       return jsonString;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: "Erreur lors de l'exportation: $e",
+        errorMessage: 'Error exporting to JSON: $e',
       );
       return null;
     }
   }
 
-  /// Vérifie si une attestation est compatible eIDAS
+  /// Checks if a given W3C [Credential] is already considered eIDAS compatible.
+  /// Delegates the check to the [eidasCredentialServiceProvider].
   bool isEidasCompatible(Credential credential) {
     final service = _ref.read(eidasCredentialServiceProvider);
     return service.isEidasCompatible(credential);
   }
 
-  /// Rend une attestation compatible eIDAS
+  /// Attempts to convert a standard W3C [Credential] into an eIDAS compatible format.
+  /// Uses the [eidasCredentialServiceProvider].
   Future<Credential?> makeEidasCompatible(Credential credential) async {
-    state = state.copyWith(
-      isLoading: true,
-    );
-
+    state = state.copyWith(isLoading: true);
     try {
       final service = _ref.read(eidasCredentialServiceProvider);
       final result = await service.makeEidasCompatible(credential);
-
-      state = state.copyWith(
-        isLoading: false,
-      );
-
+      state = state.copyWith(isLoading: false);
       return result;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors de la conversion eIDAS: $e',
+        errorMessage: 'Error making credential eIDAS compatible: $e',
       );
       return null;
     }
   }
 
-  /// Importe une attestation depuis l'EUDI Wallet
+  /// Simulates importing a credential from an external EUDI Wallet application.
+  /// In a real scenario, this would involve inter-app communication.
   Future<Credential?> importFromEudiWallet() async {
-    state = state.copyWith(
-      isLoading: true,
-    );
-
+    state = state.copyWith(isLoading: true);
     try {
-      // Dans une implémentation réelle, cette méthode :
-      // 1. Ouvrirait l'application EUDI Wallet via une Intent/URL Scheme
-      // 2. Recevrait les données de l'attestation sélectionnée
-      // 3. Convertirait ces données au format attendu par l'application
+      // --- Real Implementation Steps (commented out) ---
+      // 1. Open EUDI Wallet app via Intent/URL Scheme.
+      // 2. Receive selected credential data back.
+      // 3. Convert data to internal Credential format.
 
-      await Future.delayed(const Duration(seconds: 2)); // Simuler le délai
+      await Future.delayed(const Duration(seconds: 1)); // Simulate delay
 
       final service = _ref.read(eidasCredentialServiceProvider);
 
-      // Simulation: charger un exemple de credential eIDAS
-      final jsonString = await service.exportToJson(Credential(
-        id: 'urn:uuid:${DateTime.now().millisecondsSinceEpoch}',
-        type: ['VerifiableCredential', 'EuropeanIdentityCredential'],
-        issuer: 'did:example:eudi-wallet-issuer',
-        issuanceDate: DateTime.now(),
-        subject: 'did:example:c1234',
-        credentialSubject: {
-          'id': 'did:example:c1234',
-          'firstName': 'Alice',
-          'lastName': 'Martin',
-          'dateOfBirth': '1990-01-01',
-          'nationality': 'FR',
-          'documentNumber': 'FR-ID-123456789',
-        },
-        context: [
-          'https://www.w3.org/2018/credentials/v1',
-          'https://ec.europa.eu/2023/credentials/eidas/v1',
+      // Simulate loading a sample eIDAS credential JSON and importing it.
+      // TODO: Replace mock data with actual inter-app communication logic.
+      const mockEidasJson = '''
+{
+        "@context": [
+          "https://www.w3.org/2018/credentials/v1",
+          "https://ec.europa.eu/2023/credentials/eidas/v1"
         ],
-        proof: {
-          'type': 'EidasSignature2023',
-          'created': DateTime.now().toIso8601String(),
-          'verificationMethod': 'did:example:eudi-wallet-issuer#key-1',
-          'proofPurpose': 'assertionMethod',
-          'proofValue': 'zQeVbY4oey5q2M3XKaxup3tmzN4DRFTLVqpLMweBrSxBz',
+        "id": "urn:uuid:mock-eidas-credential",
+        "type": ["VerifiableCredential", "MockEidasPid"],
+        "issuer": "did:example:mock-issuer",
+        "issuanceDate": "2024-01-01T00:00:00Z",
+        "credentialSubject": {
+          "id": "did:example:mock-subject",
+          "given_name": "Mock",
+          "family_name": "User",
+          "birthdate": "1980-01-01"
         },
-      ),);
+        "proof": {
+          "type": "EidasSignature2023",
+          "created": "2024-01-01T00:00:00Z",
+          "verificationMethod": "did:example:mock-issuer#key-1",
+          "proofPurpose": "assertionMethod",
+          "proofValue": "mockProofValue..."
+        }
+      }''';
 
-      final credential = await service.importFromJson(jsonString);
-
-      state = state.copyWith(
-        isLoading: false,
-      );
-
+      final credential = await service.importFromJson(mockEidasJson);
+      state = state.copyWith(isLoading: false);
+      // Again, does not add to the main credential list automatically.
       return credential;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: "Erreur lors de l'importation depuis EUDI Wallet: $e",
+        errorMessage: 'Error importing from EUDI Wallet (simulation): $e',
       );
       return null;
     }
   }
 
-  /// Vérifie l'authenticité d'une attestation eIDAS
+  /// Verifies an eIDAS credential, checking signature, revocation status, and issuer trust.
+  ///
+  /// - Converts the credential to eIDAS format if needed.
+  /// - Calls the [eidasCredentialServiceProvider] to verify the signature.
+  /// - Calls the service to check revocation status.
+  /// - Calls [EidasTrustList] to check if the issuer is trusted.
+  /// - Updates the state with the detailed [verificationResult] and [revocationStatus].
+  ///
+  /// Returns a [eidas_service.VerificationResult] summarizing the outcome.
   Future<eidas_service.VerificationResult> verifyCredential(
-      Credential credential,) async {
-    state = state.copyWith(
-      isLoading: true,
-    );
-
+    Credential credential,
+  ) async {
+    state = state.copyWith(isLoading: true);
     try {
       final service = _ref.read(eidasCredentialServiceProvider);
 
-      // Convertir en format eIDAS si nécessaire
+      // Ensure credential is in eIDAS format for verification.
       final eidasCompatible = await service.makeEidasCompatible(credential);
-      final eidasCredential = EidasCredential.fromCredential(eidasCompatible);
+      // Manually construct EidasCredential from the compatible Credential
+      // This assumes makeEidasCompatible added necessary context/types
+      // and the structure aligns. Might need refinement based on actual data.
+      final eidasCredential = EidasCredential(
+        id: eidasCompatible.id,
+        type: eidasCompatible.type,
+        // Assuming issuer can be parsed or is stored appropriately
+        issuer: EidasIssuer.fromJson(eidasCompatible.issuer),
+        issuanceDate: eidasCompatible.issuanceDate,
+        credentialSubject: eidasCompatible.credentialSubject,
+        expirationDate: eidasCompatible.expirationDate,
+        credentialStatus: eidasCompatible.status != null
+            ? EidasCredentialStatus.fromJson(eidasCompatible.status!)
+            : null,
+        credentialSchema: eidasCompatible.credentialSchema != null
+            ? EidasCredentialSchema.fromJson(eidasCompatible.credentialSchema!)
+            : null,
+        proof: eidasCompatible.proof.isNotEmpty
+            ? EidasProof.fromJson(eidasCompatible.proof)
+            : null,
+        // Evidence might not be directly available on the base Credential model
+      );
 
-      // Vérifier la signature cryptographique
-      final verificationResult =
+      // 1. Verify cryptographic signature.
+      final signatureVerification =
           await service.verifyEidasCredential(eidasCredential);
 
-      // Vérifier le statut de révocation si la signature est valide
+      // 2. Check revocation status only if signature is valid.
       eidas_service.RevocationStatus? revocationStatus;
-      if (verificationResult.isValid) {
+      if (signatureVerification.isValid) {
         revocationStatus = await service.checkRevocationStatus(eidasCredential);
       }
 
-      // Vérifier si l'émetteur est dans la liste de confiance européenne
+      // 3. Check if issuer is in the EU Trust List.
       var issuerTrusted = false;
       if (eidasCredential.issuer.id.isNotEmpty) {
         issuerTrusted = await EidasTrustList.instance
             .isIssuerTrusted(eidasCredential.issuer.id);
       }
 
-      // Créer un résultat enrichi avec les informations de confiance
-      final result = eidas_service.VerificationResult(
-        isValid: verificationResult.isValid &&
-            (revocationStatus?.isRevoked != true) &&
-            issuerTrusted,
+      // Combine results into a final verification status.
+      final overallIsValid = signatureVerification.isValid &&
+          (revocationStatus?.isRevoked != true) &&
+          issuerTrusted;
+
+      final finalResult = eidas_service.VerificationResult(
+        isValid: overallIsValid,
         message: _buildVerificationMessage(
-            verificationResult, revocationStatus, issuerTrusted,),
+          signatureVerification,
+          revocationStatus,
+          issuerTrusted,
+        ),
         details: {
-          ...?verificationResult.details,
+          // Spread operator with null check
+          ...(signatureVerification.details ?? {}),
           'issuerTrusted': issuerTrusted,
+          // Store relevant revocation info if available
           if (revocationStatus != null)
-            'revocationStatus':
-                revocationStatus.isRevoked ? 'révoqué' : 'valide',
+            'revocationStatus': {
+              'isRevoked': revocationStatus.isRevoked,
+              'message': revocationStatus.message,
+              'lastChecked': revocationStatus.lastChecked.toIso8601String(),
+            } // No comma needed here as it's the last element
         },
       );
 
       state = state.copyWith(
         isLoading: false,
-        verificationResult: result,
-        revocationStatus: revocationStatus,
+        verificationResult: finalResult,
+        revocationStatus: revocationStatus, // Store the detailed status
       );
-
-      return result;
+      return finalResult;
     } catch (e) {
       final errorResult = eidas_service.VerificationResult(
         isValid: false,
-        message: 'Erreur lors de la vérification: $e',
+        message: 'Error during eIDAS verification: $e',
       );
-
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors de la vérification: $e',
+        errorMessage: 'Error during eIDAS verification: $e',
         verificationResult: errorResult,
       );
-
       return errorResult;
     }
   }
 
-  /// Construit un message de vérification synthétique
+  /// Helper method to build a consolidated verification message string.
   String _buildVerificationMessage(
-    eidas_service.VerificationResult result,
-    eidas_service.RevocationStatus? revocationStatus,
+    eidas_service.VerificationResult sigResult,
+    eidas_service.RevocationStatus? revStatus,
     bool issuerTrusted,
   ) {
-    final messages = <String>[];
-
-    // Message principal de vérification
-    messages.add(result.message);
-
-    // Statut de révocation
-    if (revocationStatus != null) {
-      messages.add(revocationStatus.message);
+    final messages = <String>[
+      sigResult.message, // Start with signature verification message.
+    ];
+    if (revStatus != null) {
+      messages.add(revStatus.message); // Add revocation message if available.
     }
-
-    // Statut de confiance de l'émetteur
-    if (issuerTrusted) {
-      messages.add('Émetteur présent dans le registre de confiance européen');
-    } else {
-      messages
-          .add('Émetteur non reconnu par le registre de confiance européen');
-    }
-
-    return messages.join('. ');
+    messages.add(
+      issuerTrusted
+          ? 'Issuer recognized by EU Trust Registry.'
+          : 'Issuer NOT recognized by EU Trust Registry.',
+    );
+    return messages.join(' ');
   }
 
-  /// Génère un QR code pour partager une attestation
+  /// Generates data suitable for a QR code representing the credential.
+  /// Currently exports to eIDAS JSON format.
+  /// TODO: Implement actual QR code generation (e.g., using a library).
   Future<String?> generateQrCodeForCredential(Credential credential) async {
-    state = state.copyWith(
-      isLoading: true,
-    );
-
+    state = state.copyWith(isLoading: true);
     try {
       final service = _ref.read(eidasCredentialServiceProvider);
-
-      // Convertir en format eIDAS si nécessaire
+      // Ensure eIDAS format before exporting.
       final eidasCompatible = await service.makeEidasCompatible(credential);
-
-      // Exporter au format JSON pour le QR code
       final json = await service.exportToJson(eidasCompatible);
 
-      // Dans une implémentation réelle, on utiliserait une bibliothèque pour
-      // générer un QR code à partir du JSON, potentiellement compressé
+      // In a real app, use a QR code library here:
+      // e.g., final qrImageData = await QrPainter(data: json, ...).toImageData(200);
 
-      // Pour cette démo, on retourne simplement le JSON
-      state = state.copyWith(
-        isLoading: false,
-      );
-
-      return json;
+      state = state.copyWith(isLoading: false);
+      return json; // Return JSON for now, UI layer would generate QR.
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors de la génération du QR code: $e',
+        errorMessage: 'Error generating QR code data: $e',
       );
       return null;
     }
   }
 
-  /// Synchronise les attestations avec l'infrastructure eIDAS européenne
+  /// Triggers synchronization with the EU Trust Registry infrastructure.
+  /// Uses [EuTrustRegistryService] to fetch updates and then updates
+  /// the local [EidasTrustList] cache and the state.
   Future<bool> synchronizeWithEidasInfrastructure() async {
-    state = state.copyWith(
-      isLoading: true,
-    );
-
+    state = state.copyWith(isLoading: true);
     try {
-      // Dans une implémentation réelle, cette méthode :
-      // 1. Se connecterait à l'infrastructure de nœuds eIDAS
-      // 2. Mettrait à jour les listes de révocation
-      // 3. Synchroniserait les listes de confiance
-      // 4. Mettrait à jour les schémas de validation
-
-      // Utiliser le service de registre européen pour synchroniser les données
-      final success =
+      // 1. Fetch updates from the central EU Trust Registry.
+      final syncSuccess =
           await EuTrustRegistryService.instance.synchronizeTrustList();
 
-      if (success) {
-        // Mettre à jour les données locales
-        final lastSyncDate = await EidasTrustList.instance.getLastSyncDate();
-        final trustedIssuers =
-            await EidasTrustList.instance.getAllTrustedIssuers();
-        final trustListReport =
-            await EidasTrustList.instance.generateTrustListReport();
-
-        // Générer un rapport d'interopérabilité
-        final interoperabilityReport = await EuTrustRegistryService.instance
-            .generateInteroperabilityReport();
-
-        state = state.copyWith(
-          isLoading: false,
-          lastSyncDate: lastSyncDate,
-          trustedIssuers: trustedIssuers,
-          trustListReport: trustListReport,
-          interoperabilityReport: interoperabilityReport,
-        );
-
-        return true;
-      } else {
-        throw Exception(
-            'Échec de la synchronisation avec le registre européen',);
+      if (!syncSuccess) {
+        throw Exception('Synchronization with EU Trust Registry failed.');
       }
+
+      // 2. If sync succeeded, update local cache representation and state.
+      final trustList = EidasTrustList.instance;
+      final lastSyncDate = await trustList.getLastSyncDate();
+      final trustedIssuers = await trustList.getAllTrustedIssuers();
+      final trustListReport = await trustList.generateTrustListReport();
+
+      // Also generate an interoperability report based on the updated list.
+      final interoperabilityReport = await EuTrustRegistryService.instance
+          .generateInteroperabilityReport();
+
+      state = state.copyWith(
+        isLoading: false,
+        lastSyncDate: lastSyncDate,
+        trustedIssuers: trustedIssuers, // Update the full list in state
+        trustListReport: trustListReport,
+        interoperabilityReport: interoperabilityReport,
+      );
+      return true;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage:
-            "Erreur lors de la synchronisation avec l'infrastructure eIDAS: $e",
+        errorMessage: 'Error during eIDAS infrastructure synchronization: $e',
       );
       return false;
     }
   }
 
-  /// Filtre les émetteurs de confiance par pays
+  /// Filters the displayed list of trusted issuers based on a country code.
+  /// If [countryCode] is null or empty, resets the country filter.
+  /// Re-applies the existing trust level filter if any.
   Future<void> filterIssuersByCountry(String? countryCode) async {
     state = state.copyWith(
       isLoading: true,
-      selectedCountry: countryCode,
+      selectedCountry: countryCode, // Update selected country filter
     );
-
     try {
+      final trustList = EidasTrustList.instance;
       List<TrustedIssuer> filteredIssuers;
 
-      if (countryCode == null) {
-        // Pas de filtre de pays
-        filteredIssuers = await EidasTrustList.instance.getAllTrustedIssuers();
+      if (countryCode == null || countryCode.isEmpty) {
+        // No country filter: get all issuers.
+        filteredIssuers = await trustList.getAllTrustedIssuers();
       } else {
-        // Filtrer par pays
-        filteredIssuers = await EidasTrustList.instance
-            .getTrustedIssuersByCountry(countryCode);
+        // Apply country filter.
+        filteredIssuers =
+            await trustList.getTrustedIssuersByCountry(countryCode);
       }
 
-      // Appliquer le filtre de niveau si existant
+      // Re-apply the trust level filter if one is selected.
       if (state.selectedTrustLevel != null) {
         filteredIssuers = filteredIssuers
             .where((issuer) => issuer.trustLevel == state.selectedTrustLevel)
@@ -502,37 +472,38 @@ class EidasNotifier extends StateNotifier<EidasState> {
 
       state = state.copyWith(
         isLoading: false,
-        trustedIssuers: filteredIssuers,
+        trustedIssuers: filteredIssuers, // Update displayed list
       );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors du filtrage par pays: $e',
+        errorMessage: 'Error filtering issuers by country: $e',
       );
     }
   }
 
-  /// Filtre les émetteurs de confiance par niveau de confiance
+  /// Filters the displayed list of trusted issuers based on a trust level.
+  /// If [level] is null, resets the trust level filter.
+  /// Re-applies the existing country filter if any.
   Future<void> filterIssuersByTrustLevel(TrustLevel? level) async {
     state = state.copyWith(
       isLoading: true,
-      selectedTrustLevel: level,
+      selectedTrustLevel: level, // Update selected trust level filter
     );
-
     try {
+      final trustList = EidasTrustList.instance;
       List<TrustedIssuer> filteredIssuers;
 
       if (level == null) {
-        // Pas de filtre de niveau
-        filteredIssuers = await EidasTrustList.instance.getAllTrustedIssuers();
+        // No level filter: get all issuers.
+        filteredIssuers = await trustList.getAllTrustedIssuers();
       } else {
-        // Filtrer par niveau
-        filteredIssuers =
-            await EidasTrustList.instance.getTrustedIssuersByLevel(level);
+        // Apply level filter.
+        filteredIssuers = await trustList.getTrustedIssuersByLevel(level);
       }
 
-      // Appliquer le filtre de pays si existant
-      if (state.selectedCountry != null) {
+      // Re-apply the country filter if one is selected.
+      if (state.selectedCountry != null && state.selectedCountry!.isNotEmpty) {
         filteredIssuers = filteredIssuers
             .where((issuer) => issuer.country == state.selectedCountry)
             .toList();
@@ -540,107 +511,85 @@ class EidasNotifier extends StateNotifier<EidasState> {
 
       state = state.copyWith(
         isLoading: false,
-        trustedIssuers: filteredIssuers,
+        trustedIssuers: filteredIssuers, // Update displayed list
       );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors du filtrage par niveau: $e',
+        errorMessage: 'Error filtering issuers by trust level: $e',
       );
     }
   }
 
-  /// Vérifie si un émetteur est dans le registre de confiance européen
+  /// Verifies if a specific issuer ID exists in the EU Trust Registry.
+  /// Uses the [EuTrustRegistryService].
+  /// Returns a map containing verification status and details or an error.
   Future<Map<String, dynamic>> verifyTrustedIssuer(String issuerId) async {
-    state = state.copyWith(
-      isLoading: true,
-    );
-
+    state = state.copyWith(isLoading: true);
     try {
       final result =
           await EuTrustRegistryService.instance.verifyTrustedIssuer(issuerId);
-
-      state = state.copyWith(
-        isLoading: false,
-      );
-
+      state = state.copyWith(isLoading: false);
       return result;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: "Erreur lors de la vérification de l'émetteur: $e",
+        errorMessage: 'Error verifying issuer: $e',
       );
-
-      return {
-        'isValid': false,
-        'error': e.toString(),
-      };
+      return {'isValid': false, 'error': e.toString()};
     }
   }
 
-  /// Récupère les schémas de confiance disponibles
+  /// Fetches available trust schemes from the EU Trust Registry.
+  /// Uses the [EuTrustRegistryService].
+  /// Returns a map containing the list of schemes or an error.
   Future<Map<String, dynamic>> fetchTrustSchemes() async {
-    state = state.copyWith(
-      isLoading: true,
-    );
-
+    state = state.copyWith(isLoading: true);
     try {
       final schemes = await EuTrustRegistryService.instance.fetchTrustSchemes();
-
-      state = state.copyWith(
-        isLoading: false,
-      );
-
+      state = state.copyWith(isLoading: false);
       return schemes;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage:
-            'Erreur lors de la récupération des schémas de confiance: $e',
+        errorMessage: 'Error fetching trust schemes: $e',
       );
-
-      return {'schemes': []};
+      return {'schemes': [], 'error': e.toString()};
     }
   }
 
-  /// Partage une attestation avec l'EUDI Wallet
+  /// Simulates sharing a credential with an external EUDI Wallet application.
+  /// In a real scenario, this would involve inter-app communication.
   Future<bool> shareWithEudiWallet(Credential credential) async {
     if (!state.isEudiWalletAvailable) {
       state = state.copyWith(
-        errorMessage: "L'EUDI Wallet n'est pas disponible sur cet appareil",
+        errorMessage: 'EUDI Wallet is not available on this device.',
       );
       return false;
     }
 
-    state = state.copyWith(
-      isLoading: true,
-    );
-
+    state = state.copyWith(isLoading: true);
     try {
-      // Dans une implémentation réelle, cette méthode :
-      // 1. Convertirait l'attestation au format eIDAS si nécessaire
-      // 2. Ouvrirait l'application EUDI Wallet via une Intent/URL Scheme
-      // 3. Partagerait les données avec l'EUDI Wallet
+      // --- Real Implementation Steps (commented out) ---
+      // 1. Convert credential to eIDAS format if needed.
+      // 2. Prepare data payload for sharing.
+      // 3. Open EUDI Wallet app via Intent/URL Scheme with payload.
 
-      // Convertir en format eIDAS si nécessaire
       final service = _ref.read(eidasCredentialServiceProvider);
+      // Ensure credential is in eIDAS format.
       final eidasCompatible = await service.makeEidasCompatible(credential);
+      // Export to JSON (or other required format for sharing).
+      /* final jsonData = */ await service.exportToJson(eidasCompatible);
 
-      // Exporter au format JSON pour le partage
-      final json = await service.exportToJson(eidasCompatible);
+      // Simulate sharing operation delay
+      await Future.delayed(const Duration(seconds: 1));
 
-      // Simuler un délai pour l'opération de partage
-      await Future.delayed(const Duration(seconds: 2));
-
-      state = state.copyWith(
-        isLoading: false,
-      );
-
-      return true;
+      state = state.copyWith(isLoading: false);
+      return true; // Assume success in simulation
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors du partage avec EUDI Wallet: $e',
+        errorMessage: 'Error sharing with EUDI Wallet (simulation): $e',
       );
       return false;
     }

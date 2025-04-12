@@ -67,33 +67,46 @@ const _$VerificationStatusEnumMap = {
 _$CredentialPresentationImpl _$$CredentialPresentationImplFromJson(
         Map<String, dynamic> json) =>
     _$CredentialPresentationImpl(
-      id: json['id'] as String,
+      context: (json['@context'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const <String>['https://www.w3.org/2018/credentials/v1'],
+      id: json['id'] as String?,
       type: (json['type'] as List<dynamic>).map((e) => e as String).toList(),
-      verifiableCredentials: (json['verifiableCredentials'] as List<dynamic>)
-          .map((e) => Credential.fromJson(e as Map<String, dynamic>))
+      holder: json['holder'] as String,
+      verifiableCredentials: (json['verifiableCredential'] as List<dynamic>?)
+          ?.map((e) => Credential.fromJson(e as Map<String, dynamic>))
           .toList(),
-      challenge: json['challenge'] as String?,
-      domain: json['domain'] as String?,
       revealedAttributes:
-          (json['revealedAttributes'] as Map<String, dynamic>).map(
+          (json['revealedAttributes'] as Map<String, dynamic>?)?.map(
         (k, e) =>
             MapEntry(k, (e as List<dynamic>).map((e) => e as String).toList()),
       ),
+      predicates: (json['predicates'] as List<dynamic>?)
+          ?.map((e) => CredentialPredicate.fromJson(e as Map<String, dynamic>))
+          .toList(),
       proof: json['proof'] as Map<String, dynamic>,
-      created: DateTime.parse(json['created'] as String),
+      created: json['created'] == null
+          ? null
+          : DateTime.parse(json['created'] as String),
+      challenge: json['challenge'] as String?,
+      domain: json['domain'] as String?,
     );
 
 Map<String, dynamic> _$$CredentialPresentationImplToJson(
         _$CredentialPresentationImpl instance) =>
     <String, dynamic>{
+      '@context': instance.context,
       'id': instance.id,
       'type': instance.type,
-      'verifiableCredentials': instance.verifiableCredentials,
+      'holder': instance.holder,
+      'verifiableCredential': instance.verifiableCredentials,
+      'revealedAttributes': instance.revealedAttributes,
+      'predicates': instance.predicates,
+      'proof': instance.proof,
+      'created': instance.created?.toIso8601String(),
       'challenge': instance.challenge,
       'domain': instance.domain,
-      'revealedAttributes': instance.revealedAttributes,
-      'proof': instance.proof,
-      'created': instance.created.toIso8601String(),
     };
 
 _$CredentialPredicateImpl _$$CredentialPredicateImplFromJson(

@@ -300,62 +300,73 @@ class Credential with _$Credential {
 
 /// Represents a Verifiable Presentation (VP) based on the W3C VC Data Model v2.0.
 ///
-/// A VP is a data format used to present one or more Verifiable Credentials (VCs)
-/// to a verifier. It is typically signed by the holder of the VCs to prove control.
+/// A Verifiable Presentation is a data format used to present Verifiable Credentials
+/// to a verifier. It can bundle one or more credentials and includes a proof generated
+/// by the holder to demonstrate control over the credentials.
 ///
 /// See: https://www.w3.org/TR/vc-data-model-2.0/#presentations-0
 @freezed
 class CredentialPresentation with _$CredentialPresentation {
   /// Creates a CredentialPresentation instance.
-  /// Note: Signature adjusted for compatibility with current generated code.
-  /// Consider regenerating after model changes.
   const factory CredentialPresentation({
-    /// A unique identifier for the presentation (URI). OPTIONAL in the W3C standard.
-    /// Note: Kept required here for compatibility with generated code.
-    required String id,
+    /// The JSON-LD context(s) used in the presentation. REQUIRED.
+    /// Defines the vocabulary used. The first item MUST be `https://www.w3.org/2018/credentials/v1`.
+    /// Corresponds to the `@context` property in the W3C VC Data Model.
+    @Default(<String>['https://www.w3.org/2018/credentials/v1'])
+    @JsonKey(name: '@context')
+    List<String> context,
+
+    /// A unique identifier for the presentation (URI). OPTIONAL.
+    /// Corresponds to the `id` property in the W3C VC Data Model.
+    String? id,
 
     /// One or more URIs identifying the type(s) of the presentation. REQUIRED.
-    /// The first type MUST be `VerifiablePresentation`.
-    /// Corresponds to the `type` property in the W3C VP Data Model.
+    /// The first type MUST be `VerifiablePresentation`. Additional types can be used.
+    /// Corresponds to the `type` property in the W3C VC Data Model.
     required List<String> type,
 
-    /// The list of Verifiable Credentials being presented. REQUIRED, but can be empty.
-    /// These can be embedded VCs or references (URIs) to VCs.
-    /// Corresponds to the `verifiableCredential` property in the W3C VP Data Model.
-    required List<Credential> verifiableCredentials, // W3C allows VCs or URIs
+    /// The identifier (e.g., DID URI) of the holder who created the presentation. REQUIRED.
+    /// Corresponds to the `holder` property in the W3C VC Data Model.
+    required String holder,
 
-    // /// The entity that created and signed the presentation, typically the holder of the VCs. REQUIRED by W3C.
-    // /// Usually a DID URI.
-    // /// Corresponds to the `holder` property in the W3C VP Data Model.
-    // required String holder, // Temporarily commented out for compatibility
+    /// One or more Verifiable Credentials being presented. OPTIONAL but typically present.
+    /// Corresponds to the `verifiableCredential` property in the W3C VC Data Model.
+    /// Can be an array of VCs (as JSON strings or objects).
+    @JsonKey(name: 'verifiableCredential')
+    List<Credential>? verifiableCredentials,
 
-    /// A cryptographic challenge provided by the verifier to prevent replay attacks. OPTIONAL.
-    /// Included in the `proof` options when generating the VP proof.
-    /// Corresponds to the `challenge` property within the `proof` options in W3C VP.
-    String? challenge, // Part of proof options
+    /// Information about which credential attributes are revealed. OPTIONAL.
+    /// Used in conjunction with ZKP schemes like BBS+ for selective disclosure.
+    /// This field's structure depends on the specific ZKP implementation.
+    Map<String, List<String>>? revealedAttributes,
 
-    /// The intended domain (audience) for the presentation. OPTIONAL.
-    /// Included in the `proof` options when generating the VP proof.
-    /// Corresponds to the `domain` property within the `proof` options in W3C VP.
-    String? domain, // Part of proof options
+    /// Information about predicates used in the presentation. OPTIONAL.
+    /// Used with ZKP schemes to prove statements about credential attributes
+    /// without revealing the attributes themselves.
+    List<CredentialPredicate>? predicates,
 
-    /// **NON-STANDARD:** Specifies which attributes are revealed for each credential.
-    /// Key: Credential ID, Value: List of revealed attribute names/paths.
-    /// Used for selective disclosure implementations. Not part of W3C VP standard.
-    /// Note: Kept required here for compatibility with generated code.
-    required Map<String, List<String>>
-        revealedAttributes, // Application-specific
-
-    /// One or more cryptographic proofs verifying the presentation's integrity and holder. REQUIRED.
-    /// Binds the VCs to the holder for this specific transaction (challenge/domain).
-    /// Corresponds to the `proof` property in the W3C VP Data Model.
+    /// A cryptographic proof generated by the holder. REQUIRED.
+    /// Demonstrates control over the presented credentials and the presentation itself.
+    /// Corresponds to the `proof` property in the W3C VC Data Model.
+    /// Can be a single proof object or an array. Use the [Proof] model.
     required Map<String, dynamic> proof, // W3C allows object or array
 
-    /// **NON-STANDARD:** The date and time when the presentation was created.
-    /// The standard practice is to include the creation timestamp within the `proof` (`created` property).
-    /// Note: Kept required here for compatibility with generated code.
-    required DateTime created,
+    /// The date and time when the presentation was created. OPTIONAL.
+    /// Useful for tracking presentation freshness. Not explicitly in the core model,
+    /// but often included within the proof (`created`).
+    DateTime? created,
+
+    /// A nonce or challenge provided by the verifier. OPTIONAL but recommended for replay protection.
+    /// Corresponds to the `challenge` property used within some proof types (e.g., `proof.challenge`).
+    String? challenge,
+
+    /// The intended domain or audience for the presentation. OPTIONAL but recommended.
+    /// Helps prevent presentation reuse across different relying parties.
+    /// Corresponds to the `domain` property used within some proof types (e.g., `proof.domain`).
+    String? domain,
   }) = _CredentialPresentation;
+
+  const CredentialPresentation._(); // Private constructor for potential custom logic
 
   factory CredentialPresentation.fromJson(Map<String, dynamic> json) =>
       _$CredentialPresentationFromJson(json);

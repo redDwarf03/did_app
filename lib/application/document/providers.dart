@@ -4,100 +4,75 @@ import 'package:did_app/domain/document/document.dart';
 import 'package:did_app/domain/document/document_repository.dart';
 import 'package:did_app/infrastructure/document/mock_document_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-/// Provider for the document repository
+part 'providers.freezed.dart';
+
+/// Provides an instance of [DocumentRepository].
+///
+/// This repository handles the storage and retrieval of user documents
+/// (e.g., PDFs, images) in a secure manner, potentially using blockchain
+/// or other secure storage solutions.
 final documentRepositoryProvider = Provider<DocumentRepository>((ref) {
-  // TODO: Replace mock implementation with real document storage on blockchain
-  // This should implement secure storage of documents, with end-to-end encryption
-  // and proper access control based on user permissions
+  // TODO: Replace mock implementation with real document storage (e.g., on blockchain).
+  // Ensure implementation includes encryption and access control.
   return MockDocumentRepository();
 });
 
-/// State for document management
-class DocumentState {
-  const DocumentState({
-    this.documents = const [],
-    this.selectedDocument,
-    this.isLoading = false,
-    this.errorMessage,
-    this.documentVersions = const [],
-    this.selectedVersion,
-    this.documentShares = const [],
-    this.sharedWithMe = const [],
-  });
+/// Represents the state for document management features.
+@freezed
+class DocumentState with _$DocumentState {
+  const factory DocumentState({
+    /// List of documents owned by the user.
+    @Default([]) List<Document> documents,
 
-  /// List of user's documents
-  final List<Document> documents;
-
-  /// Currently selected document
-  final Document? selectedDocument;
-
-  /// Loading indicator
-  final bool isLoading;
-
-  /// Error message if any
-  final String? errorMessage;
-
-  /// List of versions for the selected document
-  final List<DocumentVersion> documentVersions;
-
-  /// Selected version
-  final DocumentVersion? selectedVersion;
-
-  /// List of shares for the selected document
-  final List<DocumentShare> documentShares;
-
-  /// List of documents shared with the user
-  final List<DocumentShare> sharedWithMe;
-
-  /// Utility method to copy the instance with modifications
-  DocumentState copyWith({
-    List<Document>? documents,
+    /// The currently selected document (e.g., for viewing details).
     Document? selectedDocument,
-    bool? isLoading,
+
+    /// Indicates if a document-related operation is in progress.
+    @Default(false) bool isLoading,
+
+    /// Holds a potential error message from the last operation.
     String? errorMessage,
-    List<DocumentVersion>? documentVersions,
+
+    /// List of versions for the [selectedDocument].
+    @Default([]) List<DocumentVersion> documentVersions,
+
+    /// The currently selected version of the [selectedDocument].
     DocumentVersion? selectedVersion,
-    List<DocumentShare>? documentShares,
-    List<DocumentShare>? sharedWithMe,
-  }) {
-    return DocumentState(
-      documents: documents ?? this.documents,
-      selectedDocument: selectedDocument ?? this.selectedDocument,
-      isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage ?? this.errorMessage,
-      documentVersions: documentVersions ?? this.documentVersions,
-      selectedVersion: selectedVersion ?? this.selectedVersion,
-      documentShares: documentShares ?? this.documentShares,
-      sharedWithMe: sharedWithMe ?? this.sharedWithMe,
-    );
-  }
+
+    /// List of shares created by the user for the [selectedDocument].
+    @Default([]) List<DocumentShare> documentShares,
+
+    /// List of documents shared with the current user by others.
+    @Default([]) List<DocumentShare> sharedWithMe,
+  }) = _DocumentState;
 }
 
-/// Provider for document management
+/// Provider for the [DocumentNotifier] which manages the [DocumentState].
 final documentNotifierProvider =
     StateNotifierProvider<DocumentNotifier, DocumentState>((ref) {
   return DocumentNotifier(ref);
 });
 
-/// Notifier for document management
+/// Manages the state and orchestrates operations related to user documents.
+///
+/// Interacts with the [DocumentRepository] to load, add, update, delete,
+/// share, and manage document versions and access.
 class DocumentNotifier extends StateNotifier<DocumentState> {
+  /// Creates an instance of [DocumentNotifier].
+  /// Requires a [Ref] to access the [documentRepositoryProvider].
   DocumentNotifier(this.ref) : super(const DocumentState());
 
   final Ref ref;
 
-  /// Load user's documents
+  /// Loads the list of documents owned by the specified identity.
   Future<void> loadDocuments(String identityAddress) async {
-    state = state.copyWith(isLoading: true);
-
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(documentRepositoryProvider);
       final documents = await repository.getDocuments(identityAddress);
-
-      state = state.copyWith(
-        documents: documents,
-        isLoading: false,
-      );
+      state = state.copyWith(documents: documents, isLoading: false);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -106,19 +81,18 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     }
   }
 
-  /// Load a specific document
+  /// Loads the details of a specific document, including its versions and shares.
   Future<void> loadDocument(String documentId) async {
-    state = state.copyWith(isLoading: true);
-
+    state = state.copyWith(
+        isLoading: true, errorMessage: null, selectedDocument: null);
     try {
       final repository = ref.read(documentRepositoryProvider);
       final document = await repository.getDocument(documentId);
 
       if (document != null) {
-        // Also load versions and shares
+        // Also load associated versions and shares created by the owner.
         final versions = await repository.getDocumentVersions(documentId);
         final shares = await repository.getDocumentShares(documentId);
-
         state = state.copyWith(
           selectedDocument: document,
           documentVersions: versions,
@@ -134,12 +108,15 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Error loading document: $e',
+        errorMessage: 'Error loading document details: $e',
       );
     }
   }
 
-  /// Add a new document
+  /// Adds a new document to the repository for the user.
+  ///
+  /// Requires document content, metadata, and identity address.
+  /// Returns the newly created [Document] object or null on failure.
   Future<Document?> addDocument({
     required String identityAddress,
     required Uint8List fileBytes,
@@ -154,8 +131,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     bool isShareable = false,
     EidasLevel eidasLevel = EidasLevel.low,
   }) async {
-    state = state.copyWith(isLoading: true);
-
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(documentRepositoryProvider);
       final document = await repository.addDocument(
@@ -173,14 +149,15 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
         eidasLevel: eidasLevel,
       );
 
-      // Update document list
+      // Add the new document to the local list and select it.
       final updatedDocuments = [...state.documents, document];
       state = state.copyWith(
         documents: updatedDocuments,
         selectedDocument: document,
+        documentVersions: [],
+        documentShares: [],
         isLoading: false,
       );
-
       return document;
     } catch (e) {
       state = state.copyWith(
@@ -191,7 +168,10 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     }
   }
 
-  /// Update a document
+  /// Updates an existing document, typically creating a new version.
+  ///
+  /// Requires the document ID and new file content, along with any updated metadata.
+  /// Returns the updated [Document] object (representing the latest version) or null on failure.
   Future<Document?> updateDocument({
     required String documentId,
     required Uint8List fileBytes,
@@ -203,10 +183,9 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     List<String>? tags,
     bool? isShareable,
     EidasLevel? eidasLevel,
-    String? changeNote,
+    String? changeNote, // Note explaining the reason for the update
   }) async {
-    state = state.copyWith(isLoading: true);
-
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(documentRepositoryProvider);
       final updatedDocument = await repository.updateDocument(
@@ -223,15 +202,13 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
         changeNote: changeNote,
       );
 
-      // Update document list
+      // Update the document in the local list.
       final index = state.documents.indexWhere((doc) => doc.id == documentId);
       if (index != -1) {
         final updatedDocuments = [...state.documents];
         updatedDocuments[index] = updatedDocument;
-
-        // Load updated versions
+        // Reload versions to include the new one.
         final versions = await repository.getDocumentVersions(documentId);
-
         state = state.copyWith(
           documents: updatedDocuments,
           selectedDocument: updatedDocument,
@@ -239,12 +216,12 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
           isLoading: false,
         );
       } else {
+        // Should not happen if updating an existing doc, but handle gracefully.
         state = state.copyWith(
           selectedDocument: updatedDocument,
           isLoading: false,
         );
       }
-
       return updatedDocument;
     } catch (e) {
       state = state.copyWith(
@@ -255,32 +232,34 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     }
   }
 
-  /// Delete a document
+  /// Deletes a document and all its associated data (versions, shares).
+  /// Returns `true` on success, `false` otherwise.
   Future<bool> deleteDocument(String documentId) async {
-    state = state.copyWith(isLoading: true);
-
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(documentRepositoryProvider);
       final success = await repository.deleteDocument(documentId);
 
       if (success) {
-        // Remove document from list
+        // Remove the document from the local list.
         final updatedDocuments =
             state.documents.where((doc) => doc.id != documentId).toList();
-
+        // Clear related state if the selected document was deleted.
+        final isSelectedDocDeleted = state.selectedDocument?.id == documentId;
         state = state.copyWith(
           documents: updatedDocuments,
-          documentVersions: [],
-          documentShares: [],
+          selectedDocument:
+              isSelectedDocDeleted ? null : state.selectedDocument,
+          documentVersions: isSelectedDocDeleted ? [] : state.documentVersions,
+          documentShares: isSelectedDocDeleted ? [] : state.documentShares,
           isLoading: false,
         );
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Failed to delete document',
+          errorMessage: 'Failed to delete document from repository',
         );
       }
-
       return success;
     } catch (e) {
       state = state.copyWith(
@@ -291,49 +270,55 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     }
   }
 
-  /// Load document content
+  /// Retrieves the actual content (file bytes) of the latest version of a document.
   Future<Uint8List?> getDocumentContent(String documentId) async {
-    state = state.copyWith(isLoading: true);
-
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(documentRepositoryProvider);
       final content = await repository.getDocumentContent(documentId);
-
       state = state.copyWith(isLoading: false);
       return content;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Error loading content: $e',
+        errorMessage: 'Error loading document content: $e',
       );
       return null;
     }
   }
 
-  /// Load content of a specific version
+  /// Retrieves the actual content (file bytes) of a specific version of a document.
   Future<Uint8List?> getVersionContent(
     String documentId,
     String versionId,
   ) async {
-    state = state.copyWith(isLoading: true);
-
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(documentRepositoryProvider);
       final content =
           await repository.getDocumentVersionContent(documentId, versionId);
-
       state = state.copyWith(isLoading: false);
       return content;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Error loading version: $e',
+        errorMessage: 'Error loading version content: $e',
       );
       return null;
     }
   }
 
-  /// Share a document
+  /// Creates a share record for a document, allowing others to access it.
+  ///
+  /// - [documentId]: The ID of the document to share.
+  /// - [recipientDescription]: A description of the recipient (e.g., email, name).
+  /// - [recipientId]: Optional identifier of the recipient (e.g., DID).
+  /// - [expiresAt]: When the share access expires.
+  /// - [accessType]: The type of access (e.g., view, download).
+  /// - [accessCode]: Optional code required to access the share.
+  /// - [maxAccessCount]: Optional limit on the number of accesses.
+  ///
+  /// Returns the created [DocumentShare] object or null on failure.
   Future<DocumentShare?> shareDocument({
     required String documentId,
     required String recipientDescription,
@@ -343,8 +328,17 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     String? accessCode,
     int? maxAccessCount,
   }) async {
-    state = state.copyWith(isLoading: true);
+    // Ensure a document is selected before sharing
+    if (state.selectedDocument?.id != documentId) {
+      await loadDocument(documentId);
+      if (state.selectedDocument?.id != documentId) {
+        state = state.copyWith(
+            errorMessage: 'Cannot share: Document not loaded or found.');
+        return null;
+      }
+    }
 
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(documentRepositoryProvider);
       final share = await repository.shareDocument(
@@ -357,13 +351,9 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
         maxAccessCount: maxAccessCount,
       );
 
-      // Update shares list
+      // Add the new share to the local list for the selected document.
       final updatedShares = [...state.documentShares, share];
-      state = state.copyWith(
-        documentShares: updatedShares,
-        isLoading: false,
-      );
-
+      state = state.copyWith(documentShares: updatedShares, isLoading: false);
       return share;
     } catch (e) {
       state = state.copyWith(
@@ -374,30 +364,25 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     }
   }
 
-  /// Revoke a share
+  /// Revokes a previously created share.
+  /// Returns `true` on success, `false` otherwise.
   Future<bool> revokeShare(String shareId) async {
-    state = state.copyWith(isLoading: true);
-
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(documentRepositoryProvider);
       final success = await repository.revokeDocumentShare(shareId);
 
       if (success) {
-        // Remove share from list
+        // Remove the share from the local list.
         final updatedShares =
             state.documentShares.where((share) => share.id != shareId).toList();
-
-        state = state.copyWith(
-          documentShares: updatedShares,
-          isLoading: false,
-        );
+        state = state.copyWith(documentShares: updatedShares, isLoading: false);
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Failed to revoke share',
+          errorMessage: 'Failed to revoke share in repository',
         );
       }
-
       return success;
     } catch (e) {
       state = state.copyWith(
@@ -408,54 +393,53 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     }
   }
 
-  /// Load documents shared with the user
+  /// Loads the list of documents that have been shared with the current user.
   Future<void> loadSharedWithMe(String identityAddress) async {
-    state = state.copyWith(isLoading: true);
-
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(documentRepositoryProvider);
+      // Fetches share records pointing to the current user.
       final shares = await repository.getSharedWithMe(identityAddress);
-
-      state = state.copyWith(
-        sharedWithMe: shares,
-        isLoading: false,
-      );
+      state = state.copyWith(sharedWithMe: shares, isLoading: false);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Error loading shared documents: $e',
+        errorMessage: 'Error loading documents shared with me: $e',
       );
     }
   }
 
-  /// Verify document authenticity
+  /// Verifies the authenticity of a document (e.g., checking signatures, integrity).
+  /// The specific verification logic depends on the repository implementation.
+  /// Returns a [DocumentVerificationStatus] or null on failure.
   Future<DocumentVerificationStatus?> verifyDocumentAuthenticity(
     String documentId,
   ) async {
-    state = state.copyWith(isLoading: true);
-
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(documentRepositoryProvider);
       final status = await repository.verifyDocumentAuthenticity(documentId);
-
       state = state.copyWith(isLoading: false);
+      // Note: Status is returned but not stored directly in the main state.
+      // UI might display it temporarily.
       return status;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Error verifying document: $e',
+        errorMessage: 'Error verifying document authenticity: $e',
       );
       return null;
     }
   }
 
-  /// Sign a document
+  /// Signs a document using the specified signer's identity.
+  /// This typically adds a signature to the document metadata or content.
+  /// Returns the updated [Document] object with the signature or null on failure.
   Future<Document?> signDocument({
     required String documentId,
-    required String signerIdentityAddress,
+    required String signerIdentityAddress, // e.g., User's DID
   }) async {
-    state = state.copyWith(isLoading: true);
-
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(documentRepositoryProvider);
       final signedDocument = await repository.signDocument(
@@ -463,24 +447,21 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
         signerIdentityAddress: signerIdentityAddress,
       );
 
-      // Update document in the list and as selected document
+      // Update the document in the local list and selected state.
       final index = state.documents.indexWhere((doc) => doc.id == documentId);
       if (index != -1) {
         final updatedDocuments = [...state.documents];
         updatedDocuments[index] = signedDocument;
-
         state = state.copyWith(
           documents: updatedDocuments,
           selectedDocument: signedDocument,
           isLoading: false,
         );
       } else {
-        state = state.copyWith(
-          selectedDocument: signedDocument,
-          isLoading: false,
-        );
+        // Document might have been deleted or not loaded yet.
+        state =
+            state.copyWith(selectedDocument: signedDocument, isLoading: false);
       }
-
       return signedDocument;
     } catch (e) {
       state = state.copyWith(
@@ -491,30 +472,29 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     }
   }
 
-  /// Access a shared document
+  /// Accesses a document shared via a URL, potentially requiring an access code.
+  /// Returns the accessed [Document] or null if access fails.
   Future<Document?> accessSharedDocument(
-    String shareUrl,
-    String? accessCode,
+    String shareUrl, // URL received by the recipient
+    String? accessCode, // Optional code provided by the recipient
   ) async {
-    state = state.copyWith(isLoading: true);
-
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(documentRepositoryProvider);
       final document =
           await repository.accessSharedDocument(shareUrl, accessCode);
 
       if (document != null) {
-        state = state.copyWith(
-          selectedDocument: document,
-          isLoading: false,
-        );
+        // Document accessed successfully, potentially store it or display details.
+        // For now, just update selectedDocument.
+        state = state.copyWith(selectedDocument: document, isLoading: false);
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Shared document not available',
+          errorMessage:
+              'Failed to access shared document. Invalid URL, code, or permissions.',
         );
       }
-
       return document;
     } catch (e) {
       state = state.copyWith(
