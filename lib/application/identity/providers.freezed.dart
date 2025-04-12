@@ -16,13 +16,17 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$IdentityState {
-  /// The user's digital identity profile. Null if no identity exists yet.
+  /// The user's detailed digital identity profile ([DigitalIdentity]).
+  /// This holds personal information, verification status, etc.
+  /// It is `null` if no identity has been created or loaded yet.
   DigitalIdentity? get identity => throw _privateConstructorUsedError;
 
-  /// Indicates if an identity-related operation is in progress.
+  /// Indicates whether an identity-related operation (e.g., fetching, creating,
+  /// updating) is currently in progress.
   bool get isLoading => throw _privateConstructorUsedError;
 
-  /// Holds a potential error message from the last operation.
+  /// Stores an error message if the last identity operation failed.
+  /// `null` if the last operation was successful or no operation has been performed.
   String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of IdentityState
@@ -147,16 +151,20 @@ class _$IdentityStateImpl implements _IdentityState {
   const _$IdentityStateImpl(
       {this.identity, this.isLoading = false, this.errorMessage});
 
-  /// The user's digital identity profile. Null if no identity exists yet.
+  /// The user's detailed digital identity profile ([DigitalIdentity]).
+  /// This holds personal information, verification status, etc.
+  /// It is `null` if no identity has been created or loaded yet.
   @override
   final DigitalIdentity? identity;
 
-  /// Indicates if an identity-related operation is in progress.
+  /// Indicates whether an identity-related operation (e.g., fetching, creating,
+  /// updating) is currently in progress.
   @override
   @JsonKey()
   final bool isLoading;
 
-  /// Holds a potential error message from the last operation.
+  /// Stores an error message if the last identity operation failed.
+  /// `null` if the last operation was successful or no operation has been performed.
   @override
   final String? errorMessage;
 
@@ -197,15 +205,19 @@ abstract class _IdentityState implements IdentityState {
       final bool isLoading,
       final String? errorMessage}) = _$IdentityStateImpl;
 
-  /// The user's digital identity profile. Null if no identity exists yet.
+  /// The user's detailed digital identity profile ([DigitalIdentity]).
+  /// This holds personal information, verification status, etc.
+  /// It is `null` if no identity has been created or loaded yet.
   @override
   DigitalIdentity? get identity;
 
-  /// Indicates if an identity-related operation is in progress.
+  /// Indicates whether an identity-related operation (e.g., fetching, creating,
+  /// updating) is currently in progress.
   @override
   bool get isLoading;
 
-  /// Holds a potential error message from the last operation.
+  /// Stores an error message if the last identity operation failed.
+  /// `null` if the last operation was successful or no operation has been performed.
   @override
   String? get errorMessage;
 

@@ -27,11 +27,13 @@ mixin _$EidasState {
   bool get isEudiWalletAvailable => throw _privateConstructorUsedError;
 
   /// Stores the result of the last eIDAS credential verification attempt.
-  eidas_service.VerificationResult? get verificationResult =>
+  /// Uses the domain VerificationResult model.
+  VerificationResult? get verificationResult =>
       throw _privateConstructorUsedError;
 
   /// Stores the revocation status checked during the last verification.
-  eidas_service.RevocationStatus? get revocationStatus =>
+  /// Uses the local RevocationStatus from the infrastructure service, accessed via prefix.
+  revocation.RevocationStatus? get revocationStatus =>
       throw _privateConstructorUsedError;
 
   /// Timestamp of the last successful synchronization with the EU Trust Registry.
@@ -71,14 +73,16 @@ abstract class $EidasStateCopyWith<$Res> {
       {bool isLoading,
       String? errorMessage,
       bool isEudiWalletAvailable,
-      eidas_service.VerificationResult? verificationResult,
-      eidas_service.RevocationStatus? revocationStatus,
+      VerificationResult? verificationResult,
+      revocation.RevocationStatus? revocationStatus,
       DateTime? lastSyncDate,
       Map<String, dynamic>? trustListReport,
       Map<String, dynamic>? interoperabilityReport,
       List<TrustedIssuer> trustedIssuers,
       TrustLevel? selectedTrustLevel,
       String? selectedCountry});
+
+  $VerificationResultCopyWith<$Res>? get verificationResult;
 }
 
 /// @nodoc
@@ -124,11 +128,11 @@ class _$EidasStateCopyWithImpl<$Res, $Val extends EidasState>
       verificationResult: freezed == verificationResult
           ? _value.verificationResult
           : verificationResult // ignore: cast_nullable_to_non_nullable
-              as eidas_service.VerificationResult?,
+              as VerificationResult?,
       revocationStatus: freezed == revocationStatus
           ? _value.revocationStatus
           : revocationStatus // ignore: cast_nullable_to_non_nullable
-              as eidas_service.RevocationStatus?,
+              as revocation.RevocationStatus?,
       lastSyncDate: freezed == lastSyncDate
           ? _value.lastSyncDate
           : lastSyncDate // ignore: cast_nullable_to_non_nullable
@@ -155,6 +159,21 @@ class _$EidasStateCopyWithImpl<$Res, $Val extends EidasState>
               as String?,
     ) as $Val);
   }
+
+  /// Create a copy of EidasState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $VerificationResultCopyWith<$Res>? get verificationResult {
+    if (_value.verificationResult == null) {
+      return null;
+    }
+
+    return $VerificationResultCopyWith<$Res>(_value.verificationResult!,
+        (value) {
+      return _then(_value.copyWith(verificationResult: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -169,14 +188,17 @@ abstract class _$$EidasStateImplCopyWith<$Res>
       {bool isLoading,
       String? errorMessage,
       bool isEudiWalletAvailable,
-      eidas_service.VerificationResult? verificationResult,
-      eidas_service.RevocationStatus? revocationStatus,
+      VerificationResult? verificationResult,
+      revocation.RevocationStatus? revocationStatus,
       DateTime? lastSyncDate,
       Map<String, dynamic>? trustListReport,
       Map<String, dynamic>? interoperabilityReport,
       List<TrustedIssuer> trustedIssuers,
       TrustLevel? selectedTrustLevel,
       String? selectedCountry});
+
+  @override
+  $VerificationResultCopyWith<$Res>? get verificationResult;
 }
 
 /// @nodoc
@@ -220,11 +242,11 @@ class __$$EidasStateImplCopyWithImpl<$Res>
       verificationResult: freezed == verificationResult
           ? _value.verificationResult
           : verificationResult // ignore: cast_nullable_to_non_nullable
-              as eidas_service.VerificationResult?,
+              as VerificationResult?,
       revocationStatus: freezed == revocationStatus
           ? _value.revocationStatus
           : revocationStatus // ignore: cast_nullable_to_non_nullable
-              as eidas_service.RevocationStatus?,
+              as revocation.RevocationStatus?,
       lastSyncDate: freezed == lastSyncDate
           ? _value.lastSyncDate
           : lastSyncDate // ignore: cast_nullable_to_non_nullable
@@ -288,12 +310,14 @@ class _$EidasStateImpl implements _EidasState {
   final bool isEudiWalletAvailable;
 
   /// Stores the result of the last eIDAS credential verification attempt.
+  /// Uses the domain VerificationResult model.
   @override
-  final eidas_service.VerificationResult? verificationResult;
+  final VerificationResult? verificationResult;
 
   /// Stores the revocation status checked during the last verification.
+  /// Uses the local RevocationStatus from the infrastructure service, accessed via prefix.
   @override
-  final eidas_service.RevocationStatus? revocationStatus;
+  final revocation.RevocationStatus? revocationStatus;
 
   /// Timestamp of the last successful synchronization with the EU Trust Registry.
   @override
@@ -409,8 +433,8 @@ abstract class _EidasState implements EidasState {
       {final bool isLoading,
       final String? errorMessage,
       final bool isEudiWalletAvailable,
-      final eidas_service.VerificationResult? verificationResult,
-      final eidas_service.RevocationStatus? revocationStatus,
+      final VerificationResult? verificationResult,
+      final revocation.RevocationStatus? revocationStatus,
       final DateTime? lastSyncDate,
       final Map<String, dynamic>? trustListReport,
       final Map<String, dynamic>? interoperabilityReport,
@@ -432,12 +456,14 @@ abstract class _EidasState implements EidasState {
   bool get isEudiWalletAvailable;
 
   /// Stores the result of the last eIDAS credential verification attempt.
+  /// Uses the domain VerificationResult model.
   @override
-  eidas_service.VerificationResult? get verificationResult;
+  VerificationResult? get verificationResult;
 
   /// Stores the revocation status checked during the last verification.
+  /// Uses the local RevocationStatus from the infrastructure service, accessed via prefix.
   @override
-  eidas_service.RevocationStatus? get revocationStatus;
+  revocation.RevocationStatus? get revocationStatus;
 
   /// Timestamp of the last successful synchronization with the EU Trust Registry.
   @override

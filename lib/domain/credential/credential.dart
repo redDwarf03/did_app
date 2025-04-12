@@ -497,19 +497,6 @@ class CredentialSchema with _$CredentialSchema {
       _$CredentialSchemaFromJson(json);
 }
 
-/// Represents the revocation status, typically determined by checking a CredentialStatus mechanism.
-/// This is an application-level enum to represent the outcome.
-enum RevocationStatus {
-  /// The credential status indicates it is not revoked.
-  notRevoked,
-
-  /// The credential status indicates it is revoked.
-  revoked,
-
-  /// The revocation status could not be determined (e.g., status list unreachable, parsing error).
-  unknown,
-}
-
 /// Defines the types of predicates supported for Zero-Knowledge Proofs.
 /// This enum should align with the capabilities of the underlying ZKP library.
 enum PredicateType {
