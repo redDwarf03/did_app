@@ -70,7 +70,6 @@ void main() {
         credentialId: credId,
         timestamp: now.add(const Duration(minutes: 5)),
         action: RevocationAction.unrevoke,
-        reason: null,
         actor: 'did:example:issuer1',
         details: 'Revoked in error',
       );
@@ -97,11 +96,12 @@ void main() {
   group('RevocationAction Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          RevocationAction.values,
-          containsAll([
-            RevocationAction.revoke,
-            RevocationAction.unrevoke,
-          ]));
+        RevocationAction.values,
+        containsAll([
+          RevocationAction.revoke,
+          RevocationAction.unrevoke,
+        ]),
+      );
     });
   });
 

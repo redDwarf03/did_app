@@ -12,20 +12,20 @@ void main() {
       'id': 'did:example:holder1',
       'givenName': 'Alice',
       'familyName': 'Wonderland',
-      'nationality': 'Fantasy Land'
+      'nationality': 'Fantasy Land',
     };
 
-    final sampleIssuer = EidasIssuer(
+    const sampleIssuer = EidasIssuer(
       id: 'did:example:issuer123',
       name: 'Example Issuer Authority',
     );
 
-    final sampleSchema = EidasCredentialSchema(
+    const sampleSchema = EidasCredentialSchema(
       id: 'https://example.com/schemas/eidas/VerifiableId/v1',
       type: 'JsonSchemaValidator2018',
     );
 
-    final sampleStatus = EidasCredentialStatus(
+    const sampleStatus = EidasCredentialStatus(
       id: 'https://example.com/status/eidas/1#5',
       type: 'StatusList2021',
       statusListCredential: 'https://example.com/status/eidas/1',
@@ -40,7 +40,7 @@ void main() {
       proofValue: 'zSignatureValue...',
     );
 
-    final sampleEvidence = EidasEvidence(
+    const sampleEvidence = EidasEvidence(
       type: 'DocumentVerification',
       verifier: 'did:example:verifier456',
       evidenceDocument: ['passport.pdf'],
@@ -61,10 +61,14 @@ void main() {
     );
 
     test('Object creation and basic properties', () {
-      expect(baseEidasCredential.id,
-          'urn:uuid:12345678-1234-5678-1234-567812345678');
-      expect(baseEidasCredential.type,
-          containsAll(['VerifiableCredential', 'VerifiableId']));
+      expect(
+        baseEidasCredential.id,
+        'urn:uuid:12345678-1234-5678-1234-567812345678',
+      );
+      expect(
+        baseEidasCredential.type,
+        containsAll(['VerifiableCredential', 'VerifiableId']),
+      );
       expect(baseEidasCredential.issuer, sampleIssuer);
       expect(baseEidasCredential.issuanceDate, issuance);
       expect(baseEidasCredential.expirationDate, expiration);
@@ -100,21 +104,28 @@ void main() {
       expect(credential.issuanceDate, baseEidasCredential.issuanceDate);
       expect(credential.expirationDate, baseEidasCredential.expirationDate);
       expect(
-          credential.credentialSubject, baseEidasCredential.credentialSubject);
+        credential.credentialSubject,
+        baseEidasCredential.credentialSubject,
+      );
       expect(credential.subject, baseEidasCredential.credentialSubject['id']);
       expect(
-          credential.context,
-          containsAll([
-            'https://www.w3.org/2018/credentials/v1',
-            'https://ec.europa.eu/2023/credentials/eidas/v1',
-          ]));
+        credential.context,
+        containsAll([
+          'https://www.w3.org/2018/credentials/v1',
+          'https://ec.europa.eu/2023/credentials/eidas/v1',
+        ]),
+      );
       // Check conversion of nested objects to maps
       expect(credential.proof, baseEidasCredential.proof?.toJson());
       expect(credential.status, baseEidasCredential.credentialStatus?.toJson());
-      expect(credential.credentialSchema,
-          baseEidasCredential.credentialSchema?.toJson());
-      expect(credential.name,
-          'eIDAS Digital Identity'); // Based on type 'VerifiableId'
+      expect(
+        credential.credentialSchema,
+        baseEidasCredential.credentialSchema?.toJson(),
+      );
+      expect(
+        credential.name,
+        'eIDAS Digital Identity',
+      ); // Based on type 'VerifiableId'
       expect(credential.supportsZkp, isTrue);
     });
 
@@ -150,7 +161,7 @@ void main() {
       final issuerMap = {
         'id': 'did:example:issuer-map',
         'name': 'Map Issuer Name',
-        'image': 'http://example.com/logo.png'
+        'image': 'http://example.com/logo.png',
       };
       final issuer = EidasIssuer.fromJson(issuerMap);
       expect(issuer.id, 'did:example:issuer-map');
@@ -167,7 +178,7 @@ void main() {
   // Add similar small test groups for EidasCredentialSchema, EidasCredentialStatus, EidasProof, EidasEvidence
   group('EidasCredentialSchema Tests', () {
     test('Object creation works', () {
-      final schema = EidasCredentialSchema(id: 'schema-id', type: 'SchemaType');
+      const schema = EidasCredentialSchema(id: 'schema-id', type: 'SchemaType');
       expect(schema.id, 'schema-id');
       expect(schema.type, 'SchemaType');
     });
@@ -175,7 +186,7 @@ void main() {
 
   group('EidasCredentialStatus Tests', () {
     test('Object creation works', () {
-      final status = EidasCredentialStatus(id: 'status-id', type: 'StatusType');
+      const status = EidasCredentialStatus(id: 'status-id', type: 'StatusType');
       expect(status.id, 'status-id');
       expect(status.type, 'StatusType');
     });
@@ -185,11 +196,12 @@ void main() {
     final now = DateTime.now();
     test('Object creation works', () {
       final proof = EidasProof(
-          type: 'ProofType',
-          created: now,
-          verificationMethod: 'vm-id',
-          proofPurpose: 'purpose',
-          proofValue: 'value');
+        type: 'ProofType',
+        created: now,
+        verificationMethod: 'vm-id',
+        proofPurpose: 'purpose',
+        proofValue: 'value',
+      );
       expect(proof.type, 'ProofType');
       expect(proof.created, now);
     });
@@ -197,7 +209,7 @@ void main() {
 
   group('EidasEvidence Tests', () {
     test('Object creation works', () {
-      final evidence = EidasEvidence(
+      const evidence = EidasEvidence(
         type: 'EvidenceType',
         verifier: 'verifier-id',
       );

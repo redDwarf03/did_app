@@ -46,7 +46,7 @@ void main() {
       issuer: 'did:example:issuer123',
       issuanceDate: issuance,
       expirationDate: expiration,
-      subject: sampleCredentialSubject['id'] as String,
+      subject: sampleCredentialSubject['id'],
       credentialSubject: sampleCredentialSubject,
       proof: sampleProof,
       status: sampleStatusMap,
@@ -60,8 +60,10 @@ void main() {
 
       // Assert
       expect(baseCredential.id, 'http://example.edu/credentials/1872');
-      expect(baseCredential.type,
-          containsAll(['VerifiableCredential', 'AlumniCredential']));
+      expect(
+        baseCredential.type,
+        containsAll(['VerifiableCredential', 'AlumniCredential']),
+      );
       expect(baseCredential.issuer, 'did:example:issuer123');
       expect(baseCredential.issuanceDate, issuance);
       expect(baseCredential.expirationDate, expiration);
@@ -85,7 +87,7 @@ void main() {
       };
       final newProof = {
         ...sampleProof,
-        'proofValue': 'zNewProofValue...'
+        'proofValue': 'zNewProofValue...',
       }; // Shallow copy and update
 
       // Act
@@ -107,7 +109,9 @@ void main() {
       expect(updatedCredential.proof, newProof);
       expect(updatedCredential.status, baseCredential.status);
       expect(
-          updatedCredential.credentialSchema, baseCredential.credentialSchema);
+        updatedCredential.credentialSchema,
+        baseCredential.credentialSchema,
+      );
       expect(updatedCredential.name, 'Updated Alumni Credential');
       expect(updatedCredential.description, baseCredential.description);
     });
@@ -118,8 +122,10 @@ void main() {
 
       // Assert
       expect(copy, baseCredential); // Freezed models implement equality
-      expect(identical(copy, baseCredential),
-          false); // Should be a different instance
+      expect(
+        identical(copy, baseCredential),
+        false,
+      ); // Should be a different instance
     });
 
     group('Validity based on expiration (isValid getter)', () {
@@ -147,12 +153,17 @@ void main() {
       // The original verificationStatus field remains unverified by default.
       // Add a test for the actual field value if needed.
       test('verificationStatus field retains default value unless changed', () {
-        expect(baseCredential.verificationStatus,
-            cred.VerificationStatus.unverified);
-        final verifiedCred = baseCredential.copyWith(
-            verificationStatus: cred.VerificationStatus.verified);
         expect(
-            verifiedCred.verificationStatus, cred.VerificationStatus.verified);
+          baseCredential.verificationStatus,
+          cred.VerificationStatus.unverified,
+        );
+        final verifiedCred = baseCredential.copyWith(
+          verificationStatus: cred.VerificationStatus.verified,
+        );
+        expect(
+          verifiedCred.verificationStatus,
+          cred.VerificationStatus.verified,
+        );
       });
 
       // TODO: Add tests for revocation status affecting verificationStatus (or a combined validity getter)
@@ -166,8 +177,10 @@ void main() {
         expect(entry!.id, sampleStatusMap['id']);
         expect(entry.statusPurpose.name, sampleStatusMap['statusPurpose']);
         expect(entry.statusListIndex, sampleStatusMap['statusListIndex']);
-        expect(entry.statusListCredential,
-            sampleStatusMap['statusListCredential']);
+        expect(
+          entry.statusListCredential,
+          sampleStatusMap['statusListCredential'],
+        );
       });
 
       test('returns null if status is null', () {

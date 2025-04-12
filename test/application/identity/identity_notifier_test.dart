@@ -25,7 +25,7 @@ void main() {
   late IdentityNotifier notifier;
 
   // Sample PersonalInfo for testing
-  final testPersonalInfo = PersonalInfo(
+  const testPersonalInfo = PersonalInfo(
     fullName: 'Test User',
     email: 'test@example.com',
   );
@@ -35,7 +35,6 @@ void main() {
     identityAddress: 'did:mock:123',
     displayName: 'Tester',
     personalInfo: testPersonalInfo,
-    verificationStatus: IdentityVerificationStatus.unverified,
     createdAt: DateTime.now(),
     updatedAt: DateTime.now(),
   );
@@ -61,10 +60,12 @@ void main() {
     when(() => mockRepository.getIdentity())
         .thenAnswer((_) async => testIdentity);
     // Provide defaults for create/update to avoid null errors if called unexpectedly
-    when(() => mockRepository.createIdentity(
-            displayName: any(named: 'displayName'),
-            personalInfo: any(named: 'personalInfo')))
-        .thenAnswer((_) async => testIdentity);
+    when(
+      () => mockRepository.createIdentity(
+        displayName: any(named: 'displayName'),
+        personalInfo: any(named: 'personalInfo'),
+      ),
+    ).thenAnswer((_) async => testIdentity);
     when(() => mockRepository.updateIdentity(identity: any(named: 'identity')))
         .thenAnswer((_) async => testIdentity);
 
@@ -113,10 +114,12 @@ void main() {
     test('createIdentity successful path', () async {
       // Arrange: Use default mock (hasIdentity->false)
       // Override createIdentity for success case
-      when(() => mockRepository.createIdentity(
-              displayName: any(named: 'displayName'),
-              personalInfo: any(named: 'personalInfo')))
-          .thenAnswer((_) async => testIdentity);
+      when(
+        () => mockRepository.createIdentity(
+          displayName: any(named: 'displayName'),
+          personalInfo: any(named: 'personalInfo'),
+        ),
+      ).thenAnswer((_) async => testIdentity);
 
       // Act: Call createIdentity
       await notifier.createIdentity(
@@ -130,8 +133,12 @@ void main() {
       expect(notifier.state.identity, testIdentity);
       expect(notifier.state.errorMessage, null);
       // Verify specific call was made
-      verify(() => mockRepository.createIdentity(
-          displayName: 'Tester', personalInfo: testPersonalInfo)).called(1);
+      verify(
+        () => mockRepository.createIdentity(
+          displayName: 'Tester',
+          personalInfo: testPersonalInfo,
+        ),
+      ).called(1);
     });
 
     test('createIdentity fails if identity already exists', () async {
@@ -157,21 +164,31 @@ void main() {
       // Assert: Check state shows error, identity unchanged
       expect(notifier.state.isLoading, false);
       expect(
-          notifier.state.identity, testIdentity); // Identity should not change
-      expect(notifier.state.errorMessage,
-          'An identity already exists for this user.');
-      verifyNever(() => mockRepository.createIdentity(
+        notifier.state.identity,
+        testIdentity,
+      ); // Identity should not change
+      expect(
+        notifier.state.errorMessage,
+        'An identity already exists for this user.',
+      );
+      verifyNever(
+        () => mockRepository.createIdentity(
           displayName: any(named: 'displayName'),
-          personalInfo: any(named: 'personalInfo')));
+          personalInfo: any(named: 'personalInfo'),
+        ),
+      );
     });
 
     test('createIdentity handles repository error', () async {
       // Arrange: Use default mock (hasIdentity->false)
       // Override createIdentity to throw an error
       final exception = Exception('Network Error');
-      when(() => mockRepository.createIdentity(
+      when(
+        () => mockRepository.createIdentity(
           displayName: any(named: 'displayName'),
-          personalInfo: any(named: 'personalInfo'))).thenThrow(exception);
+          personalInfo: any(named: 'personalInfo'),
+        ),
+      ).thenThrow(exception);
 
       // Act: Call createIdentity
       await notifier.createIdentity(
@@ -184,7 +201,9 @@ void main() {
       expect(notifier.state.isLoading, false);
       expect(notifier.state.identity, null);
       expect(
-          notifier.state.errorMessage, 'Failed to create identity: $exception');
+        notifier.state.errorMessage,
+        'Failed to create identity: $exception',
+      );
     });
 
     test('updateIdentity successful path', () async {
@@ -194,9 +213,9 @@ void main() {
       final updatedIdentity =
           testIdentity.copyWith(personalInfo: updatedPersonalInfo);
       // Override updateIdentity mock for success
-      when(() =>
-              mockRepository.updateIdentity(identity: any(named: 'identity')))
-          .thenAnswer((_) async => updatedIdentity);
+      when(
+        () => mockRepository.updateIdentity(identity: any(named: 'identity')),
+      ).thenAnswer((_) async => updatedIdentity);
 
       // Set initial state with an existing identity for the test
       notifier.state = IdentityState(identity: testIdentity);
@@ -211,13 +230,18 @@ void main() {
       expect(notifier.state.identity, updatedIdentity);
       expect(notifier.state.errorMessage, null);
       // Verify that updateIdentity was called with the correctly updated object
-      final captured = verify(() => mockRepository.updateIdentity(
-          identity: captureAny(named: 'identity'))).captured;
+      final captured = verify(
+        () => mockRepository.updateIdentity(
+          identity: captureAny(named: 'identity'),
+        ),
+      ).captured;
       expect(captured.length, 1);
       final passedIdentity = captured.first as DigitalIdentity;
       expect(passedIdentity.personalInfo.fullName, 'Updated User');
-      expect(passedIdentity.displayName,
-          testIdentity.displayName); // Ensure non-updated fields remain
+      expect(
+        passedIdentity.displayName,
+        testIdentity.displayName,
+      ); // Ensure non-updated fields remain
     });
 
     test('updateIdentity fails if no identity exists', () async {
@@ -237,16 +261,17 @@ void main() {
       expect(notifier.state.isLoading, false);
       expect(notifier.state.identity, null);
       expect(notifier.state.errorMessage, 'No identity found to update.');
-      verifyNever(() =>
-          mockRepository.updateIdentity(identity: any(named: 'identity')));
+      verifyNever(
+        () => mockRepository.updateIdentity(identity: any(named: 'identity')),
+      );
     });
 
     test('updateIdentity handles repository error', () async {
       // Arrange: Override updateIdentity mock to throw error
       final exception = Exception('Update Failed');
-      when(() =>
-              mockRepository.updateIdentity(identity: any(named: 'identity')))
-          .thenThrow(exception);
+      when(
+        () => mockRepository.updateIdentity(identity: any(named: 'identity')),
+      ).thenThrow(exception);
 
       // Set initial state with an existing identity
       notifier.state = IdentityState(identity: testIdentity);
@@ -258,10 +283,14 @@ void main() {
 
       // Assert: Check state shows error, identity remains unchanged
       expect(notifier.state.isLoading, false);
-      expect(notifier.state.identity,
-          testIdentity); // Identity should not change on error
       expect(
-          notifier.state.errorMessage, 'Failed to update identity: $exception');
+        notifier.state.identity,
+        testIdentity,
+      ); // Identity should not change on error
+      expect(
+        notifier.state.errorMessage,
+        'Failed to update identity: $exception',
+      );
     });
 
     test('refreshIdentity calls _checkForExistingIdentity', () async {

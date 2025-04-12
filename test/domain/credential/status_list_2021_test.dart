@@ -7,7 +7,7 @@ void main() {
   final expiration = now.add(const Duration(days: 60));
 
   group('StatusList2021Credential Tests', () {
-    final subject = StatusList2021Subject(
+    const subject = StatusList2021Subject(
       id: 'https://example.com/status/1',
       type: 'StatusList2021',
       statusPurpose: StatusPurpose.revocation,
@@ -26,7 +26,7 @@ void main() {
       id: 'https://example.com/status/1',
       context: [
         'https://www.w3.org/2018/credentials/v1',
-        'https://w3id.org/vc/status-list/2021/v1'
+        'https://w3id.org/vc/status-list/2021/v1',
       ],
       type: ['VerifiableCredential', 'StatusList2021Credential'],
       issuer: 'did:example:issuer-status',
@@ -40,8 +40,10 @@ void main() {
     test('Object creation and basic properties', () {
       expect(baseStatusCredential.id, 'https://example.com/status/1');
       expect(baseStatusCredential.context.length, 2);
-      expect(baseStatusCredential.type,
-          containsAll(['VerifiableCredential', 'StatusList2021Credential']));
+      expect(
+        baseStatusCredential.type,
+        containsAll(['VerifiableCredential', 'StatusList2021Credential']),
+      );
       expect(baseStatusCredential.issuer, 'did:example:issuer-status');
       expect(baseStatusCredential.issuanceDate, issuance);
       expect(baseStatusCredential.expirationDate, expiration);
@@ -68,7 +70,7 @@ void main() {
   });
 
   group('StatusList2021Subject Tests', () {
-    final baseSubject = StatusList2021Subject(
+    const baseSubject = StatusList2021Subject(
       id: 'https://example.com/status/2',
       type: 'StatusList2021',
       statusPurpose: StatusPurpose.suspension,
@@ -122,7 +124,7 @@ void main() {
   });
 
   group('StatusList2021Entry Tests', () {
-    final baseEntry = StatusList2021Entry(
+    const baseEntry = StatusList2021Entry(
       id: 'urn:uuid:cred-123#status-5',
       statusPurpose: StatusPurpose.revocation,
       statusListCredential: 'https://example.com/status/list/3',
@@ -134,7 +136,9 @@ void main() {
       expect(baseEntry.type, 'StatusList2021'); // Default value
       expect(baseEntry.statusPurpose, StatusPurpose.revocation);
       expect(
-          baseEntry.statusListCredential, 'https://example.com/status/list/3');
+        baseEntry.statusListCredential,
+        'https://example.com/status/list/3',
+      );
       expect(baseEntry.statusListIndex, 5);
     });
 
@@ -152,11 +156,12 @@ void main() {
   group('StatusPurpose Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          StatusPurpose.values,
-          containsAll([
-            StatusPurpose.revocation,
-            StatusPurpose.suspension,
-          ]));
+        StatusPurpose.values,
+        containsAll([
+          StatusPurpose.revocation,
+          StatusPurpose.suspension,
+        ]),
+      );
     });
   });
 }

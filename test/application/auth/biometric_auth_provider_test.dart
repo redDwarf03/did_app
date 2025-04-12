@@ -36,10 +36,13 @@ void main() {
     when(() => mockAuthService.getAvailableBiometrics())
         .thenAnswer((_) async => [BiometricType.fingerprint]);
     // Default mock for authenticate - use AuthResult
-    when(() => mockAuthService.authenticate(
-            localizedReason: any(named: 'localizedReason')))
-        .thenAnswer((_) async =>
-            AuthResult(success: true, status: AuthStatus.authenticated));
+    when(
+      () => mockAuthService.authenticate(
+        localizedReason: any(named: 'localizedReason'),
+      ),
+    ).thenAnswer(
+      (_) async => AuthResult(success: true, status: AuthStatus.authenticated),
+    );
 
     // Setup container with default mocks
     container = _setupContainer(mockAuthService);
@@ -58,8 +61,10 @@ void main() {
         await Future.delayed(Duration.zero);
 
         // Assert
-        expect(notifier.state.status,
-            AuthStatus.notAuthenticated); // Ready, but not authed
+        expect(
+          notifier.state.status,
+          AuthStatus.notAuthenticated,
+        ); // Ready, but not authed
         expect(notifier.state.availableBiometrics, [BiometricType.fingerprint]);
         expect(notifier.state.currentBiometricType, BiometricType.fingerprint);
         expect(notifier.state.errorMessage, isNull);
@@ -120,7 +125,7 @@ void main() {
     group('toggleBiometricAuth', () {
       test('Enables biometric auth and re-checks availability', () async {
         // Arrange: Start with biometrics disabled
-        notifier.state = const BiometricAuthState(isBiometricEnabled: false);
+        notifier.state = const BiometricAuthState();
         // Use default mocks (available=true, types=fingerprint)
 
         // Act
@@ -129,8 +134,10 @@ void main() {
 
         // Assert
         expect(notifier.state.isBiometricEnabled, isTrue);
-        expect(notifier.state.status,
-            AuthStatus.notAuthenticated); // Updated by check
+        expect(
+          notifier.state.status,
+          AuthStatus.notAuthenticated,
+        ); // Updated by check
         expect(notifier.state.availableBiometrics, [BiometricType.fingerprint]);
         verify(() => mockAuthService.isBiometricAvailable())
             .called(greaterThanOrEqualTo(1)); // Initial + toggle
@@ -155,7 +162,6 @@ void main() {
         // Arrange: Set state to unavailable
         notifier.state = const BiometricAuthState(
           status: AuthStatus.unavailable,
-          isBiometricEnabled: false,
         );
 
         // Act
@@ -165,8 +171,9 @@ void main() {
         // Assert: State should not change
         expect(notifier.state.isBiometricEnabled, isFalse);
         expect(notifier.state.status, AuthStatus.unavailable);
-        verifyNever(() =>
-            mockAuthService.isBiometricAvailable()); // Should not attempt check
+        verifyNever(
+          () => mockAuthService.isBiometricAvailable(),
+        ); // Should not attempt check
       });
     });
 
@@ -176,10 +183,14 @@ void main() {
         // Arrange: Assume enabled and available (default setup)
         notifier.state = notifier.state.copyWith(isBiometricEnabled: true);
         // Use AuthResult for mock return
-        when(() => mockAuthService.authenticate(
-                localizedReason: any(named: 'localizedReason')))
-            .thenAnswer((_) async =>
-                AuthResult(success: true, status: AuthStatus.authenticated));
+        when(
+          () => mockAuthService.authenticate(
+            localizedReason: any(named: 'localizedReason'),
+          ),
+        ).thenAnswer(
+          (_) async =>
+              AuthResult(success: true, status: AuthStatus.authenticated),
+        );
 
         // Act
         final result = await notifier.authenticateWithBiometrics();
@@ -195,12 +206,17 @@ void main() {
         // Arrange: Assume enabled and available
         notifier.state = notifier.state.copyWith(isBiometricEnabled: true);
         // Use AuthResult for mock return
-        when(() => mockAuthService.authenticate(
-                localizedReason: any(named: 'localizedReason')))
-            .thenAnswer((_) async => AuthResult(
-                success: false,
-                status: AuthStatus.failed,
-                message: 'Fingerprint mismatch'));
+        when(
+          () => mockAuthService.authenticate(
+            localizedReason: any(named: 'localizedReason'),
+          ),
+        ).thenAnswer(
+          (_) async => AuthResult(
+            success: false,
+            status: AuthStatus.failed,
+            message: 'Fingerprint mismatch',
+          ),
+        );
 
         // Act
         final result = await notifier.authenticateWithBiometrics();
@@ -223,8 +239,11 @@ void main() {
         expect(result, isTrue);
         // Status should remain unchanged from initial check
         expect(notifier.state.status, AuthStatus.notAuthenticated);
-        verifyNever(() => mockAuthService.authenticate(
-            localizedReason: any(named: 'localizedReason')));
+        verifyNever(
+          () => mockAuthService.authenticate(
+            localizedReason: any(named: 'localizedReason'),
+          ),
+        );
       });
 
       test('Returns false if biometrics are unavailable or not set up',
@@ -240,8 +259,11 @@ void main() {
         expect(resultUnavailable, isFalse);
         expect(notifier.state.status, AuthStatus.failed);
         expect(notifier.state.errorMessage, contains('not available'));
-        verifyNever(() => mockAuthService.authenticate(
-            localizedReason: any(named: 'localizedReason')));
+        verifyNever(
+          () => mockAuthService.authenticate(
+            localizedReason: any(named: 'localizedReason'),
+          ),
+        );
 
         // Arrange: Set state to not set up
         notifier.state = notifier.state
@@ -254,17 +276,22 @@ void main() {
         expect(resultNotSetup, isFalse);
         expect(notifier.state.status, AuthStatus.failed);
         expect(notifier.state.errorMessage, contains('not set up'));
-        verifyNever(() => mockAuthService.authenticate(
-            localizedReason: any(named: 'localizedReason')));
+        verifyNever(
+          () => mockAuthService.authenticate(
+            localizedReason: any(named: 'localizedReason'),
+          ),
+        );
       });
 
       test('Returns false and sets error on service exception', () async {
         // Arrange: Assume enabled and available
         notifier.state = notifier.state.copyWith(isBiometricEnabled: true);
         final exception = Exception('Platform error');
-        when(() => mockAuthService.authenticate(
-                localizedReason: any(named: 'localizedReason')))
-            .thenThrow(exception);
+        when(
+          () => mockAuthService.authenticate(
+            localizedReason: any(named: 'localizedReason'),
+          ),
+        ).thenThrow(exception);
 
         // Act
         final result = await notifier.authenticateWithBiometrics();

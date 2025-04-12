@@ -73,7 +73,7 @@ void main() {
         0: false,
         1: true,
         2: false,
-        10: true
+        10: true,
       }, // index 1 and 10 are revoked/suspended
       size: 2048,
     );
@@ -148,27 +148,29 @@ void main() {
   group('CredentialStatusType Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          CredentialStatusType.values,
-          containsAll([
-            CredentialStatusType.valid,
-            CredentialStatusType.revoked,
-            CredentialStatusType.expired,
-            CredentialStatusType.unknown,
-          ]));
+        CredentialStatusType.values,
+        containsAll([
+          CredentialStatusType.valid,
+          CredentialStatusType.revoked,
+          CredentialStatusType.expired,
+          CredentialStatusType.unknown,
+        ]),
+      );
     });
   });
 
   group('RevocationReason Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          RevocationReason.values,
-          containsAll([
-            RevocationReason.compromised,
-            RevocationReason.superseded,
-            RevocationReason.noLongerValid,
-            RevocationReason.issuerRevoked,
-            RevocationReason.other,
-          ]));
+        RevocationReason.values,
+        containsAll([
+          RevocationReason.compromised,
+          RevocationReason.superseded,
+          RevocationReason.noLongerValid,
+          RevocationReason.issuerRevoked,
+          RevocationReason.other,
+        ]),
+      );
     });
   });
 }

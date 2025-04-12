@@ -9,7 +9,6 @@ void main() {
       fullName: 'Alice Wonderland',
       email: 'alice@wonderland.com',
       phoneNumber: '123-456-7890',
-      dateOfBirth: null,
       nationality: 'GB',
       address: PhysicalAddress(
         street: '1 Rabbit Hole',
@@ -36,8 +35,10 @@ void main() {
       expect(baseIdentity.identityAddress, 'did:example:alice123');
       expect(baseIdentity.displayName, 'AliceW');
       expect(baseIdentity.personalInfo, samplePersonalInfo);
-      expect(baseIdentity.verificationStatus,
-          IdentityVerificationStatus.fullyVerified);
+      expect(
+        baseIdentity.verificationStatus,
+        IdentityVerificationStatus.fullyVerified,
+      );
       expect(baseIdentity.createdAt, isA<DateTime>());
       expect(baseIdentity.updatedAt, now);
     });
@@ -60,19 +61,29 @@ void main() {
       );
 
       // Assert: Check updated fields
-      expect(updatedIdentity.identityAddress,
-          baseIdentity.identityAddress); // ID shouldn't change
+      expect(
+        updatedIdentity.identityAddress,
+        baseIdentity.identityAddress,
+      ); // ID shouldn't change
       expect(updatedIdentity.displayName, 'AliceUpdated');
       expect(
-          updatedIdentity.personalInfo.email, 'alice.updated@wonderland.com');
-      expect(updatedIdentity.personalInfo.fullName,
-          samplePersonalInfo.fullName); // Unchanged field
+        updatedIdentity.personalInfo.email,
+        'alice.updated@wonderland.com',
+      );
+      expect(
+        updatedIdentity.personalInfo.fullName,
+        samplePersonalInfo.fullName,
+      ); // Unchanged field
       expect(updatedIdentity.personalInfo.address, newAddress);
       expect(updatedIdentity.personalInfo.address?.postalCode, 'WND 2RL');
-      expect(updatedIdentity.verificationStatus,
-          IdentityVerificationStatus.pending);
-      expect(updatedIdentity.createdAt,
-          baseIdentity.createdAt); // Creation date shouldn't change
+      expect(
+        updatedIdentity.verificationStatus,
+        IdentityVerificationStatus.pending,
+      );
+      expect(
+        updatedIdentity.createdAt,
+        baseIdentity.createdAt,
+      ); // Creation date shouldn't change
       expect(updatedIdentity.updatedAt, later);
     });
 
@@ -82,17 +93,20 @@ void main() {
 
       // Assert
       expect(copy, baseIdentity); // Freezed models implement equality
-      expect(identical(copy, baseIdentity),
-          false); // Should be a different instance
+      expect(
+        identical(copy, baseIdentity),
+        false,
+      ); // Should be a different instance
     });
 
     test('PersonalInfo copyWith works correctly', () {
       // Arrange
       const newAddress = PhysicalAddress(
-          street: 'New Street',
-          city: 'New City',
-          postalCode: 'NC 123',
-          country: 'FL');
+        street: 'New Street',
+        city: 'New City',
+        postalCode: 'NC 123',
+        country: 'FL',
+      );
 
       // Act
       final updatedInfo = samplePersonalInfo.copyWith(

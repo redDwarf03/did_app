@@ -21,7 +21,7 @@ void main() {
       // Arrange
       const updatedAvailable = [
         BiometricType.fingerprint,
-        BiometricType.faceId
+        BiometricType.faceId,
       ];
       const updatedType = BiometricType.faceId;
       const updatedStatus = AuthStatus.authenticated;
@@ -58,9 +58,13 @@ void main() {
 
       // Assert
       expect(
-          copy, baseState); // Freezed models implement equality based on value
+        copy,
+        baseState,
+      ); // Freezed models implement equality based on value
       expect(
-          identical(copy, baseState), false); // Should be a different instance
+        identical(copy, baseState),
+        false,
+      ); // Should be a different instance
     });
 
     test('copyWith handles null error message', () {
@@ -83,28 +87,30 @@ void main() {
   group('BiometricType Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          BiometricType.values,
-          containsAll([
-            BiometricType.fingerprint,
-            BiometricType.faceId,
-            BiometricType.iris,
-            BiometricType.none,
-          ]));
+        BiometricType.values,
+        containsAll([
+          BiometricType.fingerprint,
+          BiometricType.faceId,
+          BiometricType.iris,
+          BiometricType.none,
+        ]),
+      );
     });
   });
 
   group('AuthStatus Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          AuthStatus.values,
-          containsAll([
-            AuthStatus.notAuthenticated,
-            AuthStatus.authenticating,
-            AuthStatus.authenticated,
-            AuthStatus.failed,
-            AuthStatus.unavailable,
-            AuthStatus.notSetUp,
-          ]));
+        AuthStatus.values,
+        containsAll([
+          AuthStatus.notAuthenticated,
+          AuthStatus.authenticating,
+          AuthStatus.authenticated,
+          AuthStatus.failed,
+          AuthStatus.unavailable,
+          AuthStatus.notSetUp,
+        ]),
+      );
     });
   });
 }

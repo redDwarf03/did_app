@@ -49,7 +49,7 @@ void main() {
       'id': 'did:example:ebfeb1f712ebc6f1c276e12ec21',
       'degree': {
         'type': 'BachelorDegree',
-        'name': 'Baccalauréat en musiques numériques'
+        'name': 'Baccalauréat en musiques numériques',
       },
     },
     status: {
@@ -61,15 +61,16 @@ void main() {
   final sampleEidasCredential = EidasCredential(
     id: 'eidas-cred-1',
     type: ['VerifiableCredential', 'VerifiableAttestation'],
-    issuer: EidasIssuer(id: 'did:example:eidas-issuer'),
+    issuer: const EidasIssuer(id: 'did:example:eidas-issuer'),
     issuanceDate: DateTime.now(),
     credentialSubject: {'id': 'did:example:holder', 'attribute': 'att-value'},
     proof: EidasProof(
-        type: 'a',
-        created: DateTime.now(),
-        verificationMethod: 'b',
-        proofPurpose: 'c',
-        proofValue: 'd'),
+      type: 'a',
+      created: DateTime.now(),
+      verificationMethod: 'b',
+      proofPurpose: 'c',
+      proofValue: 'd',
+    ),
   );
 
   // Define sample data needed for trust list mocks
@@ -77,7 +78,7 @@ void main() {
     /* ... populate if needed ... */
   ];
   final sampleReport = <String, dynamic>{'count': 0};
-  final sampleSyncDate = DateTime(2024, 1, 1);
+  final sampleSyncDate = DateTime(2024);
 
   setUp(() {
     // Initialize mocks
@@ -160,10 +161,13 @@ void main() {
     testWidgets('importFromJson calls service and updates state',
         (tester) async {
       // Setup container and notifier for this test
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle(); // Wait for init
@@ -183,10 +187,13 @@ void main() {
     });
 
     testWidgets('importFromJson handles errors', (tester) async {
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle();
@@ -200,17 +207,22 @@ void main() {
 
       expect(notifier.state.isLoading, false);
       expect(
-          notifier.state.errorMessage, contains('Error importing from JSON'));
+        notifier.state.errorMessage,
+        contains('Error importing from JSON'),
+      );
       verify(mockEidasService.importFromJson(jsonString)).called(1);
     });
 
     // --- Apply testWidgets and pump pattern to ALL other tests ---
 
     testWidgets('exportToJson calls service and updates state', (tester) async {
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle();
@@ -228,10 +240,13 @@ void main() {
     });
 
     testWidgets('exportToJson handles errors', (tester) async {
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle();
@@ -249,10 +264,13 @@ void main() {
     });
 
     testWidgets('isEidasCompatible calls service', (tester) async {
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle();
@@ -269,10 +287,13 @@ void main() {
 
     testWidgets('makeEidasCompatible calls service and updates state',
         (tester) async {
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle();
@@ -289,10 +310,13 @@ void main() {
     });
 
     testWidgets('makeEidasCompatible handles errors', (tester) async {
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle();
@@ -305,17 +329,22 @@ void main() {
 
       expect(result, isNull);
       expect(notifier.state.isLoading, false);
-      expect(notifier.state.errorMessage,
-          contains('Error making credential eIDAS compatible'));
+      expect(
+        notifier.state.errorMessage,
+        contains('Error making credential eIDAS compatible'),
+      );
       verify(mockEidasService.makeEidasCompatible(sampleCredential)).called(1);
     });
 
     testWidgets('importFromEudiWallet calls service (simulation)',
         (tester) async {
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle();
@@ -333,10 +362,13 @@ void main() {
 
     testWidgets('shareWithEudiWallet calls service (simulation)',
         (tester) async {
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle();
@@ -354,19 +386,23 @@ void main() {
     testWidgets(
         'verifyEidasCredential performs verification and revocation check',
         (tester) async {
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle();
 
-      final verificationResult = VerificationResult(isValid: true);
+      const verificationResult = VerificationResult(isValid: true);
       final validRevocationStatus = RevocationStatus(
-          isRevoked: false,
-          message: 'Test status valid',
-          lastChecked: DateTime.now());
+        isRevoked: false,
+        message: 'Test status valid',
+        lastChecked: DateTime.now(),
+      );
       when(mockEidasService.verifyEidasCredential(sampleEidasCredential))
           .thenAnswer((_) async => verificationResult);
       when(mockEidasService.checkRevocationStatus(sampleEidasCredential))
@@ -387,16 +423,21 @@ void main() {
 
     testWidgets('verifyEidasCredential handles invalid signature',
         (tester) async {
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle();
 
-      final verificationResult =
-          VerificationResult(isValid: false, message: 'Invalid signature');
+      const verificationResult = VerificationResult(
+        isValid: false,
+        message: 'Invalid signature',
+      );
       when(mockEidasService.verifyEidasCredential(sampleEidasCredential))
           .thenAnswer((_) async => verificationResult);
 
@@ -414,19 +455,23 @@ void main() {
 
     testWidgets('verifyEidasCredential handles revoked credential',
         (tester) async {
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle();
 
-      final verificationResult = VerificationResult(isValid: true);
+      const verificationResult = VerificationResult(isValid: true);
       final revokedStatus = RevocationStatus(
-          isRevoked: true,
-          message: 'Credential revoked',
-          lastChecked: DateTime.now());
+        isRevoked: true,
+        message: 'Credential revoked',
+        lastChecked: DateTime.now(),
+      );
       when(mockEidasService.verifyEidasCredential(sampleEidasCredential))
           .thenAnswer((_) async => verificationResult);
       when(mockEidasService.checkRevocationStatus(sampleEidasCredential))
@@ -438,8 +483,10 @@ void main() {
       // Corrected assertions based on notifier logic
       expect(notifier.state.isLoading, false);
       expect(notifier.state.verificationResult?.isValid, false);
-      expect(notifier.state.verificationResult?.message,
-          contains(revokedStatus.message));
+      expect(
+        notifier.state.verificationResult?.message,
+        contains(revokedStatus.message),
+      );
       expect(notifier.state.revocationStatus, revokedStatus);
       expect(notifier.state.errorMessage, isNull);
       verify(mockEidasService.verifyEidasCredential(sampleEidasCredential))
@@ -450,10 +497,13 @@ void main() {
 
     testWidgets('verifyEidasCredential handles verification errors',
         (tester) async {
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle();
@@ -468,12 +518,16 @@ void main() {
       // Corrected assertions based on notifier logic
       expect(notifier.state.isLoading, false);
       expect(notifier.state.verificationResult?.isValid, false);
-      expect(notifier.state.verificationResult?.message,
-          contains('Verification failed'));
+      expect(
+        notifier.state.verificationResult?.message,
+        contains('Verification failed'),
+      );
       expect(notifier.state.revocationStatus, null);
       // Correct expected error message substring
-      expect(notifier.state.errorMessage,
-          contains('Error verifying eIDAS credential'));
+      expect(
+        notifier.state.errorMessage,
+        contains('Error verifying eIDAS credential'),
+      );
       verify(mockEidasService.verifyEidasCredential(sampleEidasCredential))
           .called(1);
       verifyNever(mockEidasService.checkRevocationStatus(any));
@@ -481,15 +535,18 @@ void main() {
 
     testWidgets('verifyEidasCredential handles revocation check errors',
         (tester) async {
-      final container = ProviderContainer(overrides: [
-        eidasNotifierProvider.overrideWith(
-            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList))
-      ]);
+      final container = ProviderContainer(
+        overrides: [
+          eidasNotifierProvider.overrideWith(
+            (ref) => EidasNotifier(ref, mockEidasService, mockTrustList),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(eidasNotifierProvider.notifier);
       await tester.pumpAndSettle();
 
-      final verificationResult = VerificationResult(isValid: true);
+      const verificationResult = VerificationResult(isValid: true);
       final exception = Exception('Revocation check failed');
       when(mockEidasService.verifyEidasCredential(sampleEidasCredential))
           .thenAnswer((_) async => verificationResult);
@@ -501,11 +558,15 @@ void main() {
 
       // Corrected assertions based on notifier logic
       expect(notifier.state.isLoading, false);
-      expect(notifier.state.verificationResult?.isValid,
-          true); // Verification result is kept
+      expect(
+        notifier.state.verificationResult?.isValid,
+        true,
+      ); // Verification result is kept
       expect(notifier.state.revocationStatus, null);
-      expect(notifier.state.errorMessage,
-          contains('Error checking revocation status'));
+      expect(
+        notifier.state.errorMessage,
+        contains('Error checking revocation status'),
+      );
       verify(mockEidasService.verifyEidasCredential(sampleEidasCredential))
           .called(1);
       verify(mockEidasService.checkRevocationStatus(sampleEidasCredential))

@@ -38,7 +38,9 @@ void main() {
       expect(baseDocument.expiresAt, expires);
       expect(baseDocument.version, 1);
       expect(
-          baseDocument.verificationStatus, DocumentVerificationStatus.verified);
+        baseDocument.verificationStatus,
+        DocumentVerificationStatus.verified,
+      );
       expect(baseDocument.encryptedStoragePath, isNotNull);
       expect(baseDocument.documentHash, startsWith('sha256-'));
       expect(baseDocument.encryptionIV, isNotNull);
@@ -163,58 +165,62 @@ void main() {
   group('DocumentType Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          DocumentType.values,
-          containsAll([
-            DocumentType.nationalId,
-            DocumentType.passport,
-            DocumentType.drivingLicense,
-            DocumentType.diploma,
-            DocumentType.certificate,
-            DocumentType.addressProof,
-            DocumentType.bankDocument,
-            DocumentType.medicalRecord,
-            DocumentType.corporateDocument,
-            DocumentType.other,
-          ]));
+        DocumentType.values,
+        containsAll([
+          DocumentType.nationalId,
+          DocumentType.passport,
+          DocumentType.drivingLicense,
+          DocumentType.diploma,
+          DocumentType.certificate,
+          DocumentType.addressProof,
+          DocumentType.bankDocument,
+          DocumentType.medicalRecord,
+          DocumentType.corporateDocument,
+          DocumentType.other,
+        ]),
+      );
     });
   });
 
   group('DocumentVerificationStatus Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          DocumentVerificationStatus.values,
-          containsAll([
-            DocumentVerificationStatus.unverified,
-            DocumentVerificationStatus.pending,
-            DocumentVerificationStatus.verified,
-            DocumentVerificationStatus.rejected,
-            DocumentVerificationStatus.expired,
-          ]));
+        DocumentVerificationStatus.values,
+        containsAll([
+          DocumentVerificationStatus.unverified,
+          DocumentVerificationStatus.pending,
+          DocumentVerificationStatus.verified,
+          DocumentVerificationStatus.rejected,
+          DocumentVerificationStatus.expired,
+        ]),
+      );
     });
   });
 
   group('DocumentShareAccessType Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          DocumentShareAccessType.values,
-          containsAll([
-            DocumentShareAccessType.readOnly,
-            DocumentShareAccessType.download,
-            DocumentShareAccessType.verify,
-            DocumentShareAccessType.fullAccess,
-          ]));
+        DocumentShareAccessType.values,
+        containsAll([
+          DocumentShareAccessType.readOnly,
+          DocumentShareAccessType.download,
+          DocumentShareAccessType.verify,
+          DocumentShareAccessType.fullAccess,
+        ]),
+      );
     });
   });
 
   group('EidasLevel Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          EidasLevel.values,
-          containsAll([
-            EidasLevel.low,
-            EidasLevel.substantial,
-            EidasLevel.high,
-          ]));
+        EidasLevel.values,
+        containsAll([
+          EidasLevel.low,
+          EidasLevel.substantial,
+          EidasLevel.high,
+        ]),
+      );
     });
   });
 

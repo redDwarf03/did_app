@@ -33,7 +33,7 @@ void main() {
     test('copyWith updates fields correctly', () {
       final updatedAttributes = {
         ...baseCredential.attributes,
-        'level': 'Beginner'
+        'level': 'Beginner',
       };
       final updatedCred = baseCredential.copyWith(
         issuer: 'Updated Issuer Inc.',
@@ -84,16 +84,17 @@ void main() {
   group('SimplifiedCredentialType Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          SimplifiedCredentialType.values,
-          containsAll([
-            SimplifiedCredentialType.identity,
-            SimplifiedCredentialType.diploma,
-            SimplifiedCredentialType.certificate,
-            SimplifiedCredentialType.membership,
-            SimplifiedCredentialType.license,
-            SimplifiedCredentialType.healthCard,
-            SimplifiedCredentialType.custom,
-          ]));
+        SimplifiedCredentialType.values,
+        containsAll([
+          SimplifiedCredentialType.identity,
+          SimplifiedCredentialType.diploma,
+          SimplifiedCredentialType.certificate,
+          SimplifiedCredentialType.membership,
+          SimplifiedCredentialType.license,
+          SimplifiedCredentialType.healthCard,
+          SimplifiedCredentialType.custom,
+        ]),
+      );
     });
   });
 }

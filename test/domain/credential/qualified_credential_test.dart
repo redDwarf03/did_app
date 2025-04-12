@@ -46,21 +46,27 @@ void main() {
       expect(baseQualifiedCredential.credential, baseCredential);
       expect(baseQualifiedCredential.assuranceLevel, AssuranceLevel.high);
       expect(
-          baseQualifiedCredential.signatureType, QualifiedSignatureType.qeseal);
-      expect(baseQualifiedCredential.qualifiedTrustServiceProviderId,
-          'did:example:qtsp1');
+        baseQualifiedCredential.signatureType,
+        QualifiedSignatureType.qeseal,
+      );
+      expect(
+        baseQualifiedCredential.qualifiedTrustServiceProviderId,
+        'did:example:qtsp1',
+      );
       expect(baseQualifiedCredential.certificationDate, certDate);
       expect(baseQualifiedCredential.certificationExpiryDate, certExpiry);
       expect(baseQualifiedCredential.certificationCountry, 'BE');
       expect(baseQualifiedCredential.qualifiedTrustRegistryUrl, isNotNull);
       expect(baseQualifiedCredential.qualifiedCertificateId, 'cert-id-123');
-      expect(baseQualifiedCredential.qualifiedAttributes.containsKey('degree'),
-          isTrue);
+      expect(
+        baseQualifiedCredential.qualifiedAttributes.containsKey('degree'),
+        isTrue,
+      );
       expect(baseQualifiedCredential.qualifiedProof, 'zQSealSignatureValue...');
     });
 
     test('copyWith updates fields correctly', () {
-      final newLevel = AssuranceLevel.substantial;
+      const newLevel = AssuranceLevel.substantial;
       final newExpiry = certExpiry.add(const Duration(days: 5));
       final updatedQualCred = baseQualifiedCredential.copyWith(
         assuranceLevel: newLevel,
@@ -72,7 +78,9 @@ void main() {
       // Check unchanged fields remain the same
       expect(updatedQualCred.credential, baseQualifiedCredential.credential);
       expect(
-          updatedQualCred.signatureType, baseQualifiedCredential.signatureType);
+        updatedQualCred.signatureType,
+        baseQualifiedCredential.signatureType,
+      );
     });
   });
 
@@ -99,13 +107,15 @@ void main() {
       expect(baseTrustService.startDate, certDate);
       expect(baseTrustService.endDate, certExpiry);
       expect(baseTrustService.serviceUrl, isNotNull);
-      expect(baseTrustService.qualifiedCertificates,
-          containsAll(['cert-id-123', 'cert-id-456']));
+      expect(
+        baseTrustService.qualifiedCertificates,
+        containsAll(['cert-id-123', 'cert-id-456']),
+      );
       expect(baseTrustService.assuranceLevel, AssuranceLevel.high);
     });
 
     test('copyWith updates fields correctly', () {
-      final newStatus = 'withdrawn';
+      const newStatus = 'withdrawn';
       final newEndDate = now;
       final updatedService = baseTrustService.copyWith(
         status: newStatus,
@@ -134,24 +144,26 @@ void main() {
   group('AssuranceLevel Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          AssuranceLevel.values,
-          containsAll([
-            AssuranceLevel.low,
-            AssuranceLevel.substantial,
-            AssuranceLevel.high,
-          ]));
+        AssuranceLevel.values,
+        containsAll([
+          AssuranceLevel.low,
+          AssuranceLevel.substantial,
+          AssuranceLevel.high,
+        ]),
+      );
     });
   });
 
   group('QualifiedSignatureType Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          QualifiedSignatureType.values,
-          containsAll([
-            QualifiedSignatureType.qes,
-            QualifiedSignatureType.qeseal,
-            QualifiedSignatureType.qwac,
-          ]));
+        QualifiedSignatureType.values,
+        containsAll([
+          QualifiedSignatureType.qes,
+          QualifiedSignatureType.qeseal,
+          QualifiedSignatureType.qwac,
+        ]),
+      );
     });
   });
 }

@@ -98,7 +98,7 @@ void main() {
         updatedAt: completedTime,
         steps: [
           step1,
-          updatedStep2
+          updatedStep2,
         ], // Need to update the list with the changed step
         certificate: cert,
       );
@@ -185,57 +185,61 @@ void main() {
   group('VerificationStatus Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          VerificationStatus.values,
-          containsAll([
-            VerificationStatus.notStarted,
-            VerificationStatus.inProgress,
-            VerificationStatus.pendingReview,
-            VerificationStatus.completed,
-            VerificationStatus.rejected,
-            VerificationStatus.expired,
-          ]));
+        VerificationStatus.values,
+        containsAll([
+          VerificationStatus.notStarted,
+          VerificationStatus.inProgress,
+          VerificationStatus.pendingReview,
+          VerificationStatus.completed,
+          VerificationStatus.rejected,
+          VerificationStatus.expired,
+        ]),
+      );
     });
   });
 
   group('VerificationStepStatus Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          VerificationStepStatus.values,
-          containsAll([
-            VerificationStepStatus.notStarted,
-            VerificationStepStatus.inProgress,
-            VerificationStepStatus.completed,
-            VerificationStepStatus.rejected,
-            VerificationStepStatus.actionRequired,
-          ]));
+        VerificationStepStatus.values,
+        containsAll([
+          VerificationStepStatus.notStarted,
+          VerificationStepStatus.inProgress,
+          VerificationStepStatus.completed,
+          VerificationStepStatus.rejected,
+          VerificationStepStatus.actionRequired,
+        ]),
+      );
     });
   });
 
   group('VerificationStepType Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          VerificationStepType.values,
-          containsAll([
-            VerificationStepType.emailVerification,
-            VerificationStepType.phoneVerification,
-            VerificationStepType.idDocumentVerification,
-            VerificationStepType.addressVerification,
-            VerificationStepType.livenessCheck,
-            VerificationStepType.biometricVerification,
-            VerificationStepType.additionalDocuments,
-          ]));
+        VerificationStepType.values,
+        containsAll([
+          VerificationStepType.emailVerification,
+          VerificationStepType.phoneVerification,
+          VerificationStepType.idDocumentVerification,
+          VerificationStepType.addressVerification,
+          VerificationStepType.livenessCheck,
+          VerificationStepType.biometricVerification,
+          VerificationStepType.additionalDocuments,
+        ]),
+      );
     });
   });
 
   group('EidasLevel Enum Tests', () {
     test('Enum values exist', () {
       expect(
-          EidasLevel.values,
-          containsAll([
-            EidasLevel.low,
-            EidasLevel.substantial,
-            EidasLevel.high,
-          ]));
+        EidasLevel.values,
+        containsAll([
+          EidasLevel.low,
+          EidasLevel.substantial,
+          EidasLevel.high,
+        ]),
+      );
     });
   });
 
