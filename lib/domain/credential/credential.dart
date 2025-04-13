@@ -242,22 +242,16 @@ class Credential with _$Credential {
           statusPurposeStr == null ||
           statusListIndexDynamic == null ||
           id == null) {
-        if (kDebugMode) {
-          print(
-            'StatusList2021Entry parsing failed: Missing required fields (id, statusListCredential, statusPurpose, statusListIndex).',
-          );
-        }
         return null;
       }
 
-      // Safely convert statusListIndex to int
-      final statusListIndex = statusListIndexDynamic is int
-          ? statusListIndexDynamic
-          : (statusListIndexDynamic is String
-              ? int.tryParse(statusListIndexDynamic)
-              : null);
-
-      if (statusListIndex == null) {
+      // Convert statusListIndex to int
+      final int statusListIndex;
+      if (statusListIndexDynamic is int) {
+        statusListIndex = statusListIndexDynamic;
+      } else if (statusListIndexDynamic is String) {
+        statusListIndex = int.tryParse(statusListIndexDynamic) ?? 0;
+      } else {
         if (kDebugMode) {
           print(
             'StatusList2021Entry parsing failed: statusListIndex is not a valid integer.',

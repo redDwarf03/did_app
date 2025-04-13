@@ -1,3 +1,4 @@
+import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/application/verification/providers.dart';
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
@@ -32,16 +33,16 @@ class _CertificateRenewalScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Certificate Renewal'),
+        title: Text(l10n.certificateRenewal),
       ),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Initializing renewal process...'),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(l10n.initializingRenewal),
                 ],
               ),
             )
@@ -95,7 +96,7 @@ class _CertificateRenewalScreenState
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: const Text('Start Renewal'),
+                      child: Text(l10n.startRenewal),
                     ),
                   ),
                 ],
@@ -330,6 +331,8 @@ class _CertificateRenewalScreenState
     try {
       // Call the verification provider to start a renewal
       await ref.read(verificationNotifierProvider.notifier).startRenewal(
+            identityAddress:
+                ref.read(identityNotifierProvider).identity!.identityAddress,
             previousCertificateId: widget.certificate?.id,
           );
 
@@ -346,12 +349,12 @@ class _CertificateRenewalScreenState
         final queryParams = <String, String>{};
 
         // Convert complex object to simple string parameters
-        final processJson = verificationProcess.toJson();
-        processJson.forEach((key, value) {
-          if (value != null) {
-            queryParams[key] = value.toString();
-          }
-        });
+        final processJson = verificationProcess.toJson()
+          ..forEach((key, value) {
+            if (value != null) {
+              queryParams[key] = value.toString();
+            }
+          });
 
         await context.pushNamed(
           'verificationProcess',
@@ -362,9 +365,10 @@ class _CertificateRenewalScreenState
     } catch (e) {
       // Show error with more descriptive message
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to start renewal: $e'),
+            content: Text('${l10n.renewalFailed}($e)'),
             backgroundColor: Colors.red,
           ),
         );

@@ -10,7 +10,6 @@ import 'package:did_app/domain/credential/credential_repository.dart';
 /// Cette classe simule la gestion d'attestations vérifiables pour le développement et les tests.
 /// Elle sera remplacée par une implémentation réelle utilisant la blockchain Archethic.
 class MockCredentialRepository implements CredentialRepository {
-
   // Génère des attestations de test
   MockCredentialRepository() {
     _initMockCredentials();
@@ -232,12 +231,7 @@ class MockCredentialRepository implements CredentialRepository {
       }
 
       // Créer une copie avec les attributs filtrés
-      final disclosedCredential = Credential(
-        id: credential.id,
-        type: credential.type,
-        issuer: credential.issuer,
-        issuanceDate: credential.issuanceDate,
-        expirationDate: credential.expirationDate,
+      final disclosedCredential = credential.copyWith(
         credentialSubject: filteredSubject,
         proof: credential.proof,
         context: credential.context,
@@ -248,21 +242,36 @@ class MockCredentialRepository implements CredentialRepository {
 
     // Créer la présentation
     final presentation = CredentialPresentation(
-      id: 'presentation-${DateTime.now().millisecondsSinceEpoch}',
-      type: ['VerifiablePresentation'],
+      // Utiliser les contextes de la première attestation ou un contexte par défaut
+      context: credentials.isNotEmpty
+          ? credentials.first.context
+          : [
+              'https://www.w3.org/2018/credentials/v1',
+              'https://www.w3.org/2018/credentials/examples/v1',
+            ],
+      id: 'urn:uuid:${DateTime.now().millisecondsSinceEpoch}', // ID unique simulé
+      type: ['VerifiablePresentation', 'ExamplePresentation'],
+      // Utiliser le sujet de la première attestation comme détenteur simulé
+      holder: credentials.isNotEmpty
+          ? credentials.first.subject ?? 'did:mock:holder123'
+          : 'did:mock:holder123',
       verifiableCredentials: disclosedCredentials,
       challenge: challenge,
       domain: domain,
-      revealedAttributes: selectiveDisclosure,
-      created: DateTime.now(),
+      // Simuler une preuve pour la présentation
       proof: {
-        'type': 'ArchethicSignature2023',
+        'type': 'MockProof2024',
         'created': DateTime.now().toIso8601String(),
-        'verificationMethod': 'did:archethic:user123#key-1',
-        'proofPurpose': 'authentication',
-        'proofValue':
-            'z5U8kqbJKhnRRsj4QDGJXXhwbSXzFsAQMRFJYPGQSaJBpQYx5JmkvdcyLJbm1qHTjH8akLTdKVcGWAvvcYkzSZt',
+        'proofPurpose': 'assertionMethod',
+        'verificationMethod': credentials.isNotEmpty
+            ? (credentials.first.subject ?? 'did:mock:holder123') + '#key-1'
+            : 'did:mock:holder123#key-1',
+        'proofValue': 'zMockPresentationProofValue...',
+        if (challenge != null) 'challenge': challenge,
+        if (domain != null) 'domain': domain,
       },
+      created: DateTime.now(),
+      revealedAttributes: selectiveDisclosure,
     );
 
     return presentation;
@@ -272,14 +281,24 @@ class MockCredentialRepository implements CredentialRepository {
   Future<bool> verifyPresentation(CredentialPresentation presentation) async {
     await Future.delayed(const Duration(seconds: 1));
 
-    // Vérification de chaque attestation dans la présentation
-    for (final credential in presentation.verifiableCredentials) {
-      final isValid = await verifyCredential(credential);
-      if (!isValid) return false;
+    // Vérifier la signature/preuve simulée (toujours valide dans le mock si non vide)
+    if (presentation.proof.isEmpty ||
+        presentation.proof['proofValue'] == null) {
+      return false;
     }
 
-    // Dans un cas réel, on vérifierait la signature de la présentation
-    // Mock: 90% de chance que la vérification réussisse
+    // Vérifier la validité de chaque attestation incluse
+    if (presentation.verifiableCredentials != null) {
+      for (final credential in presentation.verifiableCredentials!) {
+        if (credential.expirationDate != null &&
+            credential.expirationDate!.isBefore(DateTime.now())) {
+          return false;
+        }
+        // Ici, on pourrait aussi appeler verifyCredential pour une vérification plus poussée
+      }
+    }
+
+    // Mock: 90% chance que la vérification réussisse si tout le reste est ok
     return Random().nextDouble() <= 0.90;
   }
 

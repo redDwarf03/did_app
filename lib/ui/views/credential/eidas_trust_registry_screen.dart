@@ -1,5 +1,6 @@
 import 'package:did_app/application/credential/eidas_provider.dart';
 import 'package:did_app/infrastructure/credential/eidas_trust_list.dart';
+import 'package:did_app/infrastructure/credential/eu_trust_registry_service.dart';
 import 'package:did_app/ui/common/widgets/app_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
@@ -35,8 +36,7 @@ class _EidasTrustRegistryScreenState
     });
 
     try {
-      final schemes =
-          await ref.read(eidasNotifierProvider.notifier).fetchTrustSchemes();
+      final schemes = await EuTrustRegistryService.instance.fetchTrustSchemes();
       setState(() {
         _trustSchemes = schemes;
         _isLoadingSchemes = false;
@@ -705,9 +705,10 @@ class _EidasTrustRegistryScreenState
       label: Text(label),
       selected: level == selectedLevel,
       onSelected: (selected) {
-        ref
-            .read(eidasNotifierProvider.notifier)
-            .filterIssuersByTrustLevel(selected ? level : null);
+        ref.read(eidasNotifierProvider.notifier).filterTrustedIssuers(
+              level: selected ? level : null,
+              country: ref.read(eidasNotifierProvider).selectedCountry,
+            );
       },
     );
   }
@@ -721,9 +722,10 @@ class _EidasTrustRegistryScreenState
       label: Text(label),
       selected: countryCode == selectedCountry,
       onSelected: (selected) {
-        ref
-            .read(eidasNotifierProvider.notifier)
-            .filterIssuersByCountry(selected ? countryCode : null);
+        ref.read(eidasNotifierProvider.notifier).filterTrustedIssuers(
+              country: selected ? countryCode : null,
+              level: ref.read(eidasNotifierProvider).selectedTrustLevel,
+            );
       },
     );
   }
@@ -808,9 +810,7 @@ class _EidasTrustRegistryScreenState
   }
 
   Future<void> _synchronizeWithEuRegistry() async {
-    await ref
-        .read(eidasNotifierProvider.notifier)
-        .synchronizeWithEidasInfrastructure();
+    await ref.read(eidasNotifierProvider.notifier).syncTrustRegistry();
   }
 
   Future<void> _verifyIssuer(String issuerId) async {
@@ -820,11 +820,24 @@ class _EidasTrustRegistryScreenState
     });
 
     try {
-      final result = await ref
-          .read(eidasNotifierProvider.notifier)
-          .verifyTrustedIssuer(issuerId);
+      final isTrusted = await EidasTrustList.instance.isIssuerTrusted(issuerId);
+      Map<String, dynamic>? details;
+      if (isTrusted) {
+        final issuer = await EidasTrustList.instance.getTrustedIssuer(issuerId);
+        details = {
+          'status': 'TRUSTED',
+          'timestamp': DateTime.now().toIso8601String(),
+          'trustLevel': issuer?.trustLevel.name
+        };
+      } else {
+        details = {
+          'status': 'UNTRUSTED',
+          'timestamp': DateTime.now().toIso8601String(),
+        };
+      }
+
       setState(() {
-        _verificationResult = result;
+        _verificationResult = {'isValid': isTrusted, 'verification': details};
         _isVerifyingIssuer = false;
       });
     } catch (e) {

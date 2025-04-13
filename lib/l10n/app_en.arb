@@ -1,7 +1,6 @@
 {
     "@@locale": "en",
     "connectWallet": "Connect Wallet",
-    "disconnectWallet": "Disconnect",
     "connectedMessage": "You are connected to the Archethic wallet!",
     "credentialDetailTitle": "Credential Details",
     "eidasCompatibleTooltip": "eIDAS 2.0 Compatible",
@@ -206,6 +205,13 @@
     "verificationResult": "Verification Result",
     "credentialValidMessage": "This credential is valid and has not been modified",
     "errorOccurred": "Error",
+    "@errorOccurred": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
     "errorOccurredMessage": "An error occurred: {error}",
     "@errorOccurredMessage": {
         "placeholders": {
@@ -247,8 +253,6 @@
     "tutorialPage4Title": "eIDAS 2.0 Compliance",
     "tutorialPage4Desc": "Credentials with the € symbol are recognized throughout the European Union thanks to the eIDAS 2.0 regulation.",
     "gotItButton": "Got it!",
-    "connectWalletStatusButton": "Connect Wallet",
-    "disconnectWalletTooltip": "Disconnect",
     "navHome": "Home",
     "navIdentity": "Identity",
     "navCredentials": "Credentials",
@@ -592,7 +596,6 @@
     "verificationErrorTitle": "Verification Error",
     "retryButtonVerification": "Retry",
     "identityVerificationTitle": "Identity Verification",
-    "goBackButton": "Go Back",
     "verifyYourIdentityTitle": "Verify Your Identity",
     "verifyYourIdentityDescription": "Complete the verification process to access all features of your digital identity wallet.",
     "verificationStepEmailPhone": "Email & Phone Verification",
@@ -600,7 +603,6 @@
     "verificationStepAddressProof": "Address Proof Verification",
     "verificationStepLiveness": "Liveness Check",
     "startVerificationButtonMain": "Start Verification",
-    "verificationProcessHelpTooltip": "Help with verification process",
     "certificateIdLabel": "Certificate ID",
     "signatureAuthenticityInfo": "This digital signature proves the authenticity of the certificate",
     "copySignatureTooltip": "Copy signature",
@@ -616,6 +618,29 @@
     "eidasLevelLabel": "eIDAS Level",
     "eidasCompliantLevel": "eIDAS Compliant Level",
     "copiedToClipboardMessage": "Copied to clipboard",
+    "@copiedToClipboardMessage": {
+        "placeholders": {
+            "message": {
+                "type": "String"
+            }
+        }
+    },
+    "copiedToClipboard": "Copied to clipboard",
+    "@copiedToClipboard": {
+        "placeholders": {
+            "message": {
+                "type": "String"
+            }
+        }
+    },
+    "versionNumber": "Version {versionNumber}",
+    "@versionNumber": {
+        "placeholders": {
+            "versionNumber": {
+                "type": "int"
+            }
+        }
+    },
     "shareCertificateDialogTitle": "Share Certificate",
     "shareCertificateDialogContent": "Share your verification certificate with others",
     "eidasLevelLowDescription": "Basic level of assurance suitable for low-risk transactions",
@@ -800,50 +825,21 @@
     "issuanceDate": "Issuance Date",
     "expirationDate": "Expiration Date",
     "confirmButton": "Confirm",
-    "verificationStatusNotStarted": "Not Started",
     "verificationStatusInProgress": "In Progress",
-    "verificationStatusPendingReview": "Pending Review",
     "verificationStatusCompleted": "Completed",
     "verificationStatusFailed": "Failed",
-    "verificationStatusCancelled": "Cancelled",
     "verificationStatusExpired": "Expired",
     "verificationStatusRejected": "Rejected",
-    "verificationStatusActionRequired": "Action Required",
-    "verificationStatusNotStartedDescription": "Verification has not started yet.",
     "verificationStatusInProgressDescription": "Verification is in progress.",
-    "verificationStatusPendingReviewDescription": "Your submission is pending review.",
     "verificationStatusCompletedDescription": "Verification is complete.",
     "verificationStatusFailedDescription": "Verification failed.",
-    "verificationStatusCancelledDescription": "Verification was cancelled.",
-    "verificationStatusPendingDescription": "Verification is pending.",
-    "verificationStatusExpiredDescription": "Verification has expired.",
-    "verificationStatusRejectedDescription": "Verification was rejected.",
-    "verificationStepEmailVerification": "Email Verification",
-    "verificationStepPhoneVerification": "Phone Verification",
-    "verificationStepIdDocumentVerification": "ID Document Verification",
-    "verificationStepAddressVerification": "Address Verification",
-    "verificationStepLivenessCheck": "Liveness Check",
-    "verificationStepBiometricVerification": "Biometric Verification",
-    "verificationStepAdditionalDocuments": "Additional Documents",
-    "verificationStepSignature": "Signature",
-    "verificationStepPayment": "Payment",
-    "verificationStepReview": "Review",
-    "verificationStepSelfieCapture": "Selfie Capture",
-    "verificationStepIdentityVerification": "Identity Verification",
-    "verificationStepDocumentUpload": "Document Upload",
-    "stepStatusNotStarted": "Not Started",
     "stepStatusInProgress": "In Progress",
     "stepStatusCompleted": "Completed",
-    "stepStatusRejected": "Rejected",
-    "stepStatusActionRequired": "Action Required",
-    "deleteCredentialSuccess": "Credential deleted successfully",
-    "deleteCredentialFailure": "Failed to delete credential",
     "verifyingMessage": "Verifying...",
     "receivingMessage": "Receiving...",
     "deletingMessage": "Deleting...",
     "understoodButton": "Got it",
     "aboutCredentialsTitle": "About Digital Credentials",
-    "verificationResultTitle": "Verification Result",
     "verificationSuccessMessage": "This credential is valid and has not been modified.",
     "verificationFailureMessage": "Warning! This credential is not valid or has been modified.",
     "credentialReceivedTitle": "Credential Received",
@@ -855,5 +851,135 @@
     "credentialDiplomaIssuer": "Issued by educational institutions",
     "credentialDrivingLicenseIssuer": "Issued by transport authorities",
     "credentialOtherType": "Other Credential",
-    "credentialOtherIssuer": "Any other type of credential"
+    "loginSuccessful": "Login successful",
+    "cancel": "Cancel",
+    "authenticateWithBiometrics": "Authenticate with Biometrics",
+    "testAuthentication": "Test Authentication",
+    "configureMagicLink": "Configure Magic Link",
+    "configureNotifications": "Configure Notifications",
+    "twoFactorAuth": "Two-Factor Authentication",
+    "emailForVerification": "Email for Verification",
+    "emailForVerificationHint": "Enter your email address to receive verification codes",
+    "passwordlessLogin": "Passwordless Login",
+    "magicLinkConfigComplete": "Magic Link configuration complete",
+    "notificationConfigComplete": "Notification configuration complete",
+    "authenticationSuccessful": "Authentication successful",
+    "credentialOtherIssuer": "Any other type of credential",
+    "saveEmail": "Save Email",
+    "verificationProcessHelp": "Verification Process Help",
+    "followVerificationSteps": "Follow the verification steps to complete the process",
+    "exportAsPdf": "Export as PDF",
+    "generateLink": "Generate Link",
+    "renewalFailed": "Renewal Failed",
+    "startRenewal": "Start Renewal",
+    "certificateRenewal": "Certificate Renewal",
+    "initializingRenewal": "Initializing Renewal",
+    "cancelVerification": "Cancel Verification",
+    "cancelVerificationConfirm": "Are you sure you want to cancel the verification process?",
+    "takeSelfie": "Take Selfie",
+    "uploadDocument": "Upload Document",
+    "universityDiploma": "University Diploma",
+    "universityDiplomaUrl": "https://example.university.edu/credentials",
+    "employmentCertificate": "Employment Certificate",
+    "employmentCertificateUrl": "https://example.employer.com/credentials",
+    "edit": "Edit",
+    "delete": "Delete",
+    "credentialIssuerUrl": "https://example.issuer.com/credentials",
+    "credentialIssuerUrlHelper": "Enter the URL provided by the credential issuer",
+    "errorMessage": "Error: {error}",
+    "@errorMessage": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "issuerUrl": "Issuer URL",
+    "exampleEmail": "example@example.com",
+    "password": "Password",
+    "passwordHint": "Enter your password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "or": "Or",
+    "loginWithMagicLink": "Login with Magic Link",
+    "magicLinkSent": "Magic link sent to {email}",
+    "loginNotificationSent": "Login notification sent to",
+    "passwordResetSent": "Password reset link sent to {email}",
+    "loginWithPushNotification": "Login with Push Notification",
+    "shareDocument": "Share Document",
+    "recipient": "Recipient",
+    "recipientHint": "Enter recipient name or email",
+    "expires": "Expires",
+    "accessType": "Access Type",
+    "readOnly": "Read Only",
+    "download": "Download",
+    "verificationOnly": "Verification Only",
+    "fullAccess": "Full Access",
+    "maxAccesses": "Max Accesses",
+    "unlimited": "Unlimited",
+    "requireAccessCode": "Require Access Code",
+    "accessCode": "Access Code",
+    "accessCodeHint": "Enter 4-6 digit code",
+    "share": "Share",
+    "creatingShare": "Creating share...",
+    "shareCreationFailed": "Failed to create share",
+    "documentShared": "Document Shared",
+    "shareUrl": "Share URL",
+    "urlCopied": "URL copied to clipboard",
+    "recipientInfo": "Recipient: {recipient}",
+    "accessCodeInfo": "Access Code: {code}",
+    "maxAccessesInfo": "Max Accesses: {count}",
+    "close": "Close",
+    "yourIdentity": "Your Identity",
+    "selectedAddress": "Selected Address",
+    "serviceStatus": "Service Status",
+    "serviceNotInitialized": "Not Initialized",
+    "serviceInitialized": "Initialized",
+    "error": "Error",
+    "retry": "Retry",
+    "initializeService": "Initialize Service",
+    "connected": "Connected",
+    "noIdentity": "No Identity",
+    "loading": "Loading...",
+    "loadingIdentity": "Loading identity...",
+    "showIdentityDetails": "Show Identity Details",
+    "disconnect": "Disconnect",
+    "connecting": "Connecting...",
+    "errorLoadingIdentity": "Error loading identity",
+    "noIdentityFound": "No identity found",
+    "serviceStatusFor": "Service Status for {serviceName}",
+    "serviceInitializedStatus": "Service initialized",
+    "serviceNotInitializedStatus": "Service not initialized",
+    "initializeServiceButton": "Initialize Service",
+    "initializingService": "Initializing service...",
+    "@initializingService": {
+        "placeholders": {
+            "serviceName": {
+                "type": "String"
+            }
+        }
+    },
+    "serviceInitializationSuccess": "Service initialized successfully",
+    "@serviceInitializationSuccess": {
+        "placeholders": {
+            "serviceName": {
+                "type": "String"
+            }
+        }
+    },
+    "serviceInitializationError": "Error initializing service",
+    "@serviceInitializationError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "selectedAddressLabel": "Selected Address",
+    "notAvailable": "Not Available",
+    "addCredentialTitle": "Add Credential",
+    "addCredentialDescription": "Add a new credential to your wallet",
+    "addCredentialSuccess": "Credential added successfully",
+    "addCredentialError": "Error adding credential",
+    "addCredentialCancel": "Cancel"
 }

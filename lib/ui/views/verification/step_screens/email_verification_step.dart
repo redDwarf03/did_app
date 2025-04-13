@@ -309,18 +309,24 @@ class _EmailVerificationStepState extends ConsumerState<EmailVerificationStep> {
         // Code is valid, simulate submission to the blockchain
         // In a real app, this would interact with the actual verification process
 
-        // Submit verification step
+        // Corrected: Call submitVerificationStep with named `documentPaths` (empty list for email)
+        // Optionally, could pass email/code via formData if the notifier used it.
         await ref
             .read(verificationNotifierProvider.notifier)
-            .submitVerificationStep([enteredCode]);
+            .submitVerificationStep(
+                documentPaths: []); // Pass empty list for documentPaths
+        // .submitVerificationStep(formData: {'email': _emailController.text, 'code': enteredCode}); // Alternative if formData was used
 
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Email successfully verified'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        if (mounted) {
+          // Added mounted check
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Email successfully verified'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       } else {
         // Invalid code
         ScaffoldMessenger.of(context).showSnackBar(

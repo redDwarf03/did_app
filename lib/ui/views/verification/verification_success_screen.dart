@@ -128,8 +128,12 @@ class VerificationSuccessScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            _buildInfoRow(l10n.certificateIdLabel, certificate.id,
-                copyable: true, l10n: l10n,),
+            _buildInfoRow(
+              l10n.certificateIdLabel,
+              certificate.id,
+              copyable: true,
+              l10n: l10n,
+            ),
             _buildInfoRow(
               l10n.issuedDateLabel,
               _formatDate(certificate.issuedAt),
@@ -153,8 +157,12 @@ class VerificationSuccessScreen extends ConsumerWidget {
   }
 
   /// Build an information row with label and value
-  Widget _buildInfoRow(String label, String value,
-      {bool copyable = false, required AppLocalizations l10n,}) {
+  Widget _buildInfoRow(
+    String label,
+    String value, {
+    bool copyable = false,
+    required AppLocalizations l10n,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -188,7 +196,9 @@ class VerificationSuccessScreen extends ConsumerWidget {
 
   /// Build the eIDAS compliance badge
   Widget _buildEidasComplianceBadge(
-      BuildContext context, AppLocalizations l10n,) {
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -236,7 +246,7 @@ class VerificationSuccessScreen extends ConsumerWidget {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(scaffoldKey.currentContext!).showSnackBar(
       SnackBar(
-        content: Text(l10n.copiedToClipboardMessage),
+        content: Text(l10n.copiedToClipboardMessage(text)),
         duration: const Duration(seconds: 2),
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Address verification step component for verification process
 class AddressVerificationStep extends StatefulWidget {
@@ -18,6 +19,7 @@ class AddressVerificationStep extends StatefulWidget {
 class _AddressVerificationStepState extends State<AddressVerificationStep> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Placeholder implementation - to be completed with actual functionality
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,7 +42,7 @@ class _AddressVerificationStepState extends State<AddressVerificationStep> {
             onPressed: () {
               // TODO: Implement document upload functionality
             },
-            child: const Text('Upload Document'),
+            child: Text(l10n.uploadDocument),
           ),
         ),
       ],

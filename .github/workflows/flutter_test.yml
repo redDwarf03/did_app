@@ -1,0 +1,39 @@
+name: Flutter CI
+
+# Trigger the workflow on push events to the main branch
+on:
+  push:
+    branches: [ main ]
+  # Allow manual trigger from the GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  test:
+    # Use the latest available Ubuntu runner
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Flutter SDK
+      # Uses subosito/flutter-action to install Flutter
+      # Fetches the version specified in pubspec.yaml or uses latest stable
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          # Optional: specify Flutter version e.g., '3.16.0'
+          # flutter-version: ''
+          channel: 'stable' # Use stable channel
+          flutter-version: '3.27.4'
+          cache: true # Enable caching for faster builds
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Step 4: Run unit tests
+      # Executes all tests found in the 'test' directory
+      - name: Run tests
+        run: flutter test 

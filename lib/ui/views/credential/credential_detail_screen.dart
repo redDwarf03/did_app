@@ -229,7 +229,10 @@ class CredentialDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildCredentialDetails(
-      BuildContext context, Credential credential, AppLocalizations l10n,) {
+    BuildContext context,
+    Credential credential,
+    AppLocalizations l10n,
+  ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -250,7 +253,10 @@ class CredentialDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildStatusCard(
-      BuildContext context, Credential credential, AppLocalizations l10n,) {
+    BuildContext context,
+    Credential credential,
+    AppLocalizations l10n,
+  ) {
     final theme = Theme.of(context);
 
     Color statusColor;
@@ -298,8 +304,11 @@ class CredentialDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildGeneralInfoSection(
-      BuildContext context, Credential credential, AppLocalizations l10n,) {
-    final theme = Theme.of(context);
+    BuildContext context,
+    Credential credential,
+    AppLocalizations l10n,
+  ) {
+    Theme.of(context);
     final dateFormat = DateFormat('dd/MM/yyyy');
 
     return Column(
@@ -348,7 +357,10 @@ class CredentialDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildCredentialSubjectSection(
-      BuildContext context, Credential credential, AppLocalizations l10n,) {
+    BuildContext context,
+    Credential credential,
+    AppLocalizations l10n,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: credential.credentialSubject.entries.map((entry) {
@@ -372,7 +384,10 @@ class CredentialDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildProofSection(
-      BuildContext context, Map<String, dynamic> proof, AppLocalizations l10n,) {
+    BuildContext context,
+    Map<String, dynamic> proof,
+    AppLocalizations l10n,
+  ) {
     final created = proof['created'] != null
         ? DateTime.tryParse(proof['created'].toString()) ?? DateTime.now()
         : DateTime.now();
@@ -482,7 +497,10 @@ class CredentialDetailScreen extends ConsumerWidget {
   }
 
   String _formatValue(
-      BuildContext context, dynamic value, AppLocalizations l10n,) {
+    BuildContext context,
+    dynamic value,
+    AppLocalizations l10n,
+  ) {
     if (value == null) return l10n.unspecified;
     if (value is DateTime) {
       return DateFormat('dd/MM/yyyy').format(value);
@@ -567,7 +585,9 @@ class CredentialDetailScreen extends ConsumerWidget {
                   child: Text(
                     l10n.understandCredentialTitle,
                     style: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.bold,),
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -619,7 +639,11 @@ class CredentialDetailScreen extends ConsumerWidget {
 
   /// Construit une section d'aide avec titre, contenu et icône
   Widget _buildHelpSection(
-      BuildContext context, String title, String content, IconData icon,) {
+    BuildContext context,
+    String title,
+    String content,
+    IconData icon,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -637,7 +661,9 @@ class CredentialDetailScreen extends ConsumerWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold,),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 5),
                 Text(

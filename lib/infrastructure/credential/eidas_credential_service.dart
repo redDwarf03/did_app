@@ -1,78 +1,111 @@
 import 'dart:convert';
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/credential/eidas_credential.dart';
+import 'package:did_app/domain/credential/qualified_credential.dart'; // Import for AssuranceLevel
+// Import the domain VerificationResult with a prefix
+import 'package:did_app/domain/verification/verification_result.dart' as domain;
+import 'revocation_status.dart' as revocation;
 
-/// Service pour gérer les attestations eIDAS et l'intégration avec l'EUDI Wallet
+/// Service for managing eIDAS credentials and EUDI Wallet integration.
 class EidasCredentialService {
-  /// Importe une attestation depuis un fichier JSON compatible eIDAS 2.0
+  /// Imports a credential from an eIDAS 2.0 compatible JSON string.
   Future<Credential?> importFromJson(String jsonString) async {
     try {
       final Map<String, dynamic> jsonData = jsonDecode(jsonString);
 
-      // Vérifier que c'est bien un document eIDAS
+      // Check if it's an eIDAS document by context
       final context = jsonData['@context'] as List<dynamic>?;
       if (context == null ||
           !context.any((e) => e.toString().contains('eidas'))) {
-        throw const FormatException("Le document n'est pas au format eIDAS");
+        throw const FormatException("Document is not in eIDAS format");
       }
 
-      final eidasCredential = EidasCredential.fromJson(jsonData);
-      return eidasCredential.toCredential();
+      // Attempt to parse as EidasCredential first (more specific)
+      try {
+        final eidasCredential = EidasCredential.fromJson(jsonData);
+        return eidasCredential.toCredential();
+      } catch (_) {
+        // If parsing as EidasCredential fails, try parsing as base Credential
+        // This might handle cases where it's a standard VC with eIDAS context/type
+        return Credential.fromJson(jsonData);
+      }
     } catch (e) {
-      print("Erreur lors de l'import: $e");
+      // TODO: Log error
+      print("Error during import: $e");
       return null;
     }
   }
 
-  /// Exporte une attestation au format JSON compatible eIDAS 2.0
+  /// Exports a credential to eIDAS 2.0 compatible JSON format.
   Future<String> exportToJson(Credential credential) async {
-    final eidasCredential = EidasCredential.fromCredential(credential);
+    // Need a way to convert Credential back to EidasCredential or handle directly
+    // Assuming EidasCredential might have a factory constructor for this
+    // For now, creating a basic EidasCredential structure from Credential
+    final eidasCredential = EidasCredential(
+      id: credential.id,
+      type: credential.type,
+      issuer: EidasIssuer(id: credential.issuer), // Basic issuer mapping
+      issuanceDate: credential.issuanceDate,
+      credentialSubject: credential.credentialSubject,
+      expirationDate: credential.expirationDate,
+      proof:
+          EidasProof.fromJson(credential.proof), // Assume proof maps directly
+      credentialSchema: credential.credentialSchema != null
+          ? EidasCredentialSchema.fromJson(credential.credentialSchema!)
+          : null,
+      credentialStatus: credential.status != null
+          ? EidasCredentialStatus.fromJson(credential.status!)
+          : null,
+      // Evidence is not directly available in the base Credential model
+    );
     return jsonEncode(eidasCredential.toJson());
   }
 
-  /// Vérifie si une attestation est compatible avec la norme eIDAS 2.0
+  /// Checks if a credential is compatible with the eIDAS 2.0 standard.
   bool isEidasCompatible(Credential credential) {
+    // Check context first
     if (credential.context.any((e) => e.contains('eidas'))) {
       return true;
     }
 
-    // Types d'attestations compatibles avec eIDAS
+    // Common eIDAS credential types (non-exhaustive list)
     const eidasTypes = [
       'IdentityCredential',
       'VerifiableId',
       'VerifiableAttestation',
       'VerifiableDiploma',
       'VerifiableAuthorisation',
+      'EuropeanIdentityCredential', // From potential eIDAS specific profiles
     ];
 
     return credential.type
         .any((type) => eidasTypes.any((eidasType) => type.contains(eidasType)));
   }
 
-  /// Convertit une attestation pour la rendre compatible eIDAS
+  /// Converts a credential to make it eIDAS compatible (adds context/type).
   Future<Credential> makeEidasCompatible(Credential credential) async {
     if (isEidasCompatible(credential)) {
       return credential;
     }
 
-    // Ajouter les contextes eIDAS
+    // Add eIDAS context
     final newContext = List<String>.from(credential.context);
-    if (!newContext
-        .contains('https://ec.europa.eu/2023/credentials/eidas/v1')) {
-      newContext.add('https://ec.europa.eu/2023/credentials/eidas/v1');
+    const eidasContextV1 =
+        'https://ec.europa.eu/2023/credentials/eidas/v1'; // Example context
+    if (!newContext.contains(eidasContextV1)) {
+      newContext.add(eidasContextV1);
     }
 
-    // Adapter le type si nécessaire
+    // Adapt type if necessary (example logic)
     final newType = List<String>.from(credential.type);
-    if (credential.type.contains('IdentityCredential')) {
-      if (!newType.contains('VerifiableId')) {
-        newType.add('VerifiableId');
-      }
-    } else if (newType.contains('UniversityDegreeCredential')) {
-      if (!newType.contains('VerifiableDiploma')) {
-        newType.add('VerifiableDiploma');
-      }
+    if (credential.type.contains('IdentityCredential') &&
+        !newType.contains('VerifiableId')) {
+      newType.add('VerifiableId');
+    } else if (credential.type.contains('UniversityDegreeCredential') &&
+        !newType.contains('VerifiableDiploma')) {
+      newType.add('VerifiableDiploma');
     } else if (!newType.contains('VerifiableAttestation')) {
+      // Add a generic attestation type if no specific mapping found
       newType.add('VerifiableAttestation');
     }
 
@@ -82,254 +115,213 @@ class EidasCredentialService {
     );
   }
 
-  /// Partage une attestation avec l'EUDI Wallet
+  /// Shares a credential with the EUDI Wallet (simulated).
   Future<bool> shareWithEudiWallet(Credential credential) async {
     try {
-      // Rendre l'attestation compatible eIDAS
+      // Ensure credential is eIDAS compatible
       final eidasCredential = await makeEidasCompatible(credential);
 
-      // Exporter au format JSON
+      // Export to JSON
       final jsonString = await exportToJson(eidasCredential);
 
-      // Dans une implémentation réelle, on utiliserait les API du système
-      // pour partager avec l'application EUDI Wallet
-      // Ici on simule juste un succès
-
+      // In a real implementation, use system APIs (e.g., platform channels)
+      // to invoke the EUDI Wallet application via its sharing interface.
+      print('Simulating sharing with EUDI Wallet: $jsonString');
       return true;
     } catch (e) {
-      print('Erreur lors du partage avec EUDI Wallet: $e');
+      // TODO: Log error
+      print('Error sharing with EUDI Wallet: $e');
       return false;
     }
   }
 
-  /// Importe une attestation depuis l'EUDI Wallet
-  /// Cette fonction est simulée car l'interface réelle dépend des API natives
+  /// Imports a credential from the EUDI Wallet (simulated).
+  /// This function is simulated as the real interface depends on native APIs.
   Future<Credential?> importFromEudiWallet() async {
     try {
-      // Dans une implémentation réelle, on lancerait une intent/activité
-      // pour demander à l'EUDI Wallet de partager une attestation
+      // In a real implementation, launch an intent/activity
+      // to request the EUDI Wallet to share a credential.
+      // The result would likely be received via a callback or result handler.
 
-      // Simulation: charger un exemple de credential eIDAS
+      // Simulation: load a sample eIDAS credential
       final jsonString = await _loadSampleEidasCredential();
+      print('Simulating receiving from EUDI Wallet: $jsonString');
 
       return importFromJson(jsonString);
     } catch (e) {
-      print("Erreur lors de l'import depuis EUDI Wallet: $e");
+      // TODO: Log error
+      print("Error importing from EUDI Wallet: $e");
       return null;
     }
   }
 
-  /// Charge un exemple d'attestation eIDAS depuis les assets (pour la démo)
+  /// Loads a sample eIDAS credential JSON string (for demo purposes).
   Future<String> _loadSampleEidasCredential() async {
-    // Dans une application réelle, cela viendrait de l'EUDI Wallet
+    // In a real application, this data would come from the EUDI Wallet interaction.
+    // This is a sample Verifiable ID based on eIDAS PID structure.
     return '''
     {
       "@context": [
         "https://www.w3.org/2018/credentials/v1",
         "https://ec.europa.eu/2023/credentials/eidas/v1"
       ],
-      "id": "https://example.com/credentials/3732",
+      "id": "urn:uuid:f817388a-a21b-4abc-84d9-7e854a2dbf8b",
       "type": ["VerifiableCredential", "VerifiableId"],
       "issuer": {
-        "id": "did:example:28394728934792387",
-        "name": "Ministère de l'Intérieur",
-        "organizationType": "Government"
+        "id": "did:example:gov-issuer-123",
+        "name": "National Identity Service"
       },
-      "issuanceDate": "2023-06-15T16:30:00Z",
-      "expirationDate": "2028-06-15T16:30:00Z",
+      "issuanceDate": "2024-01-15T10:00:00Z",
+      "expirationDate": "2029-01-14T23:59:59Z",
       "credentialSubject": {
-        "id": "did:example:3456345634563456",
-        "firstName": "Jean",
-        "lastName": "Dupont",
-        "dateOfBirth": "1990-01-01",
-        "placeOfBirth": "Paris, France",
-        "currentAddress": {
-          "streetAddress": "123 Rue Exemple",
-          "postalCode": "75001",
-          "locality": "Paris",
-          "countryName": "France"
-        },
-        "gender": "M",
-        "nationality": "FR"
+        "id": "did:example:holder-456",
+        "given_name": "Maria",
+        "family_name": "Garcia",
+        "birthdate": "1995-03-20",
+        // ... other potential PID attributes
+        "nationality": "ES"
       },
       "credentialSchema": {
-        "id": "https://ec.europa.eu/schemas/eidas/pid/2023/v1",
+        "id": "https://example.eu/schemas/pid/v1",
         "type": "JsonSchema"
       },
-      "evidence": [
-        {
-          "type": "DocumentVerification",
-          "verifier": "did:example:government-verification-service",
-          "evidenceDocument": ["Passport"],
-          "subjectPresence": "Physical",
-          "documentPresence": "Physical",
-          "time": "2023-06-15T12:00:00Z"
-        }
-      ],
       "proof": {
         "type": "Ed25519Signature2020",
-        "created": "2023-06-15T16:30:00Z",
-        "verificationMethod": "did:example:28394728934792387#key-1",
+        "created": "2024-01-15T10:01:00Z",
+        "verificationMethod": "did:example:gov-issuer-123#key-1",
         "proofPurpose": "assertionMethod",
-        "proofValue": "z58DAdFfa9SkqZMVPxAQpic7ndSayn1PzZs6ZjWp1CktyGesjuTdwCBZf5DZXd3rSJ3YV72id3w5zdjEzv74xnGx"
+        "proofValue": "zExampleSignatureValue..."
       }
     }
     ''';
   }
 
-  /// Vérifie la signature cryptographique d'une attestation eIDAS
-  Future<VerificationResult> verifyEidasCredential(
-      EidasCredential credential,) async {
+  /// Verifies the cryptographic signature of an eIDAS credential (simulated).
+  Future<domain.VerificationResult> verifyEidasCredential(
+    EidasCredential credential,
+  ) async {
     try {
-      // Vérifier que le document contient une preuve
+      // Check if the credential has a proof
       if (credential.proof == null) {
-        return VerificationResult(
+        return domain.VerificationResult(
           isValid: false,
-          message: "L'attestation ne contient pas de preuve cryptographique",
+          message: "Credential does not contain a cryptographic proof",
         );
       }
 
-      // Vérifier la date d'expiration
+      // Check expiration date
       final now = DateTime.now();
       if (credential.expirationDate != null &&
           credential.expirationDate!.isBefore(now)) {
-        return VerificationResult(
+        return domain.VerificationResult(
           isValid: false,
           message:
-              "L'attestation a expiré le ${_formatDate(credential.expirationDate)}",
+              "Credential expired on ${_formatDate(credential.expirationDate)}",
         );
       }
 
-      // Dans une implémentation réelle, cette fonction :
-      // 1. Extrairait la clé publique de l'émetteur à partir de son DID
-      // 2. Vérifierait la signature numérique avec cette clé
-      // 3. Validerait le statut de révocation de l'attestation
+      // In a real implementation, this function would:
+      // 1. Resolve the issuer's DID (from proof.verificationMethod or credential.issuer.id)
+      // 2. Obtain the issuer's public key.
+      // 3. Perform cryptographic signature verification using the key and proof details.
+      // 4. Potentially check credential status (revocation).
 
-      // Pour cette démo, on simule une vérification réussie
+      // For this demo, simulate a successful verification.
       await Future.delayed(
-          const Duration(seconds: 1),); // Simuler le temps de vérification
+          const Duration(milliseconds: 700)); // Simulate verification time
 
-      return VerificationResult(
+      // TODO: Add more details to the success result if needed
+      return domain.VerificationResult(
         isValid: true,
-        message: 'Attestation vérifiée avec succès',
-        details: {
-          'issuer': credential.issuer.id,
-          'issuanceDate': _formatDate(credential.issuanceDate),
-          'verificationMethod': credential.proof?.verificationMethod,
-          'proofType': credential.proof?.type,
-        },
+        message: 'eIDAS Credential verified successfully',
+        // details: {
+        //   'issuer': credential.issuer.id,
+        //   'issuanceDate': _formatDate(credential.issuanceDate),
+        //   'verificationMethod': credential.proof?.verificationMethod,
+        //   'proofType': credential.proof?.type,
+        // },
       );
     } catch (e) {
-      return VerificationResult(
+      // TODO: Log error
+      return domain.VerificationResult(
         isValid: false,
-        message: 'Erreur lors de la vérification: $e',
+        message: 'Error during eIDAS credential verification: $e',
       );
     }
   }
 
-  /// Vérifie le statut de révocation d'une attestation eIDAS
-  Future<RevocationStatus> checkRevocationStatus(
-      EidasCredential credential,) async {
+  /// Checks the revocation status of an eIDAS credential (simulated).
+  Future<revocation.RevocationStatus> checkRevocationStatus(
+    EidasCredential credential,
+  ) async {
     try {
-      // Vérifier que le document contient un statut
+      // Check if the credential has status information
       if (credential.credentialStatus == null) {
-        return RevocationStatus(
-          isRevoked: false,
-          message: 'Aucune information de statut disponible',
+        return revocation.RevocationStatus(
+          isRevoked: false, // Assume not revoked if no status info
+          message: 'No revocation status information available',
           lastChecked: DateTime.now(),
         );
       }
 
-      // Dans une implémentation réelle, cette fonction :
-      // 1. Extrairait l'URL du service de statut
-      // 2. Interrogerait ce service pour vérifier si l'attestation a été révoquée
-      // 3. Analyserait la réponse pour déterminer le statut
+      // In a real implementation, this function would:
+      // 1. Parse the credentialStatus object (e.g., StatusList2021Entry).
+      // 2. Fetch the status list or query the status service indicated.
+      // 3. Check the specific credential's status according to the mechanism.
 
-      // Pour cette démo, on simule une vérification réussie (non révoquée)
-      await Future.delayed(const Duration(
-          milliseconds: 800,),); // Simuler le temps de vérification
+      // For this demo, simulate a successful check (not revoked).
+      await Future.delayed(
+          const Duration(milliseconds: 500)); // Simulate status check time
 
-      return RevocationStatus(
-        isRevoked: false,
-        message: 'Attestation non révoquée',
+      // TODO: Implement actual status check logic based on credential.credentialStatus
+      final statusId = credential.credentialStatus!.id;
+      final statusType = credential.credentialStatus!.type;
+
+      return revocation.RevocationStatus(
+        isRevoked: false, // Assume not revoked in mock
+        message: 'Status checked via $statusType ($statusId) - Assumed valid',
         lastChecked: DateTime.now(),
-        details: {
-          'statusType': credential.credentialStatus?.type,
-          'statusId': credential.credentialStatus?.id,
-        },
       );
     } catch (e) {
-      return RevocationStatus(
-        isRevoked: true,
-        message: 'Erreur lors de la vérification du statut: $e',
+      // TODO: Log error
+      return revocation.RevocationStatus(
+        isRevoked: false, // Assume not revoked on error for safety? Or true?
+        message: 'Error checking revocation status: $e',
         lastChecked: DateTime.now(),
+        error: e.toString(),
       );
     }
   }
 
-  /// Génère une signature eIDAS pour une attestation
-  Future<EidasProof> generateEidasSignature(
-      Map<String, dynamic> credentialData,) async {
-    // Dans une implémentation réelle, on utiliserait une cryptographie conforme à eIDAS
-    // comme Ed25519Signature2020 ou EcdsaSecp256k1Signature2019
-
-    final now = DateTime.now();
-
-    return EidasProof(
-      type: 'Ed25519Signature2020',
-      created: now,
-      verificationMethod: 'did:example:app-wallet#key-1',
-      proofPurpose: 'assertionMethod',
-      proofValue: 'z${_generateRandomSignature(64)}',
-    );
-  }
-
-  /// Génère une valeur aléatoire simulant une signature (pour la démo)
-  String _generateRandomSignature(int length) {
-    const chars =
-        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    final random = DateTime.now().millisecondsSinceEpoch;
-    final buffer = StringBuffer();
-
-    for (var i = 0; i < length; i++) {
-      final index = (random + i) % chars.length;
-      buffer.write(chars[index]);
-    }
-
-    return buffer.toString();
-  }
-
-  /// Formate une date pour l'affichage
+  /// Formats a DateTime object for display.
   String _formatDate(DateTime? date) {
-    if (date == null) return 'Non spécifiée';
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    if (date == null) return 'N/A';
+    // Simple date formatting, adjust as needed
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 }
 
-/// Modèle de résultat de vérification
-class VerificationResult {
-
-  VerificationResult({
-    required this.isValid,
-    required this.message,
-    this.details,
-  });
-  final bool isValid;
-  final String message;
-  final Map<String, dynamic>? details;
-}
-
-/// Modèle de statut de révocation
-class RevocationStatus {
-
-  RevocationStatus({
-    required this.isRevoked,
-    required this.message,
-    required this.lastChecked,
-    this.details,
-  });
-  final bool isRevoked;
-  final String message;
-  final DateTime lastChecked;
-  final Map<String, dynamic>? details;
-}
+// --- Helper Models --- //
+// RevocationStatus class moved to its own file: revocation_status.dart
+// /// Represents the result of a revocation status check.
+// /// TODO: Consider moving to domain layer if generally applicable.
+// class RevocationStatus {
+//   RevocationStatus({
+//     required this.isRevoked,
+//     required this.message,
+//     required this.lastChecked,
+//     this.error,
+//   });
+// 
+//   /// Indicates whether the credential is confirmed revoked.
+//   final bool isRevoked;
+// 
+//   /// A message providing details about the status check outcome.
+//   final String message;
+// 
+//   /// Timestamp indicating when the status was last checked.
+//   final DateTime lastChecked;
+// 
+//   /// An optional error message if the status check failed.
+//   final String? error;
+// }

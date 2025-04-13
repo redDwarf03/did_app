@@ -200,7 +200,8 @@ class _DocumentVersionsScreenState
                               : Colors.grey.shade200,
                           foregroundColor:
                               isSelected ? Colors.white : Colors.grey.shade700,
-                          child: Text('v${version.versionNumber}'),
+                          child:
+                              Text(l10n.versionNumber(version.versionNumber)),
                         ),
                         title: Text(
                           l10n.versionLabel(version.versionNumber),
@@ -252,7 +253,7 @@ class _DocumentVersionsScreenState
                 backgroundColor: Theme.of(context).primaryColor,
                 foregroundColor: Colors.white,
                 radius: 24,
-                child: Text('v${version.versionNumber}'),
+                child: Text(l10n.versionNumber(version.versionNumber)),
               ),
               const SizedBox(width: 16),
               Expanded(

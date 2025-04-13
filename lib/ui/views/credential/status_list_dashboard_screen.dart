@@ -322,10 +322,6 @@ class _StatusListDashboardScreenState
                   l10n.statusPurposeLabel,
                   _selectedList!.credentialSubject.statusPurpose.toString(),
                 ),
-                _buildDetailRow(
-                  l10n.statusListSizeLabel,
-                  _selectedList!.credentialSubject.statusListSize.toString(),
-                ),
               ],
             ),
           ),

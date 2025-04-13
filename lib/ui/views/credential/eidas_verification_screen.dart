@@ -1,5 +1,7 @@
 import 'package:did_app/application/credential/eidas_provider.dart';
 import 'package:did_app/domain/credential/credential.dart';
+import 'package:did_app/domain/credential/eidas_credential.dart';
+import 'package:did_app/infrastructure/credential/eidas_trust_list.dart';
 import 'package:did_app/ui/common/app_card.dart';
 import 'package:did_app/ui/common/section_title.dart';
 import 'package:did_app/ui/views/credential/eidas_trust_registry_screen.dart';
@@ -35,13 +37,25 @@ class _EidasVerificationScreenState
   }
 
   Future<void> _verifyCredential() async {
+    if (widget.credential is! EidasCredential) {
+      setState(() {
+        _isVerifying = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Cannot verify: Not an eIDAS credential type.'),
+            backgroundColor: Colors.orange),
+      );
+      return;
+    }
+
     setState(() {
       _isVerifying = true;
     });
 
     await ref
         .read(eidasNotifierProvider.notifier)
-        .verifyCredential(widget.credential);
+        .verifyEidasCredential(widget.credential as EidasCredential);
 
     setState(() {
       _isVerifying = false;
@@ -224,8 +238,7 @@ class _EidasVerificationScreenState
   }
 
   Widget _buildCryptographicDetailsCard(AppLocalizations l10n) {
-    final eidasState = ref.watch(eidasNotifierProvider);
-    final details = eidasState.verificationResult?.details;
+    final proof = widget.credential.proof;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,25 +253,27 @@ class _EidasVerificationScreenState
                 _buildDetailRow(
                   l10n,
                   l10n.issuerLabel,
-                  details?['issuer'] ?? widget.credential.issuer,
+                  widget.credential.issuer,
                 ),
                 const SizedBox(height: 8),
                 _buildDetailRow(
                   l10n,
                   l10n.issuanceDateLabel,
-                  details?['issuanceDate'] ?? '',
+                  widget.credential.issuanceDate != null
+                      ? _formatDateTime(widget.credential.issuanceDate!)
+                      : 'N/A',
                 ),
                 const SizedBox(height: 8),
                 _buildDetailRow(
                   l10n,
                   l10n.proofMethodLabel,
-                  details?['verificationMethod'] ?? '',
+                  proof['verificationMethod']?.toString() ?? 'N/A',
                 ),
                 const SizedBox(height: 8),
                 _buildDetailRow(
                   l10n,
                   l10n.proofTypeLabel,
-                  details?['proofType'] ?? '',
+                  proof['type']?.toString() ?? 'N/A',
                 ),
               ],
             ),
@@ -273,8 +288,8 @@ class _EidasVerificationScreenState
     final verificationResult = eidasState.verificationResult;
     final trustListReport = eidasState.trustListReport;
 
-    // Déterminer si l'émetteur est dans le registre de confiance
-    final issuerTrusted = verificationResult?.details?['issuerTrusted'] == true;
+    final issuerTrustedFuture =
+        EidasTrustList.instance.isIssuerTrusted(widget.credential.issuer);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -339,7 +354,30 @@ class _EidasVerificationScreenState
                   l10n.eudiWalletTitle,
                   eidasState.isEudiWalletAvailable,
                 ),
-                _buildComplianceCheck(l10n.verifiedIssuer, issuerTrusted),
+                FutureBuilder<bool>(
+                  future: issuerTrustedFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Padding(
+                        padding: EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                                width: 20,
+                                height: 20,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2)),
+                            SizedBox(width: 8),
+                            Text('Checking issuer trust...'),
+                          ],
+                        ),
+                      );
+                    }
+                    final isTrusted = snapshot.data ?? false;
+                    return _buildComplianceCheck(
+                        l10n.verifiedIssuer, isTrusted);
+                  },
+                ),
 
                 // Section registre de confiance
                 if (trustListReport != null ||
@@ -447,7 +485,7 @@ class _EidasVerificationScreenState
   Future<void> _generateQrCode() async {
     final qrCodeData = await ref
         .read(eidasNotifierProvider.notifier)
-        .generateQrCodeForCredential(widget.credential);
+        .exportToJson(widget.credential);
 
     if (qrCodeData != null && mounted) {
       _showQrCodeDialog(qrCodeData);

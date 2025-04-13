@@ -48,7 +48,8 @@ class _CredentialRenewalScreenState
       final renewalNeeded = await statusNotifier.checkForRenewalNeeded(
         credentials,
         const Duration(
-            days: 30,), // Renouveler si expiration dans moins de 30 jours
+          days: 30,
+        ), // Renouveler si expiration dans moins de 30 jours
       );
 
       setState(() {
@@ -169,8 +170,11 @@ class _CredentialRenewalScreenState
                 ? const Icon(Icons.gpp_bad, color: Colors.red, size: 36)
                 : isExpired
                     ? const Icon(Icons.warning, color: Colors.orange, size: 36)
-                    : Icon(_getCredentialTypeIcon(credentialType),
-                        color: Colors.amber, size: 36,),
+                    : Icon(
+                        _getCredentialTypeIcon(credentialType),
+                        color: Colors.amber,
+                        size: 36,
+                      ),
             title: Text(_getCredentialName(credential)),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,7 +249,9 @@ class _CredentialRenewalScreenState
   }
 
   Future<void> _initiateRenewal(
-      Credential credential, AppLocalizations l10n,) async {
+    Credential credential,
+    AppLocalizations l10n,
+  ) async {
     // Déplacer l'attestation vers "en cours"
     setState(() {
       _renewalCandidates.remove(credential);
@@ -322,7 +328,6 @@ class _CredentialRenewalScreenState
       case CredentialType.professionalBadge:
         return Icons.badge;
       case CredentialType.other:
-      default:
         return Icons.badge;
     }
   }

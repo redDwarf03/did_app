@@ -147,9 +147,9 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
                     ),
                   )
                 : const Icon(Icons.send),
-            label: Text(_isUploading
-                ? l10n.submittingButton
-                : l10n.submitDocumentsButton,),
+            label: Text(
+              _isUploading ? l10n.submittingButton : l10n.submitDocumentsButton,
+            ),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
@@ -245,10 +245,10 @@ class _DocumentUploadStepState extends ConsumerState<DocumentUploadStep> {
       _isUploading = true;
     });
 
-    // Submit documents to the verification provider
+    // Corrected: Use named parameter `documentPaths`
     await ref
         .read(verificationNotifierProvider.notifier)
-        .submitVerificationStep(_uploadedDocuments);
+        .submitVerificationStep(documentPaths: _uploadedDocuments);
 
     setState(() {
       _isUploading = false;

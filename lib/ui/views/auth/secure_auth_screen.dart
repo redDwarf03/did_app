@@ -189,7 +189,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
         children: [
           ListTile(
             leading: const Icon(Icons.security, size: 32),
-            title: const Text('Two-Factor Authentication'),
+            title: Text(AppLocalizations.of(context)!.twoFactorAuth),
             subtitle: const Text(
               'Add an extra layer of security to your account',
             ),
@@ -204,9 +204,10 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
               padding: const EdgeInsets.all(16),
               child: TextField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email for Verification',
-                  hintText: 'Enter your email address',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.emailForVerification,
+                  hintText:
+                      AppLocalizations.of(context)!.emailForVerificationHint,
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.email),
                 ),
@@ -217,7 +218,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
               padding: const EdgeInsets.all(16),
               child: ElevatedButton(
                 onPressed: () => _configureMagicLink(l10n),
-                child: const Text('Save Email'),
+                child: Text(AppLocalizations.of(context)!.saveEmail),
               ),
             ),
           ],
@@ -239,7 +240,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
         children: [
           ListTile(
             leading: const Icon(Icons.lock_open, size: 32),
-            title: const Text('Passwordless Login'),
+            title: Text(AppLocalizations.of(context)!.passwordlessLogin),
             subtitle: const Text(
               'Sign in without passwords using secure alternatives',
             ),
@@ -258,7 +259,8 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () => _configureMagicLink(l10n),
                       icon: const Icon(Icons.email),
-                      label: const Text('Configure Magic Link'),
+                      label: Text(
+                          AppLocalizations.of(context)!.configureMagicLink),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -266,7 +268,8 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () => _configureNotifications(l10n),
                       icon: const Icon(Icons.notifications),
-                      label: const Text('Configure Notifications'),
+                      label: Text(
+                          AppLocalizations.of(context)!.configureNotifications),
                     ),
                   ),
                 ],
@@ -283,7 +286,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
       child: ElevatedButton.icon(
         onPressed: () => _testAuthentication(l10n),
         icon: const Icon(Icons.security),
-        label: const Text('Test Authentication'),
+        label: Text(AppLocalizations.of(context)!.testAuthentication),
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(200, 50),
         ),
@@ -320,7 +323,8 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
             ElevatedButton.icon(
               onPressed: () => _authenticateWithBiometrics(l10n),
               icon: const Icon(Icons.fingerprint),
-              label: const Text('Authenticate with Biometrics'),
+              label: Text(
+                  AppLocalizations.of(context)!.authenticateWithBiometrics),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(250, 50),
               ),
@@ -329,7 +333,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
             OutlinedButton.icon(
               onPressed: _cancelAuthentication,
               icon: const Icon(Icons.cancel),
-              label: const Text('Cancel'),
+              label: Text(AppLocalizations.of(context)!.cancel),
             ),
           ],
         ),
@@ -369,8 +373,8 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Magic link configuration complete'),
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.magicLinkConfigComplete),
         backgroundColor: Colors.green,
       ),
     );
@@ -385,8 +389,8 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Notification configuration complete'),
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.notificationConfigComplete),
         backgroundColor: Colors.green,
       ),
     );
@@ -428,8 +432,9 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
       if (success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Authentication successful'),
+            SnackBar(
+              content:
+                  Text(AppLocalizations.of(context)!.authenticationSuccessful),
               backgroundColor: Colors.green,
             ),
           );

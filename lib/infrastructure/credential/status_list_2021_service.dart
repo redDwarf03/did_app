@@ -8,10 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
-/// Service d'implémentation du Status List 2021
-/// selon la spécification du W3C: https://w3c.github.io/vc-status-list-2021/
+/// Service implementing Status List 2021 according to the W3C specification:
+/// https://w3c.github.io/vc-status-list-2021/
 class StatusList2021Service {
-
   StatusList2021Service({
     required http.Client httpClient,
     required Box<Map<dynamic, dynamic>> cacheBox,
@@ -19,25 +18,26 @@ class StatusList2021Service {
   })  : _httpClient = httpClient,
         _cacheBox = cacheBox,
         _cacheDuration = cacheDuration ?? const Duration(hours: 1);
+
   final http.Client _httpClient;
   final Box<Map<dynamic, dynamic>> _cacheBox;
   final Duration _cacheDuration;
 
-  /// Vérifie le statut d'une attestation à l'aide de Status List 2021
+  /// Checks the status of a credential using the Status List 2021 mechanism.
   Future<StatusCheckResult> checkCredentialStatus(Credential credential) async {
     try {
-      // Vérifier si l'attestation a un statut Status List 2021
+      // Check if the credential has Status List 2021 information
       final statusEntry = _getStatusEntryFromCredential(credential);
       if (statusEntry == null) {
         return StatusCheckResult(
           credentialId: credential.id,
           status: CredentialStatusType.unknown,
           checkedAt: DateTime.now(),
-          error: 'Aucune information de statut Status List 2021 trouvée',
+          error: 'No Status List 2021 information found in credential',
         );
       }
 
-      // Récupérer la liste de statut
+      // Fetch the status list credential
       final statusList =
           await _fetchStatusListCredential(statusEntry.statusListCredential);
       if (statusList == null) {
@@ -45,45 +45,49 @@ class StatusList2021Service {
           credentialId: credential.id,
           status: CredentialStatusType.unknown,
           checkedAt: DateTime.now(),
-          error: 'Impossible de récupérer la liste de statut',
+          error: 'Could not fetch the status list credential',
         );
       }
 
-      // Vérifier que la liste est valide pour l'usage prévu
+      // Verify that the list's purpose matches the entry's purpose
       if (statusList.credentialSubject.statusPurpose !=
           statusEntry.statusPurpose) {
         return StatusCheckResult(
           credentialId: credential.id,
           status: CredentialStatusType.unknown,
           checkedAt: DateTime.now(),
-          error:
-              "La finalité de la liste ne correspond pas à celle de l'entrée",
+          error: 'Status list purpose does not match status entry purpose',
         );
       }
 
-      // Vérifier l'index
-      final maxIndex = statusList.credentialSubject.statusListSize - 1;
+      // Validate the status index
+      // Infer size from the decoded bitset length
+      final decodedList = _decodeBitset(
+        statusList.credentialSubject.encodedList,
+        statusList.credentialSubject.encoding,
+      );
+      final statusListSize = decodedList.length * 8;
+      final maxIndex = statusListSize - 1;
+
       if (statusEntry.statusListIndex < 0 ||
           statusEntry.statusListIndex > maxIndex) {
         return StatusCheckResult(
           credentialId: credential.id,
           status: CredentialStatusType.unknown,
           checkedAt: DateTime.now(),
-          error: 'Index de statut invalide',
+          error:
+              'Invalid status index (index: ${statusEntry.statusListIndex}, max: $maxIndex)',
         );
       }
 
-      // Décoder la liste et vérifier le statut
-      final bitset = _decodeBitset(
-        statusList.credentialSubject.encodedList,
-        statusList.credentialSubject.encoding,
-      );
+      // Decode the bitset and check the status
+      final bitset = decodedList; // Use already decoded list
 
       final isRevoked = _getBitAtIndex(bitset, statusEntry.statusListIndex);
       final statusType =
           isRevoked ? CredentialStatusType.revoked : CredentialStatusType.valid;
 
-      // Status List 2021 ne gère pas l'expiration, nous devons vérifier séparément
+      // Status List 2021 does not handle expiration; check separately.
       if (statusType == CredentialStatusType.valid &&
           credential.expirationDate != null &&
           DateTime.now().isAfter(credential.expirationDate!)) {
@@ -91,13 +95,13 @@ class StatusList2021Service {
           credentialId: credential.id,
           status: CredentialStatusType.expired,
           checkedAt: DateTime.now(),
-          details: 'Attestation expirée',
+          details: 'Credential has expired',
         );
       }
 
       final details = statusType == CredentialStatusType.revoked
-          ? 'Attestation révoquée via Status List 2021'
-          : 'Attestation valide selon Status List 2021';
+          ? 'Credential revoked according to Status List 2021'
+          : 'Credential valid according to Status List 2021';
 
       return StatusCheckResult(
         credentialId: credential.id,
@@ -106,46 +110,49 @@ class StatusList2021Service {
         details: details,
       );
     } catch (e) {
+      // TODO: Log error
       return StatusCheckResult(
         credentialId: credential.id,
         status: CredentialStatusType.unknown,
         checkedAt: DateTime.now(),
-        error: 'Erreur lors de la vérification: $e',
+        error: 'Error during status check: $e',
       );
     }
   }
 
-  /// Récupère une liste de statut depuis l'URL fournie
-  /// avec mise en cache pour les performances
+  /// Fetches a status list credential from the given URL, using caching.
   Future<StatusList2021Credential?> _fetchStatusListCredential(
-      String url,) async {
+    String url,
+  ) async {
     try {
-      // Vérifier le cache d'abord
+      // Check cache first
       final cachedData = _getCachedStatusList(url);
       if (cachedData != null) {
         return cachedData;
       }
 
-      // Récupérer depuis le réseau
+      // Fetch from network
       final response = await _httpClient.get(Uri.parse(url));
       if (response.statusCode != 200) {
+        // TODO: Log HTTP error
         return null;
       }
 
       final jsonData = json.decode(response.body);
       final statusList = StatusList2021Credential.fromJson(jsonData);
 
-      // Stocker dans le cache
+      // Store in cache
       _cacheStatusList(url, statusList);
 
       return statusList;
     } catch (e) {
-      // En cas d'erreur, essayer de retourner la version en cache même expirée
+      // TODO: Log error
+      // On error, attempt to return cached version even if expired
       return _getCachedStatusList(url, ignoreExpiry: true);
     }
   }
 
-  /// Récupère une liste de statut depuis le cache
+  /// Retrieves a status list from the cache.
   StatusList2021Credential? _getCachedStatusList(
     String url, {
     bool ignoreExpiry = false,
@@ -166,13 +173,15 @@ class StatusList2021Service {
       }
 
       return StatusList2021Credential.fromJson(
-          cachedMap['data'] as Map<String, dynamic>,);
+        cachedMap['data'] as Map<String, dynamic>,
+      );
     } catch (e) {
+      // TODO: Log cache read error
       return null;
     }
   }
 
-  /// Stocke une liste de statut dans le cache
+  /// Stores a status list credential in the cache.
   void _cacheStatusList(String url, StatusList2021Credential credential) {
     try {
       final cacheKey = _getCacheKey(url);
@@ -183,81 +192,73 @@ class StatusList2021Service {
 
       _cacheBox.put(cacheKey, cacheData);
     } catch (e) {
-      // Ignorer les erreurs de cache
+      // TODO: Log cache write error
+      // Ignore cache errors for now
     }
   }
 
-  /// Génère une clé de cache pour une URL
+  /// Generates a cache key for a given URL.
   String _getCacheKey(String url) {
+    // Use base64url encoding of the URL for a safe cache key
     return 'status_list_${base64Url.encode(utf8.encode(url))}';
   }
 
-  /// Force la mise à jour d'une liste de statut dans le cache
+  /// Forces a refresh of a specific status list in the cache.
   Future<void> refreshStatusList(String url) async {
     final cacheKey = _getCacheKey(url);
     await _cacheBox.delete(cacheKey);
-    await _fetchStatusListCredential(url);
+    await _fetchStatusListCredential(url); // Fetch and re-cache
   }
 
-  /// Récupère une liste de statut par son URL
+  /// Retrieves a status list by its URL (fetches if not cached or expired).
   Future<StatusList2021Credential> getStatusList(String url) async {
     final statusList = await _fetchStatusListCredential(url);
     if (statusList == null) {
-      throw Exception('Impossible de récupérer la liste de statut');
+      throw Exception('Could not retrieve status list credential from $url');
     }
     return statusList;
   }
 
-  /// Extrait l'entrée de statut Status List 2021 d'une attestation
+  /// Extracts the StatusList2021Entry from a credential's status property.
   StatusList2021Entry? _getStatusEntryFromCredential(Credential credential) {
     return credential.getStatusList2021Entry();
   }
 
-  /// Décode une liste de statut encodée en base64url
+  /// Decodes a base64url encoded bitset.
   Uint8List _decodeBitset(String encodedList, String encoding) {
+    // Currently only supports base64url encoding as per spec example
     if (encoding != 'base64url') {
-      throw UnsupportedError("Seul l'encodage base64url est supporté");
+      throw UnsupportedError(
+          'Only base64url encoding is supported for status list');
     }
-
-    return base64Url.decode(encodedList);
+    // Add padding if needed for base64Url decoding
+    final padded = base64Url.normalize(encodedList);
+    return base64Url.decode(padded);
   }
 
-  /// Récupère la valeur d'un bit à un index donné
+  /// Gets the value of a bit at a specific index in the bitset.
   bool _getBitAtIndex(Uint8List bitset, int index) {
     final byteIndex = index ~/ 8;
     final bitIndex = index % 8;
 
     if (byteIndex >= bitset.length) {
+      // Index out of bounds defaults to not revoked (bit = 0)
       return false;
     }
 
+    // Check the specific bit within the byte (MSB is bit 0)
     return (bitset[byteIndex] & (1 << (7 - bitIndex))) != 0;
   }
 
-  /// Construit une liste de statut à partir d'un mappage de bits
-  Uint8List _buildBitset(Map<int, bool> statusMap, int size) {
-    final byteLength = (size + 7) ~/ 8;
-    final bitset = Uint8List(byteLength);
-
-    // Initialiser tous les bits à 0
-    for (var i = 0; i < bitset.length; i++) {
-      bitset[i] = 0;
-    }
-
-    // Définir les bits selon le mappage
-    statusMap.forEach((index, isRevoked) {
-      if (isRevoked && index >= 0 && index < size) {
-        final byteIndex = index ~/ 8;
-        final bitIndex = index % 8;
-        bitset[byteIndex] |= 1 << bitIndex;
-      }
-    });
-
-    return bitset;
-  }
+  // Note: _buildBitset method removed as it seems related to creating/managing
+  // status lists, not just checking them, which might belong elsewhere.
+  // /// Builds a bitset from a status map (for creating/updating lists).
+  // Uint8List _buildBitset(Map<int, bool> statusMap, int size) {
+  //   ...
+  // }
 }
 
-/// Provider pour le service Status List 2021
+/// Provider for the Status List 2021 service
 final statusList2021ServiceProvider = Provider<StatusList2021Service>((ref) {
   return StatusList2021Service(
     httpClient: http.Client(),

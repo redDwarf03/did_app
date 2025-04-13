@@ -385,9 +385,10 @@ class CertificateDetailsScreen extends ConsumerWidget {
 
   // Action methods
   void _copyToClipboard(BuildContext context, String text, String message) {
+    final l10n = AppLocalizations.of(context)!;
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$message copied to clipboard')),
+      SnackBar(content: Text(l10n.copiedToClipboardMessage(message))),
     );
   }
 

@@ -60,6 +60,56 @@ La SSI, c'est la philosophie derrière notre application. Cela signifie que :
 3. **Ajoutez vos attestations** (carte d'identité, permis de conduire, diplômes, etc.)
 4. **Utilisez votre identité** pour des services en ligne ou en personne
 
+## 🔧 Getting Started (Development)
+
+Suivez ces étapes pour configurer l'environnement de développement :
+
+1.  **Prérequis :**
+    *   Assurez-vous d'avoir [Flutter](https://docs.flutter.dev/get-started/install) installé sur votre machine.
+    *   Utilisez un gestionnaire de versions comme [asdf](https://asdf-vm.com/) avec le plugin Flutter pour gérer les versions SDK spécifiées dans le fichier `.tool-versions`. Installez les versions requises :
+        ```bash
+        asdf install
+        ```
+    *   (Optionnel, si applicable) Exécutez le script de configuration initiale :
+        ```bash
+        ./setup.sh 
+        ```
+        *(Note : Examinez `setup.sh` pour comprendre ce qu'il fait avant de l'exécuter).*
+
+2.  **Cloner le dépôt :**
+    ```bash
+    git clone <URL_DU_DEPOT>
+    cd did_app 
+    ```
+
+3.  **Installer les dépendances :**
+    ```bash
+    flutter pub get
+    ```
+
+4.  **Générer le code (si nécessaire) :**
+    Si le projet utilise des générateurs de code (comme `build_runner`), exécutez :
+    ```bash
+    flutter pub run build_runner build --delete-conflicting-outputs
+    ```
+
+5.  **Lancer l'application :**
+    ```bash
+    flutter run
+    ```
+
+6.  **Commandes utiles :**
+    *   Vérifier les problèmes de code : `flutter analyze`
+    *   Exécuter les tests : `flutter test`
+
+### 🧪 Testing
+
+Ce projet inclut des tests unitaires pour garantir la qualité et la stabilité du code. Pour exécuter tous les tests unitaires, utilisez la commande suivante à la racine du projet :
+
+```bash
+flutter test
+```
+
 ## Fonctionnalités Implémentées
 
 1. **Gestion des Attestations**
@@ -143,7 +193,7 @@ L'application est construite avec Flutter et suit une architecture propre avec :
 - Domain-Driven Design (DDD)
 - Clean Architecture
 - Riverpod pour la gestion d'état
-- Hive pour le stockage local sécurisé
+- flutter_secure_storage pour le stockage local sécurisé
 
 ## Conformité
 
@@ -176,6 +226,84 @@ Les contributions sont les bienvenues ! Si vous souhaitez améliorer ce template
 3. Committez vos changements (`git commit -m 'Add some amazing feature'`)
 4. Poussez vers la branche (`git push origin feature/amazing-feature`)
 5. Ouvrez une Pull Request
+
+## 🔐 Gestion de l'Identité et Interaction Wallet
+
+Cette application gère l'identité numérique de l'utilisateur en s'appuyant sur la blockchain Archethic et le portefeuille externe **Archethic Wallet (aeWallet)**. L'interaction se fait via le protocole **Archethic Wallet Client (AWC)**.
+
+### Flux d'Identité
+
+1.  **Connexion :** L'utilisateur connecte son aeWallet à la dApp en utilisant un de ses comptes/services existants (par exemple, son compte UCO principal).
+2.  **Création du Service dApp :** Pour lier l'identité de l'utilisateur spécifiquement à cette dApp, l'application demande à aeWallet de créer un nouveau **service** dédié (par exemple, `did_app_profile`) au sein de la Keychain de l'utilisateur. Cette opération est initiée par la dApp mais confirmée et exécutée par l'utilisateur dans son aeWallet. Ce service crée une nouvelle paire de clés cryptographiques sous le contrôle de l'utilisateur, associée à son identité dans le contexte de la dApp.
+3.  **Utilisation :**
+    *   Le DID (Decentralized Identifier) de l'utilisateur est dérivé de sa Keychain gérée par aeWallet.
+    *   Les informations d'identité spécifiques à l'application (attributs, attestations) sont gérées sous forme de **Verifiable Credentials (VCs)**.
+    *   Les opérations nécessitant une signature cryptographique liée à l'identité dApp (par exemple, émettre un VC auto-signé, créer une présentation de VCs) devraient idéalement utiliser la clé associée au service dApp (`did_app_profile`).
+4.  **Gestion du Compte Actif (Important) :** Pour les opérations nécessitant la clé spécifique du service dApp, l'utilisateur **pourrait avoir besoin de sélectionner manuellement ce service comme compte actif dans son aeWallet** avant de confirmer l'opération. La dApp tentera de détecter le compte actif et guidera l'utilisateur si un changement est nécessaire.
+
+### Verifiable Credentials (VCs)
+
+L'application utilisera le standard W3C Verifiable Credentials pour représenter les attributs d'identité et les attestations (conformité eIDAS 2.0).
+
+*   Les VCs peuvent être émis par des tiers de confiance ou par l'utilisateur lui-même (Self-Issued).
+*   Le stockage des VCs sera géré de manière sécurisée (potentiellement stockage local chiffré ou via des transactions `DATA` sur la blockchain Archethic, signées via AWC).
+*   Le service dApp dans la Keychain ancre cryptographiquement l'identité de l'utilisateur (`did`) qui est le sujet (`subject`) des VCs.
+
+### Exemple de Document DID W3C (issu d'une Keychain Archethic)
+
+Le document DID est généré à partir de la Keychain de l'utilisateur et représente ses clés publiques associées aux différents services. Voici un exemple simplifié :
+
+```json
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1" // Context for JWK
+  ],
+  // The DID identifier is based on the keychain's genesis address
+  "id": "did:archethic:0000db44763a3dc1aafe7b5ba7b7da6d8f631aad081c0099b64214518d8ddd402142",
+  "verificationMethod": [
+    {
+      // Identifier for the key associated with the 'uco' service
+      "id": "did:archethic:0000db44763a3dc1aafe7b5ba7b7da6d8f631aad081c0099b64214518d8ddd402142#uco",
+      // Controller is the DID itself
+      "controller": "did:archethic:0000db44763a3dc1aafe7b5ba7b7da6d8f631aad081c0099b64214518d8ddd402142",
+      // Type indicating the key format
+      "type": "JsonWebKey2020",
+      // The public key in JWK format
+      "publicKeyJwk": {
+        "kty": "OKP", // Key Type: Octet Key Pair
+        "crv": "Ed25519", // Curve: Ed25519
+        "x": "THUxvsx2-3dAwofe-0YNINr9afALrSnPKdPJX6Ndh0U" // Public key value (base64url encoded)
+      }
+    },
+    {
+      // Identifier for the key associated with the dApp-specific service
+      "id": "did:archethic:0000db44763a3dc1aafe7b5ba7b7da6d8f631aad081c0099b64214518d8ddd402142#did_app_profile",
+      "controller": "did:archethic:0000db44763a3dc1aafe7b5ba7b7da6d8f631aad081c0099b64214518d8ddd402142",
+      "type": "JsonWebKey2020",
+      "publicKeyJwk": {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "x": "R3ehm94B6wgxWHU9jhv__-pQPYaXV3bgQzmG0515wGY" // Different public key for this service
+      }
+    }
+    // ... other services/keys ...
+  ],
+  // Methods that can be used to authenticate as the DID subject
+  "authentication": [
+    "did:archethic:0000db44763a3dc1aafe7b5ba7b7da6d8f631aad081c0099b64214518d8ddd402142#uco",
+    "did:archethic:0000db44763a3dc1aafe7b5ba7b7da6d8f631aad081c0099b64214518d8ddd402142#did_app_profile"
+    // ... other authentication methods ...
+  ],
+  // Methods that can be used to assert claims about the DID subject (e.g., sign VCs)
+  "assertionMethod": [
+     "did:archethic:0000db44763a3dc1aafe7b5ba7b7da6d8f631aad081c0099b64214518d8ddd402142#uco",
+     "did:archethic:0000db44763a3dc1aafe7b5ba7b7da6d8f631aad081c0099b64214518d8ddd402142#did_app_profile"
+     // ... other assertion methods ...
+  ]
+  // Potentially other DID document properties like 'service', 'keyAgreement', etc.
+}
+```
 
 
 

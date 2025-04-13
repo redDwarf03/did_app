@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:flutter_gen/gen_l10n/localizations.dart';
+
 /// Dialog to share a document with others
 class DocumentShareDialog extends ConsumerStatefulWidget {
   const DocumentShareDialog({
@@ -37,8 +39,9 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: const Text('Share Document'),
+      title: Text(l10n.shareDocument),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -56,10 +59,10 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
               // Recipient
               TextFormField(
                 controller: _recipientController,
-                decoration: const InputDecoration(
-                  labelText: 'Recipient',
-                  hintText: 'Name or email of recipient',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.recipient,
+                  hintText: l10n.recipientHint,
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -73,7 +76,7 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
               // Expiration date
               Row(
                 children: [
-                  const Text('Expires:'),
+                  Text(l10n.expires),
                   const SizedBox(width: 8),
                   Expanded(
                     child: OutlinedButton(
@@ -88,8 +91,8 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
               const SizedBox(height: 16),
 
               // Access type
-              const Text('Access Type:'),
-              const SizedBox(height: 8),
+              Text(l10n.accessType),
+              SizedBox(height: 8),
               DropdownButtonFormField<DocumentShareAccessType>(
                 value: _accessType,
                 decoration: const InputDecoration(
@@ -97,22 +100,22 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: DocumentShareAccessType.readOnly,
-                    child: Text('Read Only'),
+                    child: Text(l10n.readOnly),
                   ),
                   DropdownMenuItem(
                     value: DocumentShareAccessType.download,
-                    child: Text('Download'),
+                    child: Text(l10n.download),
                   ),
                   DropdownMenuItem(
                     value: DocumentShareAccessType.verify,
-                    child: Text('Verification Only'),
+                    child: Text(l10n.verificationOnly),
                   ),
                   DropdownMenuItem(
                     value: DocumentShareAccessType.fullAccess,
-                    child: Text('Full Access'),
+                    child: Text(l10n.fullAccess),
                   ),
                 ],
                 onChanged: (value) {
@@ -128,7 +131,7 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
               // Max access count
               Row(
                 children: [
-                  const Text('Max accesses:'),
+                  Text(l10n.maxAccesses),
                   const SizedBox(width: 8),
                   Expanded(
                     child: DropdownButtonFormField<int?>(
@@ -139,8 +142,8 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
                             EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       ),
                       items: [
-                        const DropdownMenuItem(
-                          child: Text('Unlimited'),
+                        DropdownMenuItem(
+                          child: Text(l10n.unlimited),
                         ),
                         for (int i = 1; i <= 10; i++)
                           DropdownMenuItem(
@@ -161,7 +164,7 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
 
               // Access code
               SwitchListTile(
-                title: const Text('Require access code'),
+                title: Text(l10n.requireAccessCode),
                 value: _requireAccessCode,
                 onChanged: (value) {
                   setState(() {
@@ -174,10 +177,10 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _accessCodeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Access Code',
-                    hintText: 'Enter 4-6 digit code',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.accessCode,
+                    hintText: l10n.accessCodeHint,
+                    border: const OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {
@@ -198,11 +201,11 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.cancel),
         ),
         ElevatedButton(
           onPressed: _shareDocument,
-          child: const Text('Share'),
+          child: Text(l10n.share),
         ),
       ],
     );
@@ -237,12 +240,12 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
+      builder: (context) => AlertDialog(
         content: Row(
           children: [
             CircularProgressIndicator(),
             SizedBox(width: 16),
-            Text('Creating share...'),
+            Text(AppLocalizations.of(context)!.creatingShare),
           ],
         ),
       ),
@@ -273,8 +276,8 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
           _showShareSuccess(context, share);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to create share.'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.shareCreationFailed),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -290,7 +293,8 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('An error occurred: $e'),
+            content:
+                Text(AppLocalizations.of(context)!.errorOccurred(e.toString())),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.red,
           ),
@@ -300,15 +304,16 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
   }
 
   void _showShareSuccess(BuildContext context, DocumentShare share) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Document Shared'),
+        title: Text(l10n.documentShared),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Share URL:'),
+            Text(l10n.shareUrl),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(8),
@@ -332,8 +337,8 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
                     onPressed: () {
                       // In a real implementation, copy to clipboard
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('URL copied to clipboard'),
+                        SnackBar(
+                          content: Text(l10n.urlCopied),
                           behavior: SnackBarBehavior.floating,
                         ),
                       );
@@ -344,19 +349,16 @@ class _DocumentShareDialogState extends ConsumerState<DocumentShareDialog> {
               ),
             ),
             const SizedBox(height: 16),
-            Text('Recipient: ${share.recipientDescription}'),
-            Text(
-                'Expires: ${DateFormat('dd MMM yyyy').format(share.expiresAt)}',),
-            if (share.accessCode != null)
-              Text('Access Code: ${share.accessCode}'),
+            Text(l10n.recipientInfo(share.recipientDescription)),
+            Text(l10n.accessCodeInfo(share.accessCode ?? '')),
             if (share.maxAccessCount != null)
-              Text('Max Accesses: ${share.maxAccessCount}'),
+              Text(l10n.maxAccessesInfo(share.maxAccessCount ?? 0)),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.close),
           ),
         ],
       ),

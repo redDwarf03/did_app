@@ -355,8 +355,8 @@ class _VerificationProcessScreenState
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cancel Verification?'),
-        content: const Text('Are you sure you want to cancel?'),
+        title: Text(l10n.cancelVerification),
+        content: Text(l10n.cancelVerificationConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -380,9 +380,9 @@ class _VerificationProcessScreenState
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Verification Process Help'),
-        content: const SingleChildScrollView(
-          child: Text('Follow the steps to complete verification.'),
+        title: Text(l10n.verificationProcessHelp),
+        content: SingleChildScrollView(
+          child: Text(l10n.followVerificationSteps),
         ),
         actions: [
           TextButton(

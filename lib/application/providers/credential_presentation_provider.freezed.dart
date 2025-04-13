@@ -30,7 +30,7 @@ mixin _$CredentialPresentationState {
   String? get error => throw _privateConstructorUsedError;
 
   /// Holds the result of the last presentation verification.
-  domain.VerificationResult? get verificationResult =>
+  VerificationResult? get verificationResult =>
       throw _privateConstructorUsedError;
 
   /// Create a copy of CredentialPresentationState
@@ -53,7 +53,7 @@ abstract class $CredentialPresentationStateCopyWith<$Res> {
       bool isValidating,
       CredentialPresentation? presentation,
       String? error,
-      domain.VerificationResult? verificationResult});
+      VerificationResult? verificationResult});
 
   $CredentialPresentationCopyWith<$Res>? get presentation;
   $VerificationResultCopyWith<$Res>? get verificationResult;
@@ -101,7 +101,7 @@ class _$CredentialPresentationStateCopyWithImpl<$Res,
       verificationResult: freezed == verificationResult
           ? _value.verificationResult
           : verificationResult // ignore: cast_nullable_to_non_nullable
-              as domain.VerificationResult?,
+              as VerificationResult?,
     ) as $Val);
   }
 
@@ -149,7 +149,7 @@ abstract class _$$CredentialPresentationStateImplCopyWith<$Res>
       bool isValidating,
       CredentialPresentation? presentation,
       String? error,
-      domain.VerificationResult? verificationResult});
+      VerificationResult? verificationResult});
 
   @override
   $CredentialPresentationCopyWith<$Res>? get presentation;
@@ -198,7 +198,7 @@ class __$$CredentialPresentationStateImplCopyWithImpl<$Res>
       verificationResult: freezed == verificationResult
           ? _value.verificationResult
           : verificationResult // ignore: cast_nullable_to_non_nullable
-              as domain.VerificationResult?,
+              as VerificationResult?,
     ));
   }
 }
@@ -234,7 +234,7 @@ class _$CredentialPresentationStateImpl extends _CredentialPresentationState {
 
   /// Holds the result of the last presentation verification.
   @override
-  final domain.VerificationResult? verificationResult;
+  final VerificationResult? verificationResult;
 
   @override
   String toString() {
@@ -277,7 +277,7 @@ abstract class _CredentialPresentationState
           final bool isValidating,
           final CredentialPresentation? presentation,
           final String? error,
-          final domain.VerificationResult? verificationResult}) =
+          final VerificationResult? verificationResult}) =
       _$CredentialPresentationStateImpl;
   const _CredentialPresentationState._() : super._();
 
@@ -299,7 +299,7 @@ abstract class _CredentialPresentationState
 
   /// Holds the result of the last presentation verification.
   @override
-  domain.VerificationResult? get verificationResult;
+  VerificationResult? get verificationResult;
 
   /// Create a copy of CredentialPresentationState
   /// with the given fields replaced by the non-null parameter values.

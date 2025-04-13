@@ -131,7 +131,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         labelText: l10n.emailLabel,
-        hintText: 'example@email.com',
+        hintText: l10n.exampleEmail,
         prefixIcon: const Icon(Icons.email),
         border: const OutlineInputBorder(),
       ),
@@ -144,8 +144,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       controller: _passwordController,
       obscureText: !_isPasswordVisible,
       decoration: InputDecoration(
-        labelText: 'Password',
-        hintText: 'Enter your password',
+        labelText: l10n.password,
+        hintText: l10n.passwordHint,
         prefixIcon: const Icon(Icons.lock),
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
@@ -179,12 +179,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 }
               },
             ),
-            const Text('Remember me'),
+            Text(l10n.rememberMe),
           ],
         ),
         TextButton(
           onPressed: _isLoading ? null : () => _forgotPassword(l10n),
-          child: const Text('Forgot Password?'),
+          child: Text(l10n.forgotPassword),
         ),
       ],
     );
@@ -247,12 +247,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildDivider(AppLocalizations l10n) {
-    return const Row(
+    return Row(
       children: [
         Expanded(child: Divider()),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text('OR', style: TextStyle(color: Colors.grey)),
+          child: Text(l10n.or, style: TextStyle(color: Colors.grey)),
         ),
         Expanded(child: Divider()),
       ],
@@ -266,7 +266,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         OutlinedButton.icon(
           onPressed: _isLoading ? null : () => _sendMagicLink(l10n),
           icon: const Icon(Icons.link),
-          label: const Text('Login with Magic Link'),
+          label: Text(l10n.loginWithMagicLink),
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 14),
           ),
@@ -275,7 +275,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         OutlinedButton.icon(
           onPressed: _isLoading ? null : () => _sendNotification(l10n),
           icon: const Icon(Icons.notifications),
-          label: const Text('Login with Push Notification'),
+          label: Text(l10n.loginWithPushNotification),
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 14),
           ),
@@ -405,7 +405,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Magic link sent to $email'),
+            content: Text(l10n.magicLinkSent(email)),
             backgroundColor: Colors.green,
           ),
         );
@@ -435,8 +435,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (mounted) {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login notification sent to your device'),
+          SnackBar(
+            content: Text(l10n.loginNotificationSent),
             backgroundColor: Colors.green,
           ),
         );
@@ -471,7 +471,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Password reset instructions sent to $email'),
+        content: Text(l10n.passwordResetSent(email)),
         backgroundColor: Colors.green,
       ),
     );
@@ -490,8 +490,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     // In a real app, navigate to the home screen
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Login successful'),
+        SnackBar(
+          content: Text(l10n.loginSuccessful),
           backgroundColor: Colors.green,
         ),
       );

@@ -1,6 +1,7 @@
 import 'package:did_app/domain/document/document.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// A reusable widget to display a document card in the application
 class DocumentCard extends StatelessWidget {
@@ -221,14 +222,14 @@ class DocumentCard extends StatelessWidget {
                       },
                       itemBuilder: (context) => [
                         if (onEdit != null)
-                          const PopupMenuItem<String>(
+                          PopupMenuItem<String>(
                             value: 'edit',
-                            child: Text('Edit'),
+                            child: Text(AppLocalizations.of(context)!.edit),
                           ),
                         if (onDelete != null)
-                          const PopupMenuItem<String>(
+                          PopupMenuItem<String>(
                             value: 'delete',
-                            child: Text('Delete'),
+                            child: Text(AppLocalizations.of(context)!.delete),
                           ),
                       ],
                     ),

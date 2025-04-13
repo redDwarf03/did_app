@@ -147,7 +147,7 @@ class MockDocumentRepository implements DocumentRepository {
   @override
   Future<Document> updateDocument({
     required String documentId,
-    required Uint8List fileBytes,
+    Uint8List? fileBytes,
     String? title,
     String? description,
     String? issuer,
@@ -166,65 +166,71 @@ class MockDocumentRepository implements DocumentRepository {
       throw Exception('Document not found');
     }
 
-    // Calculate hash of the new content
-    final documentHash = sha256.convert(fileBytes).toString();
-
-    // Simulate a new initialization vector for encryption
-    final encryptionIV = _generateRandomHex(16);
-
-    // Simulated storage path for the new version
-    final storagePath =
-        'documents/${existingDocument.ownerIdentityId}/$documentId/v${existingDocument.version + 1}';
-
-    // Create a new version in history
     final now = DateTime.now();
-    final newVersion = existingDocument.version + 1;
-    final versionId = _uuid.v4();
-    final version = DocumentVersion(
-      id: versionId,
-      versionNumber: newVersion,
-      createdAt: now,
-      documentHash: documentHash,
-      encryptedStoragePath: storagePath,
-      encryptionIV: encryptionIV,
-      changeNote: changeNote,
-    );
+    int newVersion = existingDocument.version;
+    String? newDocumentHash = existingDocument.documentHash;
+    String? newEncryptionIV = existingDocument.encryptionIV;
+    String? newStoragePath = existingDocument.encryptedStoragePath;
 
-    // Update the document
+    // Only update content-related fields and version if fileBytes is provided
+    if (fileBytes != null) {
+      newVersion = existingDocument.version + 1;
+      newDocumentHash = sha256.convert(fileBytes).toString();
+      newEncryptionIV = _generateRandomHex(16);
+      newStoragePath =
+          'documents/${existingDocument.ownerIdentityId}/$documentId/v$newVersion';
+
+      // Create a new version in history
+      final versionId = _uuid.v4();
+      final version = DocumentVersion(
+        id: versionId,
+        versionNumber: newVersion,
+        createdAt: now,
+        documentHash: newDocumentHash,
+        encryptedStoragePath: newStoragePath,
+        encryptionIV: newEncryptionIV,
+        changeNote: changeNote,
+      );
+
+      // Add the new version to history
+      if (!_documentVersions.containsKey(documentId)) {
+        _documentVersions[documentId] = [];
+      }
+      _documentVersions[documentId]!.add(version);
+      _versionContents[versionId] = fileBytes;
+      // Update the main document content only if new bytes are provided
+      _documentContents[documentId] = fileBytes;
+    }
+
+    // Update the document metadata regardless of fileBytes
     final updatedDocument = Document(
       id: documentId,
-      type: existingDocument.type,
+      type: existingDocument.type, // Type is not updatable in this mock
       title: title ?? existingDocument.title,
       description: description ?? existingDocument.description,
       issuer: issuer ?? existingDocument.issuer,
-      issuedAt: existingDocument.issuedAt,
+      issuedAt: existingDocument.issuedAt, // Issuance date doesn't change
       expiresAt: expiresAt ?? existingDocument.expiresAt,
-      version: newVersion,
+      version:
+          newVersion, // Use new version number if content changed, else old
       metadata: metadata ?? existingDocument.metadata,
-      verificationStatus: existingDocument.verificationStatus,
-      encryptedStoragePath: storagePath,
-      documentHash: documentHash,
-      encryptionIV: encryptionIV,
-      issuerSignature: existingDocument.issuerSignature,
-      issuerAddress: existingDocument.issuerAddress,
-      blockchainTxId: existingDocument.blockchainTxId,
-      updatedAt: now,
+      verificationStatus:
+          existingDocument.verificationStatus, // Status not changed here
+      encryptedStoragePath: newStoragePath, // Use new path if content changed
+      documentHash: newDocumentHash, // Use new hash if content changed
+      encryptionIV: newEncryptionIV, // Use new IV if content changed
+      issuerSignature: existingDocument.issuerSignature, // Not updated in mock
+      issuerAddress: existingDocument.issuerAddress, // Not updated in mock
+      blockchainTxId: existingDocument.blockchainTxId, // Not updated in mock
+      updatedAt: now, // Always update the timestamp
       ownerIdentityId: existingDocument.ownerIdentityId,
       tags: tags ?? existingDocument.tags,
       isShareable: isShareable ?? existingDocument.isShareable,
       eidasLevel: eidasLevel ?? existingDocument.eidasLevel,
     );
 
-    // Store the updated document and its content
+    // Store the updated document metadata
     _documents[documentId] = updatedDocument;
-    _documentContents[documentId] = fileBytes;
-
-    // Add the new version to history
-    if (!_documentVersions.containsKey(documentId)) {
-      _documentVersions[documentId] = [];
-    }
-    _documentVersions[documentId]!.add(version);
-    _versionContents[versionId] = fileBytes;
 
     return updatedDocument;
   }

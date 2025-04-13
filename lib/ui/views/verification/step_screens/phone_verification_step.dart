@@ -180,7 +180,8 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
                     Expanded(
                       child: Text(
                         l10n.demoPhoneVerificationCodeMessage(
-                            _mockVerificationCode,),
+                          _mockVerificationCode,
+                        ),
                         style: const TextStyle(
                           fontStyle: FontStyle.italic,
                           fontSize: 14,
@@ -452,18 +453,24 @@ class _PhoneVerificationStepState extends ConsumerState<PhoneVerificationStep> {
         // Code is valid, simulate submission to the blockchain
         // In a real app, this would interact with the actual verification process
 
-        // Submit verification step
+        // Corrected: Call submitVerificationStep with named `documentPaths` (empty list for phone)
+        // Optionally, could pass phone/code via formData if the notifier used it.
         await ref
             .read(verificationNotifierProvider.notifier)
-            .submitVerificationStep([_completePhoneNumber, enteredCode]);
+            .submitVerificationStep(
+                documentPaths: []); // Pass empty list for documentPaths
+        // .submitVerificationStep(formData: {'phone': _completePhoneNumber, 'code': enteredCode}); // Alternative
 
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Phone number successfully verified'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        if (mounted) {
+          // Added mounted check
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Phone number successfully verified'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       } else {
         // Invalid code
         ScaffoldMessenger.of(context).showSnackBar(

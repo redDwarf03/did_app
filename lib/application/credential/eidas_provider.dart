@@ -1,5 +1,4 @@
-import 'package:did_app/domain/credential/credential.dart'
-    hide RevocationStatus;
+import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/credential/eidas_credential.dart';
 import 'package:did_app/domain/verification/verification_result.dart';
 import 'package:did_app/infrastructure/credential/eidas_credential_service.dart'
@@ -83,7 +82,7 @@ final eidasNotifierProvider =
   final trustList = EidasTrustList.instance; // Keep using singleton for now
 
   // Inject dependencies into the notifier
-  return EidasNotifier(ref, eidasService, trustList);
+  return EidasNotifier(eidasService, trustList);
 });
 
 /// Manages state and orchestrates operations related to eIDAS compliance
@@ -99,7 +98,6 @@ class EidasNotifier extends StateNotifier<EidasState> {
   /// Immediately triggers checks for EUDI Wallet availability (simulated)
   /// and loads initial Trust List data.
   EidasNotifier(
-    this._ref,
     this._eidasService, // Inject EidasCredentialService
     this._trustList, // Inject EidasTrustList
   ) : super(const EidasState()) {
@@ -109,7 +107,6 @@ class EidasNotifier extends StateNotifier<EidasState> {
     _loadTrustListData();
   }
 
-  final Ref _ref;
   final infra_eidas_service.EidasCredentialService
       _eidasService; // Store injected service
   final EidasTrustList _trustList; // Store injected trust list

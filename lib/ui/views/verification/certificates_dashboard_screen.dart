@@ -128,7 +128,10 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           _getCertificateStatus(
-                              isExpired, isExpiringSoon, l10n,),
+                            isExpired,
+                            isExpiringSoon,
+                            l10n,
+                          ),
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -165,7 +168,9 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 12),
                       _buildInfoRow(
-                          l10n.identifierLabel, _truncateId(certificate.id),),
+                        l10n.identifierLabel,
+                        _truncateId(certificate.id),
+                      ),
                       _buildInfoRow(
                         l10n.issuanceDateLabel,
                         _formatDate(certificate.issuedAt),
@@ -262,7 +267,10 @@ class CertificatesDashboardScreen extends ConsumerWidget {
   }
 
   String _getCertificateStatus(
-      bool isExpired, bool isExpiringSoon, AppLocalizations l10n,) {
+    bool isExpired,
+    bool isExpiringSoon,
+    AppLocalizations l10n,
+  ) {
     if (isExpired) return l10n.expiredStatus;
     if (isExpiringSoon) return l10n.notVerifiedStatus;
     return l10n.verifiedStatus;
@@ -334,7 +342,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.file_download),
-              title: const Text('Export as PDF'),
+              title: Text(l10n.exportAsPdf),
               onTap: () {
                 Navigator.pop(context);
                 // Export as PDF
@@ -342,7 +350,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.link),
-              title: const Text('Generate Link'),
+              title: Text(l10n.generateLink),
               onTap: () {
                 Navigator.pop(context);
                 // Generate and copy link

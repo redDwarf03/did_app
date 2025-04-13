@@ -1,4 +1,6 @@
+import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/application/verification/providers.dart';
+import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -412,23 +414,21 @@ class _VerificationStartScreenState
       // Start the verification process
       await ref
           .read(verificationNotifierProvider.notifier)
-          .startVerificationWithLevel(_selectedLevel);
+          .startVerificationWithLevel(
+            identityAddress:
+                ref.read(identityNotifierProvider).identity!.identityAddress,
+            eidasLevel: _mapVerificationLevelToEidasLevel(_selectedLevel),
+          );
 
       final verificationProcess =
           ref.read(verificationNotifierProvider).verificationProcess;
 
       // Navigate to verification process screen
       if (mounted && verificationProcess != null) {
-        // Convert process to a Map of string key-value pairs for query parameters
-        final queryParams = <String, String>{
-          'level': _selectedLevel.toString(),
-          'timestamp': DateTime.now().toIso8601String(),
-        };
-
         await context.pushNamed(
           'verificationProcess',
-          pathParameters: {'processIdentifier': 'latest'},
-          queryParameters: queryParams,
+          pathParameters: {'processIdentifier': verificationProcess.id},
+          extra: verificationProcess,
         );
       }
     } catch (e) {
@@ -447,6 +447,18 @@ class _VerificationStartScreenState
           _isLoading = false;
         });
       }
+    }
+  }
+
+  // Added helper function to map local enum to domain enum
+  EidasLevel _mapVerificationLevelToEidasLevel(VerificationLevel level) {
+    switch (level) {
+      case VerificationLevel.basic:
+        return EidasLevel.low;
+      case VerificationLevel.standard:
+        return EidasLevel.substantial;
+      case VerificationLevel.advanced:
+        return EidasLevel.high;
     }
   }
 }

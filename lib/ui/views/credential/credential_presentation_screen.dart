@@ -49,17 +49,17 @@ class _CredentialPresentationScreenState
     for (final credential in _credentials) {
       // Présélectionner les attributs courants (nom, prénom, etc.)
       final defaultAttrs = <String>[];
-      if (credential.claims?.containsKey('firstName') ?? false) {
+      if (credential.claims.containsKey('firstName')) {
         defaultAttrs.add('firstName');
       }
-      if (credential.claims?.containsKey('lastName') ?? false) {
+      if (credential.claims.containsKey('lastName')) {
         defaultAttrs.add('lastName');
       }
       if (defaultAttrs.isNotEmpty) {
         _selectedAttributes[credential.id] = defaultAttrs;
       } else {
         // Si pas d'attributs courants, présélectionner le premier
-        final keys = credential.claims?.keys.toList() ?? [];
+        final keys = credential.claims.keys.toList();
         if (keys.isNotEmpty) {
           _selectedAttributes[credential.id] = [keys.first];
         } else {
@@ -126,7 +126,6 @@ class _CredentialPresentationScreenState
   }
 
   Widget _buildContent(BuildContext context, WidgetRef ref) {
-    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -135,8 +134,7 @@ class _CredentialPresentationScreenState
           _buildHeader(),
           const SizedBox(height: 24),
           // Liste des attestations
-          ..._credentials
-              .map(_buildCredentialSection),
+          ..._credentials.map(_buildCredentialSection),
           const SizedBox(height: 24),
           // Section prédicat (si affichée)
           if (_usePredicate) _buildPredicatesSection(),
@@ -207,7 +205,8 @@ class _CredentialPresentationScreenState
               children: [
                 Icon(
                   _getCredentialTypeIcon(
-                      _getCredentialTypeFromList(credential.type),),
+                    _getCredentialTypeFromList(credential.type),
+                  ),
                   color: Theme.of(context).primaryColor,
                 ),
                 const SizedBox(width: 8),
@@ -237,12 +236,12 @@ class _CredentialPresentationScreenState
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            ...(credential.claims?.keys ?? []).map((attr) {
+            ...credential.claims.keys.map((attr) {
               final selectedAttrs = _selectedAttributes[credential.id] ?? [];
               return CheckboxListTile(
                 title: Text(attr),
                 subtitle: Text(
-                  credential.claims?[attr]?.toString() ?? '',
+                  credential.claims[attr]?.toString() ?? '',
                   style: const TextStyle(fontSize: 12),
                 ),
                 value: selectedAttrs.contains(attr),
@@ -480,7 +479,6 @@ class _CredentialPresentationScreenState
       case CredentialType.professionalBadge:
         return Icons.badge;
       case CredentialType.other:
-      default:
         return Icons.badge;
     }
   }
@@ -516,13 +514,11 @@ class _CredentialPresentationScreenState
   }
 
   String? _getNumericAttribute(Credential credential) {
-    if (credential.claims != null) {
-      for (final key in credential.claims!.keys) {
-        if (credential.claims![key] is num ||
-            (credential.claims![key] is String &&
-                int.tryParse(credential.claims![key] as String) != null)) {
-          return key;
-        }
+    for (final key in credential.claims.keys) {
+      if (credential.claims[key] is num ||
+          (credential.claims[key] is String &&
+              int.tryParse(credential.claims[key] as String) != null)) {
+        return key;
       }
     }
     return null;
@@ -578,8 +574,11 @@ class PresentationResultScreen extends StatelessWidget {
               ),
               child: Center(
                 child: link != null
-                    ? const Icon(Icons.qr_code,
-                        size: 150, color: Colors.black87,)
+                    ? const Icon(
+                        Icons.qr_code,
+                        size: 150,
+                        color: Colors.black87,
+                      )
                     : const Icon(Icons.error, size: 64, color: Colors.red),
               ),
             ),
@@ -598,15 +597,23 @@ class PresentationResultScreen extends StatelessWidget {
               context,
               title: l10n.generalInformationSection,
               children: [
-                _buildInfoRow(l10n.credentialTypeLabel,
-                    '${presentation.verifiableCredentials.length}',),
-                _buildInfoRow(l10n.documentTypeLabel,
-                    '${presentation.revealedAttributes.length ?? 0}',),
-                if (presentation.verifiableCredentials.isNotEmpty)
-                  _buildInfoRow(l10n.credentialsSection,
-                      '${presentation.verifiableCredentials.length}',),
-                _buildInfoRow(l10n.createdLabel,
-                    _formatDate(presentation.created ?? DateTime.now()),),
+                _buildInfoRow(
+                  l10n.credentialTypeLabel,
+                  '${presentation.verifiableCredentials!.length}',
+                ),
+                _buildInfoRow(
+                  l10n.documentTypeLabel,
+                  '${presentation.revealedAttributes!.length}',
+                ),
+                if (presentation.verifiableCredentials!.isNotEmpty)
+                  _buildInfoRow(
+                    l10n.credentialsSection,
+                    '${presentation.verifiableCredentials!.length}',
+                  ),
+                _buildInfoRow(
+                  l10n.createdLabel,
+                  _formatDate(presentation.created ?? DateTime.now()),
+                ),
               ],
             ),
             if (message != null && message!.isNotEmpty) ...[

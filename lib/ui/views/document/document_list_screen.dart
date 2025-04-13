@@ -282,7 +282,8 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
             content: Text(
               status != null
                   ? l10n.verificationStatusResult(
-                      _getVerificationStatusText(status),)
+                      _getVerificationStatusText(status),
+                    )
                   : l10n.verificationFailedError,
             ),
             actions: [
@@ -476,7 +477,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
               _deleteDocument(context, document);
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text(l10n.deleteButton),
           ),
         ],
       ),
@@ -486,15 +487,16 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
   // Delete document
   Future<void> _deleteDocument(BuildContext context, Document document) async {
     // Show loading indicator
+    final l10n = AppLocalizations.of(context)!;
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
+      builder: (context) => AlertDialog(
         content: Row(
           children: [
             CircularProgressIndicator(),
             SizedBox(width: 16),
-            Text('Deletion in progress...'),
+            Text(l10n.deletionInProgressDialog),
           ],
         ),
       ),
@@ -517,8 +519,8 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
           SnackBar(
             content: Text(
               success
-                  ? 'Document deleted successfully'
-                  : 'Document deletion failed',
+                  ? l10n.documentDeletedSuccess
+                  : l10n.documentDeletionFailed,
             ),
             behavior: SnackBarBehavior.floating,
           ),
@@ -534,7 +536,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('An error occurred: $e'),
+            content: Text(l10n.genericErrorMessage(e.toString())),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.red,
           ),

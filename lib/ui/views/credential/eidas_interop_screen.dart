@@ -179,7 +179,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
                   children: [
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: _synchronizeWithEidasInfrastructure,
+                        onPressed: _syncTrustRegistry,
                         icon: const Icon(Icons.sync),
                         label: Text(l10n.synchronizeWithEuRegistry),
                         style: ElevatedButton.styleFrom(
@@ -498,7 +498,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
-                  onPressed: _synchronizeWithEidasInfrastructure,
+                  onPressed: _syncTrustRegistry,
                   icon: const Icon(Icons.sync),
                   label: Text(l10n.synchronizeWithEuRegistry),
                   style: ElevatedButton.styleFrom(
@@ -551,10 +551,6 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
           .makeEidasCompatible(credential);
 
       if (eidasCredential != null) {
-        final success = await ref
-            .read(credentialNotifierProvider.notifier)
-            .addCredential(eidasCredential);
-
         if (mounted) {
           final l10n =
               Localizations.of<AppLocalizations>(context, AppLocalizations)!;
@@ -657,10 +653,11 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
 
   Future<void> _shareWithEudiWallet(Credential credential) async {
     try {
-      final success = await ref
+      await ref
           .read(eidasNotifierProvider.notifier)
           .shareWithEudiWallet(credential);
-      if (success && mounted) {
+
+      if (mounted) {
         final l10n =
             Localizations.of<AppLocalizations>(context, AppLocalizations)!;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -712,12 +709,11 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
     }
   }
 
-  Future<void> _synchronizeWithEidasInfrastructure() async {
+  Future<void> _syncTrustRegistry() async {
     try {
-      final success = await ref
-          .read(eidasNotifierProvider.notifier)
-          .synchronizeWithEidasInfrastructure();
-      if (success && mounted) {
+      await ref.read(eidasNotifierProvider.notifier).syncTrustRegistry();
+
+      if (mounted) {
         final l10n =
             Localizations.of<AppLocalizations>(context, AppLocalizations)!;
         ScaffoldMessenger.of(context).showSnackBar(

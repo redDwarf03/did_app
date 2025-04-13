@@ -1,5 +1,6 @@
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Liveness verification step component for verification process
 class LivenessVerificationStep extends StatefulWidget {
@@ -18,6 +19,7 @@ class LivenessVerificationStep extends StatefulWidget {
 class _LivenessVerificationStepState extends State<LivenessVerificationStep> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Placeholder implementation - to be completed with actual functionality
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,7 +42,7 @@ class _LivenessVerificationStepState extends State<LivenessVerificationStep> {
             onPressed: () {
               // TODO: Implement selfie capture functionality
             },
-            child: const Text('Take Selfie'),
+            child: Text(l10n.takeSelfie),
           ),
         ),
       ],

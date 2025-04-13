@@ -41,7 +41,6 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
   Widget build(BuildContext context) {
     final credentialState = ref.watch(credentialNotifierProvider);
     final identityState = ref.watch(identityNotifierProvider);
-    final hasIdentity = identityState.identity != null;
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
 
     if (identityState.identity == null) {
@@ -194,7 +193,9 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
 
   // Présenter une attestation
   Future<void> _presentCredential(
-      BuildContext context, Credential credential,) async {
+    BuildContext context,
+    Credential credential,
+  ) async {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
 
     // Ici, on afficherait une interface permettant de créer une présentation sélective
@@ -241,7 +242,9 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
 
   // Vérifier une attestation
   Future<void> _verifyCredential(
-      BuildContext context, Credential credential,) async {
+    BuildContext context,
+    Credential credential,
+  ) async {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     // Montrer un indicateur de chargement
     await DialogUtils.showLoadingDialog(context, l10n.verifyingMessage);
@@ -289,7 +292,6 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
 
   // Scanner un QR code
   Future<void> _scanQRCode(BuildContext context) async {
-    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     // Dans une implémentation réelle, on utiliserait un scanner de QR code
     // Pour le prototype, on simule simplement la réception d'une attestation
 
@@ -387,7 +389,6 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
 
   // Demander une attestation
   Future<void> _requestCredential(BuildContext context, String type) async {
-    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     // Ici, on lancerait le processus de demande d'attestation
     // En contactant un émetteur, ou en redirigeant vers son site
 
@@ -408,7 +409,8 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
             Text("2. Vous redirigerait vers l'émetteur"),
             Text('3. Vous guiderait dans le processus de vérification'),
             Text(
-                "4. Recevrait et stockerait l'attestation une fois approuvée",),
+              "4. Recevrait et stockerait l'attestation une fois approuvée",
+            ),
           ],
         ),
         actions: [
@@ -423,7 +425,6 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
 
   // Présenter une attestation (dialogue de sélection)
   Future<void> _showPresentCredentialDialog(BuildContext context) async {
-    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     final credentials = ref.read(credentialNotifierProvider).credentials;
 
     if (credentials.isEmpty) {
@@ -448,8 +449,11 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
             itemBuilder: (context, index) {
               final credential = credentials[index];
               return ListTile(
-                leading: Icon(_getCredentialTypeIcon(
-                    _getCredentialTypeFromList(credential.type),),),
+                leading: Icon(
+                  _getCredentialTypeIcon(
+                    _getCredentialTypeFromList(credential.type),
+                  ),
+                ),
                 title: Text(credential.name ?? 'Attestation'),
                 subtitle: Text(credential.issuer),
                 onTap: () {
@@ -489,7 +493,9 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
 
   // Supprimer une attestation
   Future<void> _deleteCredential(
-      BuildContext context, Credential credential,) async {
+    BuildContext context,
+    Credential credential,
+  ) async {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     // Montrer un indicateur de chargement
     await DialogUtils.showLoadingDialog(context, l10n.deletingMessage);
@@ -587,73 +593,6 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
   }
 
   // Afficher les options pour une attestation
-  void _showCredentialOptions(BuildContext context, Credential credential) {
-    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.qr_code),
-              title: const Text('Présenter'),
-              onTap: () {
-                Navigator.of(context).pop();
-                _presentCredential(context, credential);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.verified_user),
-              title: const Text("Vérifier l'authenticité"),
-              onTap: () {
-                Navigator.of(context).pop();
-                _verifyCredential(context, credential);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete),
-              title: const Text('Supprimer'),
-              textColor: Colors.red,
-              iconColor: Colors.red,
-              onTap: () {
-                Navigator.of(context).pop();
-                _confirmDeleteCredential(context, credential);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _getCredentialTypeText(BuildContext context, CredentialType type) {
-    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
-    switch (type) {
-      case CredentialType.identity:
-        return 'Identité';
-      case CredentialType.diploma:
-        return 'Diplôme';
-      case CredentialType.drivingLicense:
-        return 'Permis de conduire';
-      case CredentialType.ageVerification:
-        return "Vérification d'âge";
-      case CredentialType.addressProof:
-        return "Justificatif d'adresse";
-      case CredentialType.employmentProof:
-        return "Attestation d'emploi";
-      case CredentialType.professionalBadge:
-        return 'Badge professionnel';
-      case CredentialType.membershipCard:
-        return 'Carte de membre';
-      case CredentialType.healthInsurance:
-        return 'Assurance santé';
-      case CredentialType.medicalCertificate:
-        return 'Certificat médical';
-      case CredentialType.other:
-        return 'Autre';
-    }
-  }
 
   /// Vérifie si c'est la première visite de l'utilisateur sur cet écran
   bool _isFirstVisit(WidgetRef ref) {
@@ -702,7 +641,6 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
 
 // Ce composant sera implémenté plus tard
 class CredentialDetailScreen extends StatelessWidget {
-
   const CredentialDetailScreen({super.key, required this.credentialId});
   final String credentialId;
 

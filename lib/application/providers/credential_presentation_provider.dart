@@ -2,7 +2,7 @@ import 'package:did_app/application/credential/providers.dart';
 import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/identity/digital_identity.dart';
-import 'package:did_app/domain/verification/verification_result.dart' as domain;
+import 'package:did_app/domain/verification/verification_result.dart';
 import 'package:did_app/infrastructure/credential/qualified_credential_service.dart'
     as infra;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,7 +29,7 @@ class CredentialPresentationState with _$CredentialPresentationState {
     String? error,
 
     /// Holds the result of the last presentation verification.
-    domain.VerificationResult? verificationResult,
+    VerificationResult? verificationResult,
   }) = _CredentialPresentationState;
 
   /// Private constructor for Freezed.
@@ -169,7 +169,7 @@ class CredentialPresentationNotifier
         revealedAttributes: revealedAttributes,
         // Include holder information (the user's DID)
         holder:
-            'did:archethic:${identity.identityAddress}', // Now we can add the holder
+            'did:archethic:${identity.identityAddress}', // Use identityAddress from DigitalIdentity
         // Optional fields provided by the verifier
         challenge: challenge,
         domain: domain,
@@ -217,7 +217,7 @@ class CredentialPresentationNotifier
       'proofPurpose':
           'authentication', // Or 'assertionMethod' depending on use case
       'verificationMethod':
-          'did:archethic:${identity.identityAddress}#key-1', // Holder's verification method URL
+          '${identity.identityAddress}#key-1', // Use direct identityAddress + key fragment
       // The actual signature value would go here
       'proofValue': 'zMockSignatureValueForPresentationData...', // Placeholder
       if (challenge != null)
@@ -249,9 +249,9 @@ class CredentialPresentationNotifier
   /// 3. Qualification status if it's an eIDAS presentation.
   /// 4. Cryptographic signature/proof verification.
   ///
-  /// Returns a [domain.VerificationResult] indicating success or failure with a message.
+  /// Returns a [VerificationResult] indicating success or failure with a message.
   /// Updates the state with validation status and the result.
-  Future<domain.VerificationResult> verifyPresentation(
+  Future<VerificationResult> verifyPresentation(
     CredentialPresentation presentation,
   ) async {
     state = state.copyWith(
@@ -261,7 +261,7 @@ class CredentialPresentationNotifier
       // 1. Basic structural checks
       if (presentation.verifiableCredentials?.isEmpty ?? true) {
         // Check for null or empty
-        final result = domain.VerificationResult(
+        final result = VerificationResult(
           isValid: false,
           message: 'Presentation contains no credentials',
         );
@@ -278,7 +278,7 @@ class CredentialPresentationNotifier
 
       if (invalidCredentials.isNotEmpty) {
         final invalidIds = invalidCredentials.map((c) => c.id).join(', ');
-        final result = domain.VerificationResult(
+        final result = VerificationResult(
           isValid: false,
           message:
               'Presentation contains invalid or revoked credentials: $invalidIds',
@@ -300,7 +300,7 @@ class CredentialPresentationNotifier
         );
 
         if (!qualifiedStatuses.every((q) => q)) {
-          final result = domain.VerificationResult(
+          final result = VerificationResult(
             isValid: false,
             message: 'EidasPresentation contains non-qualified credentials',
           );
@@ -315,7 +315,7 @@ class CredentialPresentationNotifier
       final isSignatureValid = await _verifySignature(presentation);
 
       if (!isSignatureValid) {
-        final result = domain.VerificationResult(
+        final result = VerificationResult(
           isValid: false,
           message: 'Presentation signature is invalid',
         );
@@ -324,7 +324,7 @@ class CredentialPresentationNotifier
       }
 
       // All checks passed
-      final result = domain.VerificationResult(
+      final result = VerificationResult(
         isValid: true,
         message: 'Presentation verified successfully',
       );
@@ -332,7 +332,7 @@ class CredentialPresentationNotifier
       return result;
     } catch (e) {
       // TODO: Log error properly
-      final result = domain.VerificationResult(
+      final result = VerificationResult(
         isValid: false,
         message: 'Error during presentation verification: $e',
       );
