@@ -49,11 +49,11 @@ final routerProvider = Provider<GoRouter>(
       },
       routes: [
         GoRoute(
-          path: '/',
+          path: SplashScreen.routerPage,
           builder: (context, state) => const SplashScreen(),
         ),
         GoRoute(
-          path: '/welcome',
+          path: WelcomeScreen.routerPage,
           builder: (context, state) => const WelcomeScreen(),
         ),
         GoRoute(
@@ -89,31 +89,7 @@ final routerProvider = Provider<GoRouter>(
           routes: [
             GoRoute(
               path: '/main',
-              builder: (context, state) => const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.account_balance_wallet,
-                      size: 80,
-                      color: Colors.blue,
-                    ),
-                    SizedBox(height: 24),
-                    Text(
-                      'DID Wallet',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      "Votre portefeuille d'identité numérique",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
+              builder: (context, state) => const IdentityScreen(),
             ),
             GoRoute(
               path: '/main/identity',

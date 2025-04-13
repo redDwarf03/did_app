@@ -78,7 +78,7 @@ Follow these steps to set up the development environment:
 
 2.  **Clone the repository:**
     ```bash
-    git clone <REPOSITORY_URL>
+    git clone [https://github.com/redDwarf03/did_app](https://github.com/redDwarf03/did_app)
     cd did_app
     ```
 

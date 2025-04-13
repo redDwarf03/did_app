@@ -9,14 +9,15 @@ import 'package:go_router/go_router.dart';
 class WelcomeScreen extends ConsumerWidget {
   const WelcomeScreen({super.key});
 
+  static const String routerPage = '/welcome';
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.welcomeTitle),
+        title: Text(localizations.welcomeTitle),
         actions: const [
-          // Wallet connection status in the app bar
           WalletConnectionStatus(),
           SizedBox(width: 20),
         ],
@@ -34,14 +35,14 @@ class WelcomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                l10n.welcomeScreenTitle,
+                localizations.welcomeScreenTitle,
                 style:
                     const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
               Text(
-                l10n.welcomeScreenSubtitle,
+                localizations.welcomeScreenSubtitle,
                 style: const TextStyle(fontSize: 18),
                 textAlign: TextAlign.center,
               ),
@@ -49,8 +50,8 @@ class WelcomeScreen extends ConsumerWidget {
 
               // Introduction explaining digital identity for beginners
               _WelcomeInfoCard(
-                title: l10n.digitalIdentityTitle,
-                content: l10n.digitalIdentityDescription,
+                title: localizations.digitalIdentityTitle,
+                content: localizations.digitalIdentityDescription,
                 icon: Icons.person,
               ),
 
@@ -58,8 +59,8 @@ class WelcomeScreen extends ConsumerWidget {
 
               // EUDI Wallet explanation
               _WelcomeInfoCard(
-                title: l10n.eudiWalletTitle,
-                content: l10n.eudiWalletDescription,
+                title: localizations.eudiWalletTitle,
+                content: localizations.eudiWalletDescription,
                 icon: Icons.euro_symbol,
               ),
 
@@ -67,8 +68,8 @@ class WelcomeScreen extends ConsumerWidget {
 
               // eIDAS 2.0 explanation
               _WelcomeInfoCard(
-                title: l10n.eidasTitle,
-                content: l10n.eidasInteropDescription,
+                title: localizations.eidasTitle,
+                content: localizations.eidasDescription,
                 icon: Icons.verified_user,
               ),
 
@@ -76,9 +77,9 @@ class WelcomeScreen extends ConsumerWidget {
 
               // Self-Sovereign Identity explanation
               _WelcomeInfoCard(
-                title: l10n.selfSovereignIdentityTitle,
-                content: l10n.securityDescription,
-                icon: Icons.account_balance,
+                title: localizations.selfSovereignIdentityTitle,
+                content: localizations.digitalIdentityDescription,
+                icon: Icons.lock_person,
               ),
 
               const SizedBox(height: 32),
@@ -94,19 +95,19 @@ class WelcomeScreen extends ConsumerWidget {
                       vertical: 12,
                     ),
                   ),
-                  child: Text(l10n.connectWallet),
+                  child: Text(localizations.connectWallet),
                 ),
 
               // Show application content when connected
               if (ref.watch(sessionNotifierProvider).isConnected) ...[
                 Text(
-                  l10n.connectedMessage,
+                  localizations.connectedMessage,
                   style: const TextStyle(fontSize: 16, color: Colors.green),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.badge),
-                  label: Text(l10n.credentialsMenuTitle),
+                  label: Text(localizations.credentialsMenuTitle),
                   onPressed: () {
                     context.go('/main/identity');
                   },
@@ -120,7 +121,7 @@ class WelcomeScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.shield),
-                  label: Text(l10n.eidasInteropMenuTitle),
+                  label: Text(localizations.eidasInteropMenuTitle),
                   onPressed: () {
                     // Navigate to eIDAS info screen
                     context.go('/credential/eidas-interop');
@@ -129,7 +130,7 @@ class WelcomeScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.help_outline),
-                  label: Text(l10n.beginnerHelpTooltip),
+                  label: Text(localizations.beginnerHelpTooltip),
                   onPressed: () {
                     _showBeginnerGuide(context);
                   },
@@ -149,7 +150,7 @@ class WelcomeScreen extends ConsumerWidget {
   }
 
   void _showBeginnerGuide(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -166,34 +167,36 @@ class WelcomeScreen extends ConsumerWidget {
               children: [
                 Center(
                   child: Text(
-                    l10n.tutorialTitle,
+                    localizations.tutorialTitle,
                     style: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.bold,),
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
                 _buildGuideSection(
                   context,
-                  l10n.tutorialPage1Title,
-                  l10n.tutorialPage1Desc,
+                  localizations.tutorialPage1Title,
+                  localizations.tutorialPage1Desc,
                   Icons.person_add,
                 ),
                 _buildGuideSection(
                   context,
-                  l10n.tutorialPage2Title,
-                  l10n.tutorialPage2Desc,
+                  localizations.tutorialPage2Title,
+                  localizations.tutorialPage2Desc,
                   Icons.upload_file,
                 ),
                 _buildGuideSection(
                   context,
-                  l10n.tutorialPage3Title,
-                  l10n.tutorialPage3Desc,
+                  localizations.tutorialPage3Title,
+                  localizations.tutorialPage3Desc,
                   Icons.shield,
                 ),
                 _buildGuideSection(
                   context,
-                  l10n.tutorialPage4Title,
-                  l10n.tutorialPage4Desc,
+                  localizations.tutorialPage4Title,
+                  localizations.tutorialPage4Desc,
                   Icons.security,
                 ),
                 const SizedBox(height: 20),
@@ -202,7 +205,7 @@ class WelcomeScreen extends ConsumerWidget {
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
                   ),
-                  child: Text(l10n.gotItButton),
+                  child: Text(localizations.gotItButton),
                 ),
               ],
             ),
@@ -213,7 +216,11 @@ class WelcomeScreen extends ConsumerWidget {
   }
 
   Widget _buildGuideSection(
-      BuildContext context, String title, String content, IconData icon,) {
+    BuildContext context,
+    String title,
+    String content,
+    IconData icon,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -231,7 +238,9 @@ class WelcomeScreen extends ConsumerWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold,),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 5),
                 Text(
@@ -249,7 +258,6 @@ class WelcomeScreen extends ConsumerWidget {
 
 /// Widget d'information avec titre, contenu et icône
 class _WelcomeInfoCard extends StatelessWidget {
-
   const _WelcomeInfoCard({
     required this.title,
     required this.content,

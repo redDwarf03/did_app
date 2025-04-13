@@ -73,7 +73,7 @@
     "presentButton": "Present",
     "eidasInteropTitle": "eIDAS 2.0 & EUDI Wallet",
     "eidasInteropHeader": "eIDAS 2.0 Interoperability",
-    "eidasInteropDescription": "This screen allows you to import and export credentials in eIDAS 2.0 format, compatible with European digital identity regulations.",
+    "eidasInteropDescription": "This section allows you to import and export credentials in eIDAS 2.0 format, compatible with European digital identity regulations.",
     "trustRegistryTitle": "eIDAS Trust Registry",
     "eudiWalletTitle": "European Digital Identity Wallet",
     "eudiWalletDescription": "The European Digital Identity Wallet is a personal digital solution for storing identity data and documents.",

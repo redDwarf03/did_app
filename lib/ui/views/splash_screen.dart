@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:did_app/application/session/provider.dart';
+import 'package:did_app/ui/views/welcome/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,11 +10,13 @@ import 'package:go_router/go_router.dart';
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
+  static const String routerPage = '/';
+
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  SplashScreenState createState() => SplashScreenState();
 }
 
-class _SplashScreenState extends ConsumerState<SplashScreen>
+class SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -37,7 +40,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       if (sessionState.isConnected) {
         context.go('/main');
       } else {
-        context.go('/welcome');
+        context.go(
+          WelcomeScreen.routerPage,
+        );
       }
     });
   }
@@ -50,7 +55,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
@@ -78,14 +83,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             ),
             const SizedBox(height: 40),
             Text(
-              l10n.didWalletSplashTitle,
+              localizations.didWalletSplashTitle,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.primary,
                   ),
             ),
             const SizedBox(height: 30),
-            const CircularProgressIndicator(),
+            const CircularProgressIndicator(
+              strokeWidth: 1,
+            ),
           ],
         ),
       ),

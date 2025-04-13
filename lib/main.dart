@@ -1,8 +1,5 @@
 import 'package:archethic_dapp_framework_flutter/archethic_dapp_framework_flutter.dart'
     as aedappfm;
-import 'package:did_app/application/credential/providers.dart';
-import 'package:did_app/application/document/providers.dart';
-import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/router/router.dart';
 import 'package:did_app/ui/common/responsive_width_container.dart';
 import 'package:flutter/material.dart';
@@ -42,9 +39,6 @@ class ProvidersInitialization extends ConsumerWidget {
   final Widget child;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(identityNotifierProvider.notifier).refreshIdentity();
-    ref.watch(documentNotifierProvider.notifier).loadDocuments('all');
-    ref.watch(credentialNotifierProvider.notifier).loadCredentials();
     return child;
   }
 }
