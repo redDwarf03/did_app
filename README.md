@@ -1,257 +1,257 @@
-# DID App - Portefeuille d'Identité Numérique Européen
+# DID App - European Digital Identity Wallet
 
-Application mobile de portefeuille d'identité numérique conforme aux standards eIDAS 2.0 et EUDI Wallet.
+A mobile digital identity wallet application compliant with eIDAS 2.0 and EUDI Wallet standards.
 
-## 🌟 C'est quoi une identité numérique ? 
+## 🌟 What is a Digital Identity?
 
-Imaginez votre portefeuille physique, qui contient vos cartes d'identité, permis de conduire, cartes d'assurance santé et diplômes. L'identité numérique, c'est exactement ça, mais sur votre téléphone !
+Imagine your physical wallet, which holds your ID cards, driver's license, health insurance cards, and diplomas. Digital identity is exactly that, but on your phone!
 
-Cette application vous permet de :
-- Stocker vos documents d'identité sous forme numérique, sécurisée et certifiée
-- Prouver qui vous êtes en ligne sans partager toutes vos informations
-- Contrôler quelles informations vous partagez, avec qui et quand
-- Utiliser vos documents d'identité pour vous connecter à des services en ligne
+This application allows you to:
+- Store your identity documents digitally, securely, and certified
+- Prove who you are online without sharing all your information
+- Control what information you share, with whom, and when
+- Use your identity documents to log in to online services
 
-## 🇪🇺 EUDI Wallet & eIDAS 2.0 : Pourquoi c'est important ?
+## 🇪🇺 EUDI Wallet & eIDAS 2.0: Why is it important?
 
 ### EUDI Wallet (European Digital Identity Wallet)
-C'est un portefeuille d'identité numérique standardisé pour tous les citoyens européens. Il permettra de :
-- Avoir une identité numérique reconnue dans toute l'Europe
-- Accéder facilement aux services publics et privés partout dans l'UE
-- Bénéficier d'une protection solide de vos données personnelles
+It's a standardized digital identity wallet for all European citizens. It will allow:
+- Having a digital identity recognized throughout Europe
+- Easy access to public and private services anywhere in the EU
+- Strong protection of your personal data
 
 ### eIDAS 2.0
-C'est la réglementation européenne qui encadre les identités numériques. Elle garantit que :
-- Votre identité numérique est aussi fiable qu'une pièce d'identité physique
-- Les services que vous utilisez peuvent faire confiance à vos attestations numériques
-- Vos données sont protégées selon les standards européens
-- Votre vie privée est respectée grâce à des mécanismes comme la "divulgation sélective" (ne partager que les informations nécessaires)
+This is the European regulation that governs digital identities. It ensures that:
+- Your digital identity is as reliable as a physical ID document
+- The services you use can trust your digital attestations
+- Your data is protected according to European standards
+- Your privacy is respected through mechanisms like "selective disclosure" (sharing only necessary information)
 
-## 🛡️ Approche SSI (Self-Sovereign Identity) : Votre identité VOUS appartient
+## 🛡️ SSI (Self-Sovereign Identity) Approach: Your identity belongs to YOU
 
-La SSI, c'est la philosophie derrière notre application. Cela signifie que :
+SSI is the philosophy behind our application. This means that:
 
-- **Vous êtes propriétaire** de vos données d'identité, pas les grandes entreprises
-- **Vous décidez** quelles informations partager, avec qui et quand
-- **Vous stockez** vos attestations directement sur votre appareil
-- **Vous contrôlez** votre identité numérique, sans dépendre d'intermédiaires
+- **You own** your identity data, not large corporations
+- **You decide** what information to share, with whom, and when
+- **You store** your attestations directly on your device
+- **You control** your digital identity, without depending on intermediaries
 
-## 🚀 Fonctionnalités pour débutants
+## 🚀 Features for Beginners
 
-### 1. Création et gestion d'identité facile
-- Créez votre identité numérique en quelques clics
-- Importez vos documents officiels via des processus simples et guidés
-- Gérez facilement vos attestations avec une interface intuitive
+### 1. Easy Identity Creation and Management
+- Create your digital identity in a few clicks
+- Import your official documents through simple, guided processes
+- Easily manage your attestations with an intuitive interface
 
-### 2. Partage d'informations simplifié
-- Partagez uniquement les informations nécessaires (par exemple, prouver que vous avez plus de 18 ans sans révéler votre date de naissance)
-- Utilisez des QR codes pour vous authentifier rapidement
-- Contrôlez qui a accès à vos informations avec des autorisations claires
+### 2. Simplified Information Sharing
+- Share only the necessary information (e.g., prove you are over 18 without revealing your date of birth)
+- Use QR codes for quick authentication
+- Control who has access to your information with clear permissions
 
-### 3. Sécurité accessible
-- Protégez votre identité avec reconnaissance faciale ou empreinte digitale
-- Recevez des alertes claires en cas de problème de sécurité
-- Retrouvez facilement accès à vos attestations en cas de perte de votre appareil
+### 3. Accessible Security
+- Protect your identity with facial recognition or fingerprint
+- Receive clear alerts in case of security issues
+- Easily recover access to your attestations if you lose your device
 
-## 🏁 Pour commencer
+## 🏁 Getting Started
 
-1. **Installez l'application** sur votre appareil
-2. **Créez votre identité numérique** en suivant le guide pas à pas
-3. **Ajoutez vos attestations** (carte d'identité, permis de conduire, diplômes, etc.)
-4. **Utilisez votre identité** pour des services en ligne ou en personne
+1. **Install the application** on your device
+2. **Create your digital identity** by following the step-by-step guide
+3. **Add your attestations** (ID card, driver's license, diplomas, etc.)
+4. **Use your identity** for online or in-person services
 
 ## 🔧 Getting Started (Development)
 
-Suivez ces étapes pour configurer l'environnement de développement :
+Follow these steps to set up the development environment:
 
-1.  **Prérequis :**
-    *   Assurez-vous d'avoir [Flutter](https://docs.flutter.dev/get-started/install) installé sur votre machine.
-    *   Utilisez un gestionnaire de versions comme [asdf](https://asdf-vm.com/) avec le plugin Flutter pour gérer les versions SDK spécifiées dans le fichier `.tool-versions`. Installez les versions requises :
+1.  **Prerequisites:**
+    *   Ensure you have [Flutter](https://docs.flutter.dev/get-started/install) installed on your machine.
+    *   Use a version manager like [asdf](https://asdf-vm.com/) with the Flutter plugin to manage the SDK versions specified in the `.tool-versions` file. Install the required versions:
         ```bash
         asdf install
         ```
-    *   (Optionnel, si applicable) Exécutez le script de configuration initiale :
+    *   (Optional, if applicable) Run the initial setup script:
         ```bash
-        ./setup.sh 
+        ./setup.sh
         ```
-        *(Note : Examinez `setup.sh` pour comprendre ce qu'il fait avant de l'exécuter).*
+        *(Note: Examine `setup.sh` to understand what it does before running it).*
 
-2.  **Cloner le dépôt :**
+2.  **Clone the repository:**
     ```bash
-    git clone <URL_DU_DEPOT>
-    cd did_app 
+    git clone <REPOSITORY_URL>
+    cd did_app
     ```
 
-3.  **Installer les dépendances :**
+3.  **Install dependencies:**
     ```bash
     flutter pub get
     ```
 
-4.  **Générer le code (si nécessaire) :**
-    Si le projet utilise des générateurs de code (comme `build_runner`), exécutez :
+4.  **Generate code (if necessary):**
+    If the project uses code generators (like `build_runner`), run:
     ```bash
     flutter pub run build_runner build --delete-conflicting-outputs
     ```
 
-5.  **Lancer l'application :**
+5.  **Run the application:**
     ```bash
     flutter run
     ```
 
-6.  **Commandes utiles :**
-    *   Vérifier les problèmes de code : `flutter analyze`
-    *   Exécuter les tests : `flutter test`
+6.  **Useful commands:**
+    *   Check for code issues: `flutter analyze`
+    *   Run tests: `flutter test`
 
 ### 🧪 Testing
 
-Ce projet inclut des tests unitaires pour garantir la qualité et la stabilité du code. Pour exécuter tous les tests unitaires, utilisez la commande suivante à la racine du projet :
+This project includes unit tests to ensure code quality and stability. To run all unit tests, use the following command at the project root:
 
 ```bash
 flutter test
 ```
 
-## Fonctionnalités Implémentées
+## Implemented Features
 
-1. **Gestion des Attestations**
-   - Création et stockage d'attestations numériques
-   - Support des formats W3C Verifiable Credentials
-   - Vérification de l'intégrité des attestations
-   - Gestion des preuves cryptographiques
-   - Support des attestations qualifiées selon eIDAS 2.0
-   - Intégration avec les services de confiance qualifiés
-   - Vérification des signatures électroniques qualifiées
-   - Gestion des niveaux d'assurance (Low, Substantial, High)
+1. **Attestation Management**
+   - Creation and storage of digital attestations
+   - Support for W3C Verifiable Credentials formats
+   - Verification of attestation integrity
+   - Management of cryptographic proofs
+   - Support for qualified attestations according to eIDAS 2.0
+   - Integration with qualified trust services
+   - Verification of qualified electronic signatures
+   - Management of Levels of Assurance (Low, Substantial, High)
 
-2. **Portefeuille d'Identité**
-   - Stockage sécurisé des attestations
-   - Gestion des clés privées
-   - Support des DIDs (Decentralized Identifiers)
-   - Authentification biométrique
-   - Chiffrement des données sensibles
-   - Support des attestations qualifiées
-   - Intégration avec le registre de confiance européen
+2. **Identity Wallet**
+   - Secure storage of attestations
+   - Private key management
+   - Support for DIDs (Decentralized Identifiers)
+   - Biometric authentication
+   - Encryption of sensitive data
+   - Support for qualified attestations
+   - Integration with the European Trust Registry
 
-3. **Authentification Sécurisée**
-   - Authentification biométrique (empreintes digitales, reconnaissance faciale)
-   - Support multi-facteurs (MFA)
-   - Gestion des clés cryptographiques
-   - Protection des données sensibles
+3. **Secure Authentication**
+   - Biometric authentication (fingerprint, facial recognition)
+   - Multi-factor authentication (MFA) support
+   - Cryptographic key management
+   - Protection of sensitive data
 
-4. **Interopérabilité eIDAS 2.0**
-   - Conformité avec les standards européens
-   - Support des formats d'attestation eIDAS
-   - Intégration avec le Registre de Confiance Européen
-   - Vérification des émetteurs de confiance
-   - Filtrage par pays et niveau de confiance
-   - Rapports d'interopérabilité
+4. **eIDAS 2.0 Interoperability**
+   - Compliance with European standards
+   - Support for eIDAS attestation formats
+   - Integration with the European Trust Registry
+   - Verification of trusted issuers
+   - Filtering by country and trust level
+   - Interoperability reports
 
-5. **Sécurité et Confidentialité**
-   - Chiffrement de bout en bout
-   - Stockage sécurisé des données
-   - Protection contre les attaques
-   - Conformité RGPD
+5. **Security and Privacy**
+   - End-to-end encryption
+   - Secure data storage
+   - Protection against attacks
+   - GDPR compliance
 
-## 📚 Glossaire pour débutants
+## 📚 Glossary for Beginners
 
-- **Attestation** : Un document numérique certifié qui prouve quelque chose à votre sujet (votre identité, vos diplômes, etc.)
-- **Portefeuille numérique** : Une application qui stocke vos attestations numériques de façon sécurisée
-- **Émetteur** : L'organisation qui crée et certifie une attestation (par exemple, l'État pour une carte d'identité)
-- **Vérificateur** : La personne ou l'organisation qui vérifie vos attestations
-- **Niveaux d'assurance** : Le degré de confiance associé à une attestation (faible, substantiel, élevé)
-- **Divulgation sélective** : La possibilité de ne partager qu'une partie des informations contenues dans une attestation
-- **Preuve à divulgation nulle** : Une technologie qui vous permet de prouver quelque chose sans révéler d'informations supplémentaires
+- **Attestation**: A certified digital document that proves something about you (your identity, diplomas, etc.)
+- **Digital Wallet**: An application that securely stores your digital attestations
+- **Issuer**: The organization that creates and certifies an attestation (e.g., the state for an ID card)
+- **Verifier**: The person or organization that checks your attestations
+- **Levels of Assurance**: The degree of confidence associated with an attestation (low, substantial, high)
+- **Selective Disclosure**: The ability to share only part of the information contained in an attestation
+- **Zero-Knowledge Proof**: A technology that allows you to prove something without revealing additional information
 
-## 🔗 Ressources utiles pour en savoir plus
+## 🔗 Useful Resources to Learn More
 
-- [Guide du citoyen pour l'identité numérique européenne](https://digital-strategy.ec.europa.eu/en/policies/european-digital-identity)
-- [Explications simples sur eIDAS 2.0](https://www.youtube.com/watch?v=OO_MyjiAgr0)
-- [Comment protéger votre identité numérique](https://cybersecurityguide.org/resources/digital-identity-protection/)
+- [Citizen's Guide to European Digital Identity](https://digital-strategy.ec.europa.eu/en/policies/european-digital-identity)
+- [Simple Explanations of eIDAS 2.0](https://www.youtube.com/watch?v=OO_MyjiAgr0)
+- [How to Protect Your Digital Identity](https://cybersecurityguide.org/resources/digital-identity-protection/)
 
-## Fonctionnalités en Développement
+## Features Under Development
 
-1. **Gestion de Révocation des Attestations**
-   - Implémentation du Status List 2021
-   - Synchronisation automatique des statuts
-   - Interface de gestion des révocations
-   - Système de renouvellement automatique
+1. **Attestation Revocation Management**
+   - Implementation of Status List 2021
+   - Automatic status synchronization
+   - Revocation management interface
+   - Automatic renewal system
 
-2. **Support des Attestations Qualifiées**
-   - Intégration avec les autorités de certification qualifiées
-   - Support des signatures électroniques qualifiées
-   - Vérification des sceaux qualifiés
-   - Conformité avec eIDAS niveau élevé
+2. **Support for Qualified Attestations**
+   - Integration with qualified certification authorities
+   - Support for qualified electronic signatures
+   - Verification of qualified seals
+   - Compliance with eIDAS high level
 
-3. **Interopérabilité avec les Services Publics**
-   - Intégration avec les services gouvernementaux
-   - Support des cas d'usage administratifs
-   - Authentification unique (SSO)
-   - Services transfrontaliers
+3. **Interoperability with Public Services**
+   - Integration with government services
+   - Support for administrative use cases
+   - Single Sign-On (SSO)
+   - Cross-border services
 
-## Architecture Technique
+## Technical Architecture
 
-L'application est construite avec Flutter et suit une architecture propre avec :
+The application is built with Flutter and follows a clean architecture with:
 - Domain-Driven Design (DDD)
 - Clean Architecture
-- Riverpod pour la gestion d'état
-- flutter_secure_storage pour le stockage local sécurisé
+- Riverpod for state management
+- flutter_secure_storage for secure local storage
 
-## Conformité
+## Compliance
 
-L'application est conçue pour être conforme aux :
-- Règlements eIDAS 2.0
-- Standards EUDI Wallet
-- Directives de sécurité européennes
-- Règlement Général sur la Protection des Données (RGPD)
+The application is designed to comply with:
+- eIDAS 2.0 regulations
+- EUDI Wallet standards
+- European security directives
+- General Data Protection Regulation (GDPR)
 
-## FAQ pour débutants
+## FAQ for Beginners
 
-### 🤔 Est-ce que cette application remplace mes documents officiels ?
-Oui et non. Vos attestations numériques sont légalement reconnues dans l'UE grâce à eIDAS 2.0, mais il est recommandé de conserver vos documents physiques pour certaines situations.
+### 🤔 Does this application replace my official documents?
+Yes and no. Your digital attestations are legally recognized in the EU thanks to eIDAS 2.0, but it is recommended to keep your physical documents for certain situations.
 
-### 🔒 Mes données sont-elles en sécurité ?
-Absolument ! Vos données sont stockées uniquement sur votre appareil, chiffrées, et vous seul pouvez les débloquer. Même si vous perdez votre téléphone, personne ne peut accéder à vos informations.
+### 🔒 Is my data secure?
+Absolutely! Your data is stored only on your device, encrypted, and only you can unlock it. Even if you lose your phone, no one can access your information.
 
-### 🌍 Puis-je utiliser cette application dans toute l'Europe ?
-Oui, c'est justement l'objectif d'EUDI Wallet et d'eIDAS 2.0 : créer un système d'identité numérique qui fonctionne partout en Europe.
+### 🌍 Can I use this application throughout Europe?
+Yes, that is precisely the goal of EUDI Wallet and eIDAS 2.0: to create a digital identity system that works everywhere in Europe.
 
-### 📱 Que se passe-t-il si je change de téléphone ?
-L'application propose une fonctionnalité de sauvegarde et restauration qui vous permet de transférer en toute sécurité vos attestations vers votre nouvel appareil.
+### 📱 What happens if I change my phone?
+The application offers a backup and restore feature that allows you to securely transfer your attestations to your new device.
 
 ## Contribution
 
-Les contributions sont les bienvenues ! Si vous souhaitez améliorer ce template :
+Contributions are welcome! If you want to improve this template:
 
-1. Forkez le dépôt
-2. Créez votre branche de fonctionnalité (`git checkout -b feature/amazing-feature`)
-3. Committez vos changements (`git commit -m 'Add some amazing feature'`)
-4. Poussez vers la branche (`git push origin feature/amazing-feature`)
-5. Ouvrez une Pull Request
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 🔐 Gestion de l'Identité et Interaction Wallet
+## 🔐 Identity Management and Wallet Interaction
 
-Cette application gère l'identité numérique de l'utilisateur en s'appuyant sur la blockchain Archethic et le portefeuille externe **Archethic Wallet (aeWallet)**. L'interaction se fait via le protocole **Archethic Wallet Client (AWC)**.
+This application manages the user's digital identity by relying on the Archethic blockchain and the external **Archethic Wallet (aeWallet)**. Interaction occurs via the **Archethic Wallet Client (AWC)** protocol.
 
-### Flux d'Identité
+### Identity Flow
 
-1.  **Connexion :** L'utilisateur connecte son aeWallet à la dApp en utilisant un de ses comptes/services existants (par exemple, son compte UCO principal).
-2.  **Création du Service dApp :** Pour lier l'identité de l'utilisateur spécifiquement à cette dApp, l'application demande à aeWallet de créer un nouveau **service** dédié (par exemple, `did_app_profile`) au sein de la Keychain de l'utilisateur. Cette opération est initiée par la dApp mais confirmée et exécutée par l'utilisateur dans son aeWallet. Ce service crée une nouvelle paire de clés cryptographiques sous le contrôle de l'utilisateur, associée à son identité dans le contexte de la dApp.
-3.  **Utilisation :**
-    *   Le DID (Decentralized Identifier) de l'utilisateur est dérivé de sa Keychain gérée par aeWallet.
-    *   Les informations d'identité spécifiques à l'application (attributs, attestations) sont gérées sous forme de **Verifiable Credentials (VCs)**.
-    *   Les opérations nécessitant une signature cryptographique liée à l'identité dApp (par exemple, émettre un VC auto-signé, créer une présentation de VCs) devraient idéalement utiliser la clé associée au service dApp (`did_app_profile`).
-4.  **Gestion du Compte Actif (Important) :** Pour les opérations nécessitant la clé spécifique du service dApp, l'utilisateur **pourrait avoir besoin de sélectionner manuellement ce service comme compte actif dans son aeWallet** avant de confirmer l'opération. La dApp tentera de détecter le compte actif et guidera l'utilisateur si un changement est nécessaire.
+1.  **Connection:** The user connects their aeWallet to the dApp using one of their existing accounts/services (e.g., their main UCO account).
+2.  **dApp Service Creation:** To link the user's identity specifically to this dApp, the application requests aeWallet to create a new dedicated **service** (e.g., `did_app_profile`) within the user's Keychain. This operation is initiated by the dApp but confirmed and executed by the user in their aeWallet. This service creates a new cryptographic key pair under the user's control, associated with their identity within the context of the dApp.
+3.  **Usage:**
+    *   The user's DID (Decentralized Identifier) is derived from their Keychain managed by aeWallet.
+    *   Application-specific identity information (attributes, attestations) are managed as **Verifiable Credentials (VCs)**.
+    *   Operations requiring a cryptographic signature linked to the dApp identity (e.g., issuing a self-signed VC, creating a VC presentation) should ideally use the key associated with the dApp service (`did_app_profile`).
+4.  **Active Account Management (Important):** For operations requiring the specific key of the dApp service, the user **may need to manually select this service as the active account in their aeWallet** before confirming the operation. The dApp will attempt to detect the active account and guide the user if a change is necessary.
 
 ### Verifiable Credentials (VCs)
 
-L'application utilisera le standard W3C Verifiable Credentials pour représenter les attributs d'identité et les attestations (conformité eIDAS 2.0).
+The application will use the W3C Verifiable Credentials standard to represent identity attributes and attestations (eIDAS 2.0 compliance).
 
-*   Les VCs peuvent être émis par des tiers de confiance ou par l'utilisateur lui-même (Self-Issued).
-*   Le stockage des VCs sera géré de manière sécurisée (potentiellement stockage local chiffré ou via des transactions `DATA` sur la blockchain Archethic, signées via AWC).
-*   Le service dApp dans la Keychain ancre cryptographiquement l'identité de l'utilisateur (`did`) qui est le sujet (`subject`) des VCs.
+*   VCs can be issued by trusted third parties or by the user themselves (Self-Issued).
+*   VC storage will be managed securely (potentially encrypted local storage or via `DATA` transactions on the Archethic blockchain, signed via AWC).
+*   The dApp service in the Keychain cryptographically anchors the user's identity (`did`) which is the `subject` of the VCs.
 
-### Exemple de Document DID W3C (issu d'une Keychain Archethic)
+### Example W3C DID Document (from an Archethic Keychain)
 
-Le document DID est généré à partir de la Keychain de l'utilisateur et représente ses clés publiques associées aux différents services. Voici un exemple simplifié :
+The DID document is generated from the user's Keychain and represents their public keys associated with different services. Here is a simplified example:
 
 ```json
 {
