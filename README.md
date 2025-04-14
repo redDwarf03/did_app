@@ -195,6 +195,25 @@ The application is built with Flutter and follows a clean architecture with:
 - Riverpod for state management
 - flutter_secure_storage for secure local storage
 
+## Architecture: Privacy-Enhancing PII Management
+
+### Separation of Identity and Personal Data
+
+This application implements a core architectural principle that enhances privacy and aligns with W3C and eIDAS 2.0 standards:
+
+- **Core Identity Separation**: The `DigitalIdentity` model contains only minimal identifier information (DID/identity address and display name), with no embedded Personally Identifiable Information (PII).
+- **PII as Verifiable Credentials**: All personal information (name, email, date of birth, address, etc.) is stored exclusively as separate Verifiable Credentials linked to the identity.
+
+This architectural approach provides several benefits:
+
+1. **Enhanced Privacy**: Minimizes the correlation risk by not binding all personal attributes to a single entity
+2. **Selective Disclosure**: Enables sharing specific attributes without exposing the entire identity profile
+3. **Standards Compliance**: Follows W3C DID Core and VC Data Model recommendations for privacy-preserving identity management
+4. **User Control**: Allows the user to manage each credential independently (share, revoke, update)
+5. **Regulatory Alignment**: Supports GDPR data minimization principles and eIDAS 2.0 requirements
+
+When a user creates an identity, the system automatically generates separate Verifiable Credentials for each piece of personal information, all cryptographically linked to the core identity but stored and managed separately.
+
 ## Compliance
 
 The application is designed to comply with:
