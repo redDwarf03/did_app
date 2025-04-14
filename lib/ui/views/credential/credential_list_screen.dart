@@ -218,9 +218,9 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'QR Code de présentation générée', // Keep UI text, will be localized
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              l10n.generatedPresentationQrCode,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Container(
@@ -232,17 +232,17 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Seules les informations sélectionnées seront partagées', // Keep UI text
+            Text(
+              l10n.onlySelectedInfoShared,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.green),
+              style: const TextStyle(color: Colors.green),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Fermer'), // Keep UI text
+            child: Text(l10n.closeButton),
           ),
         ],
       ),
@@ -303,37 +303,38 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
   Future<void> _scanQRCode(BuildContext context) async {
     // In a real implementation, we would use a QR code scanner.
     // For the prototype, we simply simulate receiving a credential.
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
 
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Scanner un QR code'), // Keep UI text
-        content: const Column(
+        title: Text(l10n.scanQrCodeTitle),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.qr_code_scanner, size: 48, color: Colors.blue),
-            SizedBox(height: 16),
+            const Icon(Icons.qr_code_scanner, size: 48, color: Colors.blue),
+            const SizedBox(height: 16),
             Text(
-              'Cette fonctionnalité permettrait de scanner un QR code pour:', // Keep UI text
+              l10n.scanQrCodeDescription,
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16),
-            Text('- Recevoir une nouvelle attestation'), // Keep UI text
-            Text('- Vérifier une attestation'), // Keep UI text
-            Text('- Répondre à une demande de présentation'), // Keep UI text
+            const SizedBox(height: 16),
+            Text(l10n.receiveNewCredential),
+            Text(l10n.verifyCredential),
+            Text(l10n.respondToPresentationRequest),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Annuler'), // Keep UI text
+            child: Text(l10n.cancelButton),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               _simulateCredentialReceived(context);
             },
-            child: const Text('Simuler réception'), // Keep UI text
+            child: Text(l10n.simulateReception),
           ),
         ],
       ),
@@ -365,11 +366,9 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              Text(l10n
-                  .credentialReceivedType("Attestation d'âge")), // Keep UI text
-              Text(l10n.credentialReceivedIssuer(
-                  'Autorité nationale')), // Keep UI text
-              Text(l10n.credentialReceivedValidity('Un an')), // Keep UI text
+              Text(l10n.credentialReceivedType(l10n.ageAttestationType)),
+              Text(l10n.credentialReceivedIssuer(l10n.nationalAuthorityIssuer)),
+              Text(l10n.credentialReceivedValidity(l10n.oneYearValidity)),
             ],
           ),
           actions: [
@@ -402,33 +401,31 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
   Future<void> _requestCredential(BuildContext context, String type) async {
     // Here, we would launch the credential request process.
     // By contacting an issuer, or redirecting to their site.
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
 
     // For the prototype, we simulate the process.
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Processus de demande'), // Keep UI text
-        content: const Column(
+        title: Text(l10n.requestProcessTitle),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Dans une implémentation réelle, cette action:', // Keep UI text
-              style: TextStyle(fontWeight: FontWeight.bold),
+              l10n.requestProcessDescription,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16),
-            Text('1. Générerait une demande signée'), // Keep UI text
-            Text("2. Vous redirigerait vers l'émetteur"), // Keep UI text
-            Text(
-                '3. Vous guiderait dans le processus de vérification'), // Keep UI text
-            Text(
-              "4. Recevrait et stockerait l'attestation une fois approuvée", // Keep UI text
-            ),
+            const SizedBox(height: 16),
+            Text(l10n.generateSignedRequest),
+            Text(l10n.redirectToIssuer),
+            Text(l10n.guideVerificationProcess),
+            Text(l10n.receiveAndStoreCredential),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Compris'), // Keep UI text
+            child: Text(l10n.understoodButton),
           ),
         ],
       ),
@@ -437,13 +434,13 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
 
   // Present a credential (selection dialog).
   Future<void> _showPresentCredentialDialog(BuildContext context) async {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     final credentials = ref.read(credentialNotifierProvider).credentials;
 
     if (credentials.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              "Vous n'avez pas encore d'attestations à présenter"), // Keep UI text
+        SnackBar(
+          content: Text(l10n.noCredentialsToPresent),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -453,8 +450,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title:
-            const Text('Choisir une attestation à présenter'), // Keep UI text
+        title: Text(l10n.chooseCredentialToPresent),
         content: SizedBox(
           width: double.maxFinite,
           child: ListView.builder(
@@ -468,7 +464,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
                     _getCredentialTypeFromList(credential.type),
                   ),
                 ),
-                title: Text(credential.name ?? 'Attestation'), // Keep UI text
+                title: Text(credential.name ?? l10n.defaultCredentialName),
                 subtitle: Text(credential.issuer),
                 onTap: () {
                   Navigator.of(context).pop();
@@ -481,7 +477,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Annuler'), // Keep UI text
+            child: Text(l10n.cancelButton),
           ),
         ],
       ),
@@ -531,8 +527,8 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
           SnackBar(
             content: Text(
               success
-                  ? 'Attestation supprimée avec succès' // Keep UI text
-                  : 'Échec de la suppression', // Keep UI text
+                  ? l10n.credentialDeletedSuccess
+                  : l10n.credentialDeletedFailure,
             ),
             behavior: SnackBarBehavior.floating,
           ),
@@ -628,23 +624,19 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
       closeText: l10n.understoodButton,
       sections: [
         InfoSectionData(
-          text:
-              'Les attestations numériques sont des versions électroniques de vos documents officiels', // Keep UI text
+          text: l10n.digitalCredentialsDescription,
           icon: Icons.badge,
         ),
         InfoSectionData(
-          text:
-              'Elles sont sécurisées, vérifiables et peuvent être partagées en ligne', // Keep UI text
+          text: l10n.credentialsSecurityDescription,
           icon: Icons.verified_user,
         ),
         InfoSectionData(
-          text:
-              'Vous contrôlez quelles informations vous partagez et avec qui', // Keep UI text
+          text: l10n.credentialsPrivacyDescription,
           icon: Icons.privacy_tip,
         ),
         InfoSectionData(
-          text:
-              "Les attestations conformes à eIDAS 2.0 sont reconnues dans toute l'Union Européenne", // Keep UI text
+          text: l10n.eidasComplianceDescription,
           icon: Icons.euro_symbol,
         ),
       ],
@@ -659,12 +651,14 @@ class CredentialDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Détails de l'attestation"), // Keep UI text
+        title: Text(l10n.credentialDetailsScreenTitle),
       ),
       body: Center(
-        child: Text("Détails de l'attestation $credentialId"), // Keep UI text
+        child: Text(l10n.credentialDetailsDescription(credentialId)),
       ),
     );
   }

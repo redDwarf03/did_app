@@ -986,5 +986,38 @@
     "invalidStatus": "Invalid",
     "credentialAttributesLabel": "Attributes",
     "moreAttributes": "more attributes",
-    "notEidasCredential": "Cannot verify: Not an eIDAS credential type."
+    "notEidasCredential": "Cannot verify: Not an eIDAS credential type.",
+    "generatedPresentationQrCode": "Generated presentation QR Code",
+    "scanQrCodeTitle": "Scan a QR code",
+    "scanQrCodeDescription": "This feature would allow scanning a QR code to:",
+    "receiveNewCredential": "- Receive a new credential",
+    "verifyCredential": "- Verify a credential",
+    "respondToPresentationRequest": "- Respond to a presentation request",
+    "simulateReception": "Simulate reception",
+    "ageAttestationType": "Age attestation",
+    "nationalAuthorityIssuer": "National Authority",
+    "oneYearValidity": "One year",
+    "requestProcessDescription": "In a real implementation, this action would:",
+    "generateSignedRequest": "1. Generate a signed request",
+    "redirectToIssuer": "2. Redirect you to the issuer",
+    "guideVerificationProcess": "3. Guide you through the verification process",
+    "receiveAndStoreCredential": "4. Receive and store the credential once approved",
+    "understoodButton": "Understood",
+    "noCredentialsToPresent": "You don't have any credentials to present yet",
+    "chooseCredentialToPresent": "Choose a credential to present",
+    "credentialDeletedSuccess": "Credential successfully deleted",
+    "credentialDeletedFailure": "Deletion failed",
+    "digitalCredentialsDescription": "Digital credentials are electronic versions of your official documents",
+    "credentialsSecurityDescription": "They are secure, verifiable, and can be shared online",
+    "credentialsPrivacyDescription": "You control what information you share and with whom",
+    "eidasComplianceDescription": "eIDAS 2.0 compliant credentials are recognized throughout the European Union",
+    "credentialDetailsScreenTitle": "Credential Details",
+    "credentialDetailsDescription": "Details of credential {credentialId}",
+    "@credentialDetailsDescription": {
+        "placeholders": {
+            "credentialId": {
+                "type": "String"
+            }
+        }
+    }
 }

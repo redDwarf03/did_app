@@ -2,6 +2,7 @@ import 'package:did_app/application/identity/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// Screen for creating a new digital identity
 class CreateIdentityScreen extends ConsumerStatefulWidget {
@@ -65,7 +66,8 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                localizations.genericErrorMessage(identityState.errorMessage!)),
+              localizations.genericErrorMessage(identityState.errorMessage!),
+            ),
             backgroundColor: Colors.redAccent,
           ),
         );
@@ -256,7 +258,7 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
   }
 
   /// Handle form submission
-  void _submitForm() {
+  Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -265,14 +267,19 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
       });
 
       // Call the identity provider to create the identity
-      ref.read(identityNotifierProvider.notifier).createIdentity(
-            displayName: _displayName,
-            fullName: _fullName,
-            email: _email,
-            phoneNumber: _phoneNumber,
-            dateOfBirth: _dateOfBirth,
-            nationality: _nationality,
-          );
+      final newIdentity =
+          await ref.read(identityNotifierProvider.notifier).createIdentity(
+                displayName: _displayName,
+                fullName: _fullName,
+                email: _email,
+                phoneNumber: _phoneNumber,
+                dateOfBirth: _dateOfBirth,
+                nationality: _nationality,
+              );
+
+      if (newIdentity != null && mounted) {
+        context.go('/main/credential');
+      }
     }
   }
 }
