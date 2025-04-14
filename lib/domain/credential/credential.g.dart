@@ -18,8 +18,6 @@ _$CredentialImpl _$$CredentialImplFromJson(Map<String, dynamic> json) =>
       expirationDate: json['expirationDate'] == null
           ? null
           : DateTime.parse(json['expirationDate'] as String),
-      statusListUrl: json['statusListUrl'] as String?,
-      statusListIndex: (json['statusListIndex'] as num?)?.toInt(),
       verificationStatus: $enumDecodeNullable(
               _$VerificationStatusEnumMap, json['verificationStatus']) ??
           VerificationStatus.unverified,
@@ -44,8 +42,6 @@ Map<String, dynamic> _$$CredentialImplToJson(_$CredentialImpl instance) =>
       'subject': instance.subject,
       'issuanceDate': instance.issuanceDate.toIso8601String(),
       'expirationDate': instance.expirationDate?.toIso8601String(),
-      'statusListUrl': instance.statusListUrl,
-      'statusListIndex': instance.statusListIndex,
       'verificationStatus':
           _$VerificationStatusEnumMap[instance.verificationStatus]!,
       'credentialSchema': instance.credentialSchema,

@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Écran de vérification des attestations eIDAS
+/// Screen for verifying eIDAS credentials
 class EidasVerificationScreen extends ConsumerStatefulWidget {
   const EidasVerificationScreen({
     super.key,
@@ -30,7 +30,7 @@ class _EidasVerificationScreenState
   @override
   void initState() {
     super.initState();
-    // Vérifier l'attestation automatiquement au chargement
+    // Automatically verify the credential on load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _verifyCredential();
     });
@@ -42,8 +42,8 @@ class _EidasVerificationScreenState
         _isVerifying = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Cannot verify: Not an eIDAS credential type.'),
+        SnackBar(
+            content: Text(AppLocalizations.of(context)!.notEidasCredential),
             backgroundColor: Colors.orange),
       );
       return;

@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-/// Écran de vérification du statut d'une attestation utilisant Status List 2021
+/// Screen for verifying a credential's status using Status List 2021
 class CredentialStatusVerificationScreen extends ConsumerStatefulWidget {
   const CredentialStatusVerificationScreen({
     super.key,
@@ -35,7 +35,7 @@ class _CredentialStatusVerificationScreenState
     _verifyCredentialStatus();
   }
 
-  /// Vérifie le statut de l'attestation
+  /// Verifies the credential status
   Future<void> _verifyCredentialStatus() async {
     setState(() {
       _isVerifying = true;
@@ -50,20 +50,21 @@ class _CredentialStatusVerificationScreenState
 
       if (credentialAsync == null) {
         if (mounted) {
+          final localizations = AppLocalizations.of(context)!;
           setState(() {
             _isVerifying = false;
             _statusResult = StatusCheckResult(
               credentialId: widget.credentialId,
               status: CredentialStatusType.unknown,
               checkedAt: DateTime.now(),
-              error: 'Attestation non trouvée',
+              error: localizations.credentialNotFound,
             );
           });
         }
         return;
       }
 
-      // Vérifier le statut avec le service Status List 2021
+      // Verify status with Status List 2021 service
       final statusService = ref.read(statusList2021ServiceProvider);
       final result = await statusService.checkCredentialStatus(credentialAsync);
 
@@ -75,13 +76,14 @@ class _CredentialStatusVerificationScreenState
       }
     } catch (e) {
       if (mounted) {
+        final localizations = AppLocalizations.of(context)!;
         setState(() {
           _isVerifying = false;
           _statusResult = StatusCheckResult(
             credentialId: widget.credentialId,
             status: CredentialStatusType.unknown,
             checkedAt: DateTime.now(),
-            error: 'Erreur lors de la vérification: $e',
+            error: '${localizations.verificationError}: $e',
           );
           _error = e.toString();
         });

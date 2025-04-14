@@ -1,8 +1,12 @@
+import 'package:did_app/application/credential/providers.dart';
+import 'package:did_app/application/secure_storage.dart';
+import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/identity/digital_identity.dart';
 import 'package:did_app/domain/identity/identity_repository.dart';
-import 'package:did_app/infrastructure/identity/mock_identity_repository.dart';
+import 'package:did_app/infrastructure/identity/secure_storage_identity_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'providers.freezed.dart';
 
@@ -13,12 +17,12 @@ part 'providers.freezed.dart';
 /// It abstracts the data source layer (e.g., mock, blockchain, secure storage)
 /// for identity management.
 ///
-/// Currently, it uses [MockIdentityRepository] for development and testing purposes.
+/// Currently, it uses [SecureStorageIdentityRepository].
 /// **TODO:** Replace with the actual blockchain-based implementation when available.
 final identityRepositoryProvider = Provider<IdentityRepository>((ref) {
-  // Provides the MockIdentityRepository implementation for now.
-  // The Ref allows the mock repository to potentially interact with other providers if needed.
-  return MockIdentityRepository(ref);
+  // Provides the SecureStorageIdentityRepository implementation.
+  final secureStorage = ref.read(flutterSecureStorageProvider);
+  return SecureStorageIdentityRepository(secureStorage);
 });
 
 /// Represents the state for identity management within the application.
@@ -74,6 +78,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
 
   /// Riverpod ref for accessing other providers, primarily [identityRepositoryProvider].
   final Ref ref;
+  final _uuid = const Uuid();
 
   /// Checks if a digital identity already exists for the current user/wallet.
   ///
@@ -100,7 +105,6 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
       }
     } catch (e) {
       // Handle errors during the identity check.
-      // TODO: Log error for debugging.
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Failed to retrieve identity: $e',
@@ -108,13 +112,9 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
     }
   }
 
-  /// Creates a new digital identity profile for the user.
-  ///
-  /// Takes required personal information ([fullName], [email], [displayName]) and optional
-  /// details to initialize the profile. It first checks if an identity already exists
-  /// to prevent duplicates. Uses the [IdentityRepository] to persist the new identity.
-  /// Updates the state with the newly created [DigitalIdentity] or an error message.
-  Future<void> createIdentity({
+  /// Creates a new digital identity, saves it, and generates initial VCs.
+  /// Returns the created identity on success, or null on failure.
+  Future<DigitalIdentity?> createIdentity({
     /// The public display name chosen by the user for this identity.
     required String displayName,
 
@@ -134,52 +134,190 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
     String? nationality,
 
     /// The user's physical address (optional, part of [PersonalInfo]).
-    PhysicalAddress? address, // Added address parameter
+    PhysicalAddress? address,
   }) async {
-    // Set loading state and clear previous errors.
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final repository = ref.read(identityRepositoryProvider);
+      final identityRepository = ref.read(identityRepositoryProvider);
 
-      // Prevent creating an identity if one already exists.
-      final hasIdentity = await repository.hasIdentity();
+      final hasIdentity = await identityRepository.hasIdentity();
       if (hasIdentity) {
         state = state.copyWith(
           isLoading: false,
           errorMessage: 'An identity already exists for this user.',
         );
-        return;
+        return null;
       }
 
-      // Construct the PersonalInfo object from provided details.
       final personalInfo = PersonalInfo(
         fullName: fullName,
         email: email,
         phoneNumber: phoneNumber,
         dateOfBirth: dateOfBirth,
         nationality: nationality,
-        address: address, // Include address
+        address: address,
       );
 
-      // Call the repository to create the identity.
-      final identity = await repository.createIdentity(
+      // 1. Create the core identity (mocked for now)
+      final identity = await identityRepository.createIdentity(
         displayName: displayName,
         personalInfo: personalInfo,
       );
 
-      // Update the state with the newly created identity.
+      // --- 2. Create and Save Verifiable Credentials for each piece of info ---
+      final credentialRepository = ref.read(credentialRepositoryProvider);
+      final createdVCs = <Credential>[];
+      final subjectId = identity.identityAddress;
+      const issuerId = 'did:app:self';
+      final placeholderProof = <String, dynamic>{
+        'type': 'PlaceholderProof2024',
+        'proofPurpose': 'assertionMethod',
+        'verificationMethod': '$issuerId#key-1',
+        'created': DateTime.now().toIso8601String(),
+        'proofValue': 'zPlaceholderProofValue...',
+      };
+
+      try {
+        // --- Full Name VC ---
+        if (fullName.isNotEmpty) {
+          final fullNameVC = Credential(
+            id: 'urn:uuid:${_uuid.v4()}',
+            type: ['VerifiableCredential', 'FullNameCredential'],
+            issuer: issuerId,
+            issuanceDate: DateTime.now(),
+            credentialSubject: {
+              'id': subjectId,
+              'fullName': fullName,
+            },
+            proof: placeholderProof,
+            name: 'Full Name',
+            description: 'Verified full name',
+          );
+          await credentialRepository.saveCredential(fullNameVC);
+          createdVCs.add(fullNameVC);
+        }
+
+        // --- Email VC ---
+        if (email.isNotEmpty) {
+          final emailVC = Credential(
+            id: 'urn:uuid:${_uuid.v4()}',
+            type: ['VerifiableCredential', 'EmailCredential'],
+            issuer: issuerId,
+            issuanceDate: DateTime.now(),
+            credentialSubject: {
+              'id': subjectId,
+              'email': email,
+            },
+            proof: placeholderProof,
+            name: 'Email Address',
+            description: 'Verified email address',
+          );
+          await credentialRepository.saveCredential(emailVC);
+          createdVCs.add(emailVC);
+        }
+
+        // --- Phone Number VC (if provided) ---
+        if (phoneNumber != null && phoneNumber.isNotEmpty) {
+          final phoneVC = Credential(
+            id: 'urn:uuid:${_uuid.v4()}',
+            type: ['VerifiableCredential', 'PhoneNumberCredential'],
+            issuer: issuerId,
+            issuanceDate: DateTime.now(),
+            credentialSubject: {
+              'id': subjectId,
+              'phoneNumber': phoneNumber,
+            },
+            proof: placeholderProof,
+            name: 'Phone Number',
+            description: 'Verified phone number',
+          );
+          await credentialRepository.saveCredential(phoneVC);
+          createdVCs.add(phoneVC);
+        }
+
+        // --- Date of Birth VC (if provided) ---
+        if (dateOfBirth != null) {
+          final dobVC = Credential(
+            id: 'urn:uuid:${_uuid.v4()}',
+            type: ['VerifiableCredential', 'DateOfBirthCredential'],
+            issuer: issuerId,
+            issuanceDate: DateTime.now(),
+            credentialSubject: {
+              'id': subjectId,
+              'dateOfBirth': dateOfBirth.toIso8601String().substring(0, 10),
+            },
+            proof: placeholderProof,
+            name: 'Date of Birth',
+            description: 'Verified date of birth',
+          );
+          await credentialRepository.saveCredential(dobVC);
+          createdVCs.add(dobVC);
+        }
+
+        // --- Nationality VC (if provided) ---
+        if (nationality != null && nationality.isNotEmpty) {
+          final nationalityVC = Credential(
+            id: 'urn:uuid:${_uuid.v4()}',
+            type: ['VerifiableCredential', 'NationalityCredential'],
+            issuer: issuerId,
+            issuanceDate: DateTime.now(),
+            credentialSubject: {
+              'id': subjectId,
+              'nationality': nationality,
+            },
+            proof: placeholderProof,
+            name: 'Nationality',
+            description: 'Declared nationality',
+          );
+          await credentialRepository.saveCredential(nationalityVC);
+          createdVCs.add(nationalityVC);
+        }
+
+        // --- Address VC (if provided) ---
+        if (address != null) {
+          final addressVC = Credential(
+            id: 'urn:uuid:${_uuid.v4()}',
+            type: ['VerifiableCredential', 'AddressCredential'],
+            issuer: issuerId,
+            issuanceDate: DateTime.now(),
+            credentialSubject: {
+              'id': subjectId,
+              'address': address.toJson(),
+            },
+            proof: placeholderProof,
+            name: 'Address',
+            description: 'Verified address',
+          );
+          await credentialRepository.saveCredential(addressVC);
+          createdVCs.add(addressVC);
+        }
+
+        // --- Refresh the credential list immediately after saving all VCs ---
+        await ref.read(credentialNotifierProvider.notifier).loadCredentials();
+      } catch (vcError) {
+        // Log VC creation error but potentially continue with identity creation
+        // Or decide to roll back / indicate partial success
+        // For now, just set the main identity state to error
+
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage:
+              'Identity created, but failed to save credentials: $vcError',
+        );
+        return null; // Indicate failure to create identity fully
+      }
+
+      // Update identity state after successful creation and VC saving
       state = state.copyWith(
         identity: identity,
         isLoading: false,
+        errorMessage: null,
       );
+      return identity;
     } catch (e) {
-      // Handle errors during identity creation.
-      // TODO: Log error for debugging.
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'Failed to create identity: $e',
-      );
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      return null;
     }
   }
 
@@ -254,7 +392,6 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
       );
     } catch (e) {
       // Handle errors during identity update.
-      // TODO: Log error for debugging.
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Failed to update identity: $e',

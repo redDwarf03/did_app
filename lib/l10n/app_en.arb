@@ -870,7 +870,7 @@
     "followVerificationSteps": "Follow the verification steps to complete the process",
     "exportAsPdf": "Export as PDF",
     "generateLink": "Generate Link",
-    "renewalFailed": "Renewal Failed",
+    "renewalFailed": "Renewal failed",
     "startRenewal": "Start Renewal",
     "certificateRenewal": "Certificate Renewal",
     "initializingRenewal": "Initializing Renewal",
@@ -981,5 +981,10 @@
     "addCredentialDescription": "Add a new credential to your wallet",
     "addCredentialSuccess": "Credential added successfully",
     "addCredentialError": "Error adding credential",
-    "addCredentialCancel": "Cancel"
+    "addCredentialCancel": "Cancel",
+    "zkpSupportTooltip": "Supports Zero-Knowledge Proofs",
+    "invalidStatus": "Invalid",
+    "credentialAttributesLabel": "Attributes",
+    "moreAttributes": "more attributes",
+    "notEidasCredential": "Cannot verify: Not an eIDAS credential type."
 }

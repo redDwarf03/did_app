@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Écran pour gérer l'interopérabilité avec eIDAS et l'EUDI Wallet
+/// Screen for managing interoperability with eIDAS and EUDI Wallet
 class EidasInteropScreen extends ConsumerStatefulWidget {
   const EidasInteropScreen({super.key});
 
@@ -34,7 +34,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
     final credentialState = ref.watch(credentialNotifierProvider);
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
 
-    // Liste des attestations compatibles eIDAS
+    // List of eIDAS compatible credentials
     final eidasCompatibleCredentials = credentialState.credentials
         .where(
           (credential) => ref
@@ -43,7 +43,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
         )
         .toList();
 
-    // Liste des attestations qui peuvent être rendues compatibles
+    // List of credentials that can be made compatible
     final convertibleCredentials = credentialState.credentials
         .where(
           (credential) => !ref
@@ -151,9 +151,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
         Padding(
           padding: const EdgeInsets.only(bottom: 8, left: 4, right: 4),
           child: Text(
-            // TODO: Localize
-            'Synchronize with the official EU trust registry to verify issuers.',
-            // l10n.eidasTrustRegistryDescription,
+            l10n.eidasTrustRegistryDescription,
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ),

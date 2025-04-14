@@ -13,7 +13,7 @@ import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Écran affichant les attestations (Verifiable Credentials) de l'utilisateur
+/// Screen displaying the user's Verifiable Credentials.
 class CredentialListScreen extends ConsumerStatefulWidget {
   const CredentialListScreen({super.key});
 
@@ -26,13 +26,20 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
   @override
   void initState() {
     super.initState();
-    // Charger les attestations au démarrage
-    _loadCredentials();
+    // Load credentials AFTER the initial widget build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Check if the widget is still mounted before accessing ref.
+      if (mounted) {
+        _loadCredentials();
+      }
+    });
   }
 
   Future<void> _loadCredentials() async {
+    // We can use ref.read here as we are outside the build phase.
     final identity = ref.read(identityNotifierProvider).identity;
     if (identity != null) {
+      // Use .notifier to call the method.
       await ref.read(credentialNotifierProvider.notifier).loadCredentials();
     }
   }
@@ -110,22 +117,24 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
       ),
       body: Column(
         children: [
-          // Bandeau d'information pour débutants
+          // Beginner information banner.
           if (_isFirstVisit(ref))
             BeginnerInfoBanner(
               onDismiss: () => _markAsVisited(ref),
             ),
 
-          // Filtres des attestations
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: credentialState.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _buildCredentialList(context, credentialState),
+          // Credential list section - Wrap with Expanded
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: credentialState.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _buildCredentialList(context, credentialState),
+            ),
           ),
         ],
       ),
-      // Bouton pour demander une nouvelle attestation
+      // Button to request a new credential.
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -180,7 +189,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     );
   }
 
-  // Ouvrir les détails d'une attestation
+  // Open credential details.
   void _openCredentialDetails(BuildContext context, Credential credential) {
     // Navigate to credential details
     Navigator.of(context).push(
@@ -191,17 +200,17 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     );
   }
 
-  // Présenter une attestation
+  // Present a credential.
   Future<void> _presentCredential(
     BuildContext context,
     Credential credential,
   ) async {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
 
-    // Ici, on afficherait une interface permettant de créer une présentation sélective
-    // puis de générer un QR code ou un lien pour partager cette présentation
+    // Here, we would display an interface to create a selective presentation
+    // then generate a QR code or link to share this presentation.
 
-    // Pour le prototype, on montre simplement un dialog avec un QR fictif
+    // For the prototype, we simply show a dialog with a dummy QR code.
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -210,7 +219,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              'QR Code de présentation générée',
+              'QR Code de présentation générée', // Keep UI text, will be localized
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -224,7 +233,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'Seules les informations sélectionnées seront partagées',
+              'Seules les informations sélectionnées seront partagées', // Keep UI text
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.green),
             ),
@@ -233,34 +242,34 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Fermer'),
+            child: const Text('Fermer'), // Keep UI text
           ),
         ],
       ),
     );
   }
 
-  // Vérifier une attestation
+  // Verify a credential.
   Future<void> _verifyCredential(
     BuildContext context,
     Credential credential,
   ) async {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
-    // Montrer un indicateur de chargement
+    // Show a loading indicator.
     await DialogUtils.showLoadingDialog(context, l10n.verifyingMessage);
 
     try {
-      // Vérifier l'authenticité
+      // Verify authenticity
       final isValid = await ref
           .read(credentialNotifierProvider.notifier)
           .verifyCredential(credential.id);
 
-      // Fermer le dialogue de chargement
+      // Close the loading dialog.
       if (context.mounted) {
         DialogUtils.hideDialog(context);
       }
 
-      // Afficher le résultat
+      // Display the result.
       if (context.mounted) {
         await DialogUtils.showResultDialog(
           context: context,
@@ -273,12 +282,12 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
         );
       }
     } catch (e) {
-      // Fermer le dialogue de chargement
+      // Close the loading dialog.
       if (context.mounted) {
         DialogUtils.hideDialog(context);
       }
 
-      // Afficher l'erreur
+      // Display the error.
       if (context.mounted) {
         await DialogUtils.showErrorDialog(
           context: context,
@@ -290,53 +299,53 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     }
   }
 
-  // Scanner un QR code
+  // Scan a QR code.
   Future<void> _scanQRCode(BuildContext context) async {
-    // Dans une implémentation réelle, on utiliserait un scanner de QR code
-    // Pour le prototype, on simule simplement la réception d'une attestation
+    // In a real implementation, we would use a QR code scanner.
+    // For the prototype, we simply simulate receiving a credential.
 
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Scanner un QR code'),
+        title: const Text('Scanner un QR code'), // Keep UI text
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.qr_code_scanner, size: 48, color: Colors.blue),
             SizedBox(height: 16),
             Text(
-              'Cette fonctionnalité permettrait de scanner un QR code pour:',
+              'Cette fonctionnalité permettrait de scanner un QR code pour:', // Keep UI text
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 16),
-            Text('- Recevoir une nouvelle attestation'),
-            Text('- Vérifier une attestation'),
-            Text('- Répondre à une demande de présentation'),
+            Text('- Recevoir une nouvelle attestation'), // Keep UI text
+            Text('- Vérifier une attestation'), // Keep UI text
+            Text('- Répondre à une demande de présentation'), // Keep UI text
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Annuler'),
+            child: const Text('Annuler'), // Keep UI text
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               _simulateCredentialReceived(context);
             },
-            child: const Text('Simuler réception'),
+            child: const Text('Simuler réception'), // Keep UI text
           ),
         ],
       ),
     );
   }
 
-  // Simuler la réception d'une attestation
+  // Simulate receiving a credential.
   Future<void> _simulateCredentialReceived(BuildContext context) async {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     await DialogUtils.showLoadingDialog(context, l10n.receivingMessage);
 
-    // Simuler un délai réseau
+    // Simulate network delay.
     await Future.delayed(const Duration(seconds: 2));
 
     if (context.mounted) {
@@ -356,16 +365,18 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              Text(l10n.credentialReceivedType("Attestation d'âge")),
-              Text(l10n.credentialReceivedIssuer('Autorité nationale')),
-              Text(l10n.credentialReceivedValidity('Un an')),
+              Text(l10n
+                  .credentialReceivedType("Attestation d'âge")), // Keep UI text
+              Text(l10n.credentialReceivedIssuer(
+                  'Autorité nationale')), // Keep UI text
+              Text(l10n.credentialReceivedValidity('Un an')), // Keep UI text
             ],
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _loadCredentials(); // Recharger la liste
+                _loadCredentials(); // Reload the list.
               },
               child: Text(l10n.okButton),
             ),
@@ -375,7 +386,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     }
   }
 
-  // Afficher le dialogue de demande d'attestation
+  // Show the request credential dialog.
   Future<void> _showRequestCredentialDialog(BuildContext context) async {
     await showDialog(
       context: context,
@@ -387,50 +398,52 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     );
   }
 
-  // Demander une attestation
+  // Request a credential.
   Future<void> _requestCredential(BuildContext context, String type) async {
-    // Ici, on lancerait le processus de demande d'attestation
-    // En contactant un émetteur, ou en redirigeant vers son site
+    // Here, we would launch the credential request process.
+    // By contacting an issuer, or redirecting to their site.
 
-    // Pour le prototype, on simule le processus
+    // For the prototype, we simulate the process.
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Processus de demande'),
+        title: const Text('Processus de demande'), // Keep UI text
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Dans une implémentation réelle, cette action:',
+              'Dans une implémentation réelle, cette action:', // Keep UI text
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
-            Text('1. Générerait une demande signée'),
-            Text("2. Vous redirigerait vers l'émetteur"),
-            Text('3. Vous guiderait dans le processus de vérification'),
+            Text('1. Générerait une demande signée'), // Keep UI text
+            Text("2. Vous redirigerait vers l'émetteur"), // Keep UI text
             Text(
-              "4. Recevrait et stockerait l'attestation une fois approuvée",
+                '3. Vous guiderait dans le processus de vérification'), // Keep UI text
+            Text(
+              "4. Recevrait et stockerait l'attestation une fois approuvée", // Keep UI text
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Compris'),
+            child: const Text('Compris'), // Keep UI text
           ),
         ],
       ),
     );
   }
 
-  // Présenter une attestation (dialogue de sélection)
+  // Present a credential (selection dialog).
   Future<void> _showPresentCredentialDialog(BuildContext context) async {
     final credentials = ref.read(credentialNotifierProvider).credentials;
 
     if (credentials.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Vous n'avez pas encore d'attestations à présenter"),
+          content: Text(
+              "Vous n'avez pas encore d'attestations à présenter"), // Keep UI text
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -440,7 +453,8 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Choisir une attestation à présenter'),
+        title:
+            const Text('Choisir une attestation à présenter'), // Keep UI text
         content: SizedBox(
           width: double.maxFinite,
           child: ListView.builder(
@@ -454,7 +468,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
                     _getCredentialTypeFromList(credential.type),
                   ),
                 ),
-                title: Text(credential.name ?? 'Attestation'),
+                title: Text(credential.name ?? 'Attestation'), // Keep UI text
                 subtitle: Text(credential.issuer),
                 onTap: () {
                   Navigator.of(context).pop();
@@ -467,14 +481,14 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Annuler'),
+            child: const Text('Annuler'), // Keep UI text
           ),
         ],
       ),
     );
   }
 
-  // Confirmer la suppression d'une attestation
+  // Confirm credential deletion.
   void _confirmDeleteCredential(BuildContext context, Credential credential) {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     DialogUtils.showConfirmationDialog(
@@ -491,46 +505,46 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     });
   }
 
-  // Supprimer une attestation
+  // Delete a credential.
   Future<void> _deleteCredential(
     BuildContext context,
     Credential credential,
   ) async {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
-    // Montrer un indicateur de chargement
+    // Show a loading indicator.
     await DialogUtils.showLoadingDialog(context, l10n.deletingMessage);
 
     try {
-      // Supprimer l'attestation
+      // Delete the credential
       final success = await ref
           .read(credentialNotifierProvider.notifier)
           .deleteCredential(credential.id);
 
-      // Fermer le dialogue de chargement
+      // Close the loading dialog.
       if (context.mounted) {
         DialogUtils.hideDialog(context);
       }
 
-      // Afficher le résultat
+      // Display the result.
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               success
-                  ? 'Attestation supprimée avec succès'
-                  : 'Échec de la suppression',
+                  ? 'Attestation supprimée avec succès' // Keep UI text
+                  : 'Échec de la suppression', // Keep UI text
             ),
             behavior: SnackBarBehavior.floating,
           ),
         );
       }
     } catch (e) {
-      // Fermer le dialogue de chargement
+      // Close the loading dialog.
       if (context.mounted) {
         DialogUtils.hideDialog(context);
       }
 
-      // Afficher l'erreur
+      // Display the error.
       if (context.mounted) {
         await DialogUtils.showErrorDialog(
           context: context,
@@ -542,7 +556,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     }
   }
 
-  // Utilitaires
+  // Utilities.
   IconData _getCredentialTypeIcon(CredentialType type) {
     switch (type) {
       case CredentialType.identity:
@@ -592,22 +606,20 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     }
   }
 
-  // Afficher les options pour une attestation
-
-  /// Vérifie si c'est la première visite de l'utilisateur sur cet écran
+  /// Checks if this is the user's first visit to this screen.
   bool _isFirstVisit(WidgetRef ref) {
-    // Dans une implémentation réelle, cela serait stocké dans les préférences
-    // Pour cette démo, on retourne toujours true
+    // In a real implementation, this would be stored in preferences.
+    // For this demo, always return true.
     return true;
   }
 
-  /// Marque l'écran comme visité
+  /// Marks the screen as visited.
   void _markAsVisited(WidgetRef ref) {
-    // Dans une implémentation réelle, cela serait stocké dans les préférences
-    // Pour cette démo, on ne fait rien
+    // In a real implementation, this would be stored in preferences.
+    // For this demo, do nothing.
   }
 
-  /// Affiche une boîte de dialogue expliquant les attestations
+  /// Displays a dialog explaining credentials.
   void _showInfoDialog(BuildContext context) {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     DialogUtils.showInfoDialog(
@@ -617,21 +629,22 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
       sections: [
         InfoSectionData(
           text:
-              'Les attestations numériques sont des versions électroniques de vos documents officiels',
+              'Les attestations numériques sont des versions électroniques de vos documents officiels', // Keep UI text
           icon: Icons.badge,
         ),
         InfoSectionData(
           text:
-              'Elles sont sécurisées, vérifiables et peuvent être partagées en ligne',
+              'Elles sont sécurisées, vérifiables et peuvent être partagées en ligne', // Keep UI text
           icon: Icons.verified_user,
         ),
         InfoSectionData(
-          text: 'Vous contrôlez quelles informations vous partagez et avec qui',
+          text:
+              'Vous contrôlez quelles informations vous partagez et avec qui', // Keep UI text
           icon: Icons.privacy_tip,
         ),
         InfoSectionData(
           text:
-              "Les attestations conformes à eIDAS 2.0 sont reconnues dans toute l'Union Européenne",
+              "Les attestations conformes à eIDAS 2.0 sont reconnues dans toute l'Union Européenne", // Keep UI text
           icon: Icons.euro_symbol,
         ),
       ],
@@ -639,7 +652,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
   }
 }
 
-// Ce composant sera implémenté plus tard
+// This component will be implemented later.
 class CredentialDetailScreen extends StatelessWidget {
   const CredentialDetailScreen({super.key, required this.credentialId});
   final String credentialId;
@@ -648,10 +661,10 @@ class CredentialDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Détails de l'attestation"),
+        title: const Text("Détails de l'attestation"), // Keep UI text
       ),
       body: Center(
-        child: Text("Détails de l'attestation $credentialId"),
+        child: Text("Détails de l'attestation $credentialId"), // Keep UI text
       ),
     );
   }

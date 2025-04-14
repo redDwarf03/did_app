@@ -10,7 +10,7 @@ import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-/// Écran de renouvellement des attestations
+/// Screen for credential renewal
 class CredentialRenewalScreen extends ConsumerStatefulWidget {
   const CredentialRenewalScreen({super.key});
 
@@ -38,18 +38,18 @@ class _CredentialRenewalScreenState
     });
 
     try {
-      // Récupérer toutes les attestations
+      // Get all credentials
       final credentialNotifier = ref.read(credentialNotifierProvider.notifier);
       final credentials = await credentialNotifier.getCredentials();
 
-      // Vérifier celles qui nécessitent un renouvellement
+      // Check which ones need renewal
       final statusNotifier =
           ref.read(credentialStatusNotifierProvider.notifier);
       final renewalNeeded = await statusNotifier.checkForRenewalNeeded(
         credentials,
         const Duration(
           days: 30,
-        ), // Renouveler si expiration dans moins de 30 jours
+        ), // Renew if expiration in less than 30 days
       );
 
       setState(() {
@@ -252,35 +252,32 @@ class _CredentialRenewalScreenState
     Credential credential,
     AppLocalizations l10n,
   ) async {
-    // Déplacer l'attestation vers "en cours"
+    // Move the credential to "in progress"
     setState(() {
       _renewalCandidates.remove(credential);
       _inProgress.add(credential);
     });
 
-    // Initier le renouvellement
+    // Initiate renewal
     final statusNotifier = ref.read(credentialStatusNotifierProvider.notifier);
     final success = await statusNotifier.initiateRenewal(credential);
 
-    // Mettre à jour l'interface
+    // Update the UI
     setState(() {
       _inProgress.remove(credential);
       if (success) {
         _completed.add(credential);
       } else {
-        _renewalCandidates
-            .add(credential); // Remettre dans la liste à renouveler
+        _renewalCandidates.add(credential); // Put back in the list to renew
       }
     });
 
-    // Afficher un message de résultat
+    // Show result message
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            success
-                ? l10n.credentialImportedSuccessfully
-                : l10n.errorOccurredMessage('Renewal failed'),
+            success ? l10n.credentialImportedSuccessfully : l10n.renewalFailed,
           ),
           backgroundColor: success ? Colors.green : Colors.red,
         ),
@@ -290,7 +287,7 @@ class _CredentialRenewalScreenState
 
   String _getCredentialName(Credential credential) {
     final type =
-        credential.type.isNotEmpty ? credential.type.first : 'Attestation';
+        credential.type.isNotEmpty ? credential.type.first : 'Credential';
     final subject = credential.credentialSubject;
 
     if (subject.containsKey('name')) {
@@ -304,7 +301,7 @@ class _CredentialRenewalScreenState
     return type;
   }
 
-  // Méthodes utilitaires
+  // Utility methods
   IconData _getCredentialTypeIcon(CredentialType type) {
     switch (type) {
       case CredentialType.identity:

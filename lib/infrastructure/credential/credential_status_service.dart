@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 
 /// Service pour gérer la vérification des statuts de révocation
 class CredentialStatusService {
-
   CredentialStatusService({
     http.Client? httpClient,
     Duration? checkInterval,
@@ -19,15 +18,21 @@ class CredentialStatusService {
   /// Vérifie le statut d'une attestation
   Future<StatusCheckResult> checkStatus(Credential credential) async {
     try {
-      final statusListUrl = credential.statusListUrl;
-      if (statusListUrl == null) {
+      // final statusListUrl = credential.statusListUrl;
+      // Use the helper method to extract the StatusList2021Entry
+      final statusEntry = credential.getStatusList2021Entry();
+
+      if (statusEntry == null) {
         return StatusCheckResult(
           credentialId: credential.id,
           status: CredentialStatusType.unknown,
           checkedAt: DateTime.now(),
-          error: 'URL de liste de statut non définie',
+          error: 'StatusList2021 entry data not found or invalid in credential',
         );
       }
+
+      final statusListUrl = statusEntry.statusListCredential;
+      final statusListIndex = statusEntry.statusListIndex;
 
       // Récupérer la liste de statut
       final statusList = await _getStatusList(statusListUrl);
@@ -42,7 +47,8 @@ class CredentialStatusService {
 
       // Vérifier le statut dans la liste
       final isRevoked =
-          statusList.statuses[credential.statusListIndex] ?? false;
+          // statusList.statuses[credential.statusListIndex] ?? false;
+          statusList.statuses[statusListIndex] ?? false;
       final status =
           isRevoked ? CredentialStatusType.revoked : CredentialStatusType.valid;
 

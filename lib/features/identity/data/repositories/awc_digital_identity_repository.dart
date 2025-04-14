@@ -1,19 +1,18 @@
 import 'dart:async';
 import 'dart:convert'; // For jsonEncode
-import 'dart:typed_data';
+
 import 'package:archethic_lib_dart/archethic_lib_dart.dart'; // For ApiService and Transaction
 import 'package:archethic_wallet_client/archethic_wallet_client.dart' as awc;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logging/logging.dart';
-
-// Import project specific models and interface
-import 'package:did_app/features/identity/domain/models/user_identity_details.dart';
-import 'package:did_app/features/identity/domain/models/service_creation_result.dart'
-    as models;
-import 'package:did_app/features/identity/domain/repositories/digital_identity_repository.dart';
+import 'package:did_app/application/api_service.dart'; // For apiServiceProvider
 // Import providers
 import 'package:did_app/application/dapp_client.dart'; // For dappClientProvider
-import 'package:did_app/application/api_service.dart'; // For apiServiceProvider
+import 'package:did_app/features/identity/domain/models/service_creation_result.dart'
+    as models;
+// Import project specific models and interface
+import 'package:did_app/features/identity/domain/models/user_identity_details.dart';
+import 'package:did_app/features/identity/domain/repositories/digital_identity_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 
 class AWCDigitalIdentityRepository implements DigitalIdentityRepository {
   final awc.ArchethicDAppClient _awcClient;

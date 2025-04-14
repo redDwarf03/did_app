@@ -5,7 +5,7 @@ import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-/// Écran affichant l'attestation sous forme de certificat visuel
+/// Screen displaying the credential as a visual certificate
 class CredentialCertificateScreen extends ConsumerWidget {
   const CredentialCertificateScreen({
     super.key,
@@ -16,7 +16,6 @@ class CredentialCertificateScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
 
     return Scaffold(
@@ -67,7 +66,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
     final dateFormat = DateFormat('dd/MM/yyyy');
     final size = MediaQuery.of(context).size;
 
-    // On détermine le type d'attestation pour personnaliser le certificat
+    // Determine the credential type to customize the certificate
     final credentialType = _getCredentialTypeFromList(credential.type);
     final typeIcon = _getCredentialTypeIcon(credentialType);
     var typeTitle = l10n.defaultCredentialName;

@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Écran de gestion des statuts de révocation des attestations
+/// Screen for managing credential revocation statuses
 class CredentialStatusScreen extends ConsumerWidget {
   const CredentialStatusScreen({super.key});
 
@@ -60,7 +60,7 @@ class CredentialStatusScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Réessayer la vérification
+                // Retry verification
                 ref
                     .read(credentialStatusNotifierProvider.notifier)
                     .refreshAllStatusLists();
@@ -108,10 +108,16 @@ class CredentialStatusScreen extends ConsumerWidget {
             SectionTitle(title: l10n.verificationResultTitle),
             const SizedBox(height: 16),
             _buildStatusRow(l10n.credentialsStatsLabel, totalCount),
-            _buildStatusRow(l10n.verifiedLabel, validCount,
-                color: Colors.green,),
-            _buildStatusRow(l10n.revokedStatus, revokedCount,
-                color: Colors.red,),
+            _buildStatusRow(
+              l10n.verifiedLabel,
+              validCount,
+              color: Colors.green,
+            ),
+            _buildStatusRow(
+              l10n.revokedStatus,
+              revokedCount,
+              color: Colors.red,
+            ),
             if (state.lastCheck != null) ...[
               const Divider(),
               Text(
@@ -139,8 +145,11 @@ class CredentialStatusScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusList(BuildContext context, CredentialStatusState state,
-      AppLocalizations l10n,) {
+  Widget _buildStatusList(
+    BuildContext context,
+    CredentialStatusState state,
+    AppLocalizations l10n,
+  ) {
     if (state.checkResults.isEmpty) {
       return Center(
         child: Text(l10n.noCredentials),
@@ -160,7 +169,10 @@ class CredentialStatusScreen extends ConsumerWidget {
   }
 
   Widget _buildStatusCard(
-      BuildContext context, StatusCheckResult result, AppLocalizations l10n,) {
+    BuildContext context,
+    StatusCheckResult result,
+    AppLocalizations l10n,
+  ) {
     final isRevoked = result.status == CredentialStatusType.revoked;
     final color = isRevoked ? Colors.red : Colors.green;
 
@@ -225,8 +237,10 @@ class CredentialStatusScreen extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('${l10n.identifierLabel}: ',
-                    style: Theme.of(context).textTheme.bodySmall,),
+                Text(
+                  '${l10n.identifierLabel}: ',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
                 Flexible(
                   child: Text(
                     result.credentialId.length > 20

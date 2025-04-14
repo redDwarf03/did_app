@@ -1,14 +1,19 @@
+import 'package:did_app/application/secure_storage.dart';
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/credential/credential_repository.dart';
 import 'package:did_app/domain/credential/simplified_credential.dart';
-import 'package:did_app/infrastructure/credential/mock_credential_repository.dart';
+import 'package:did_app/infrastructure/credential/secure_storage_credential_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'providers.freezed.dart';
 
 /// Provider for the implementation of [CredentialRepository].
 /// Handles operations for W3C Verifiable Credentials.
 final credentialRepositoryProvider = Provider<CredentialRepository>((ref) {
-  // TODO: Replace this mock implementation with a real one using Archethic or other storage.
-  return MockCredentialRepository();
+  return SecureStorageCredentialRepository(
+    ref.read(flutterSecureStorageProvider),
+  );
 });
 
 /// Provider to fetch a specific W3C Credential by its ID.
@@ -19,62 +24,33 @@ final credentialByIdProvider = FutureProvider.family<Credential?, String>(
     try {
       return await repository.getCredentialById(credentialId);
     } catch (e) {
-      // TODO: Improve error handling/logging
       throw Exception('Error fetching credential by ID: $e');
     }
   },
 );
 
 /// State class for managing W3C Verifiable Credentials and Presentations.
-class CredentialState {
-  const CredentialState({
-    this.credentials = const [],
-    this.selectedCredential,
-    this.isLoading = false,
-    this.errorMessage,
-    this.presentations = const [],
-    this.lastPresentation,
-  });
+@freezed
+class CredentialState with _$CredentialState {
+  const factory CredentialState({
+    /// List of W3C Verifiable Credentials held by the user.
+    @Default([]) List<Credential> credentials,
 
-  /// List of W3C Verifiable Credentials held by the user.
-  final List<Credential> credentials;
-
-  /// The currently selected W3C Credential (e.g., for viewing details).
-  final Credential? selectedCredential;
-
-  /// Loading indicator for W3C credential operations.
-  final bool isLoading;
-
-  /// Potential error message related to W3C credential operations.
-  final String? errorMessage;
-
-  /// List of created W3C Verifiable Presentations.
-  final List<CredentialPresentation> presentations;
-
-  /// The most recently created W3C Verifiable Presentation.
-  final CredentialPresentation? lastPresentation;
-
-  /// Utility method to create a copy of the state with modified values.
-  CredentialState copyWith({
-    List<Credential>? credentials,
+    /// The currently selected W3C Credential (e.g., for viewing details).
     Credential? selectedCredential,
-    bool? isLoading,
-    // Allow explicitly setting errorMessage to null
+
+    /// Loading indicator for W3C credential operations.
+    @Default(false) bool isLoading,
+
+    /// Potential error message related to W3C credential operations.
     String? errorMessage,
-    bool? clearErrorMessage,
-    List<CredentialPresentation>? presentations,
+
+    /// List of created W3C Verifiable Presentations.
+    @Default([]) List<CredentialPresentation> presentations,
+
+    /// The most recently created W3C Verifiable Presentation.
     CredentialPresentation? lastPresentation,
-  }) {
-    return CredentialState(
-      credentials: credentials ?? this.credentials,
-      selectedCredential: selectedCredential ?? this.selectedCredential,
-      isLoading: isLoading ?? this.isLoading,
-      errorMessage:
-          clearErrorMessage == true ? null : errorMessage ?? this.errorMessage,
-      presentations: presentations ?? this.presentations,
-      lastPresentation: lastPresentation ?? this.lastPresentation,
-    );
-  }
+  }) = _CredentialState;
 }
 
 /// Provider for the StateNotifier that manages W3C Credentials.
@@ -88,8 +64,7 @@ final credentialNotifierProvider =
 /// and presentation creation.
 class CredentialNotifier extends StateNotifier<CredentialState> {
   CredentialNotifier(this.ref) : super(const CredentialState()) {
-    // Optionally load credentials on initialization
-    // loadCredentials();
+    loadCredentials();
   }
 
   final Ref ref;
@@ -113,7 +88,7 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
   /// Loads the user's W3C credentials from the repository.
   /// Updates the state with the loaded credentials or an error message.
   Future<void> loadCredentials() async {
-    state = state.copyWith(isLoading: true, clearErrorMessage: true);
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(credentialRepositoryProvider);
       final credentials = await repository.getCredentials();
@@ -130,9 +105,9 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
   }
 
   /// Loads a specific W3C credential by its ID from the repository.
-  /// Updates the [selectedCredential] in the state.
+  /// Updates the selectedCredential in the state.
   Future<Credential?> loadCredentialById(String credentialId) async {
-    state = state.copyWith(isLoading: true, clearErrorMessage: true);
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(credentialRepositoryProvider);
       final credential = await repository.getCredentialById(credentialId);
@@ -152,7 +127,7 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
 
   /// Deletes a W3C credential by its ID from the repository and updates the state.
   Future<bool> deleteCredential(String credentialId) async {
-    state = state.copyWith(isLoading: true, clearErrorMessage: true);
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(credentialRepositoryProvider);
       await repository.deleteCredential(credentialId);
@@ -183,7 +158,7 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
   /// Note: This currently calls the repository but doesn't update the Credential object
   /// itself in the state, as verification status might be complex (e.g., requires status list check).
   Future<bool> verifyCredential(String credentialId) async {
-    state = state.copyWith(isLoading: true, clearErrorMessage: true);
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(credentialRepositoryProvider);
       // Find the credential in the current state first.
@@ -211,7 +186,7 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
 
   /// Adds a new W3C credential or updates an existing one in the repository and state.
   Future<bool> addCredential(Credential credential) async {
-    state = state.copyWith(isLoading: true, clearErrorMessage: true);
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(credentialRepositoryProvider);
       await repository.saveCredential(credential);
@@ -253,7 +228,7 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
   /// - [challenge]: Optional challenge string provided by the verifier.
   /// - [domain]: Optional domain string provided by the verifier.
   ///
-  /// Updates the state with the newly created [lastPresentation].
+  /// Updates the state with the newly created lastPresentation.
   Future<CredentialPresentation?> createPresentation({
     required List<String> credentialIds,
     required Map<String, List<String>> revealedAttributes,
@@ -261,7 +236,7 @@ class CredentialNotifier extends StateNotifier<CredentialState> {
     String? challenge,
     String? domain,
   }) async {
-    state = state.copyWith(isLoading: true, clearErrorMessage: true);
+    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(credentialRepositoryProvider);
 
@@ -417,7 +392,7 @@ class SimplifiedCredentialsNotifier
   /// Mock function to request a new simplified credential from an issuer.
   /// In a real app, this would call an API specific to these simplified credentials.
   Future<void> requestCredential(String issuerUrl) async {
-    state = state.copyWith(isLoading: true, clearError: true);
+    state = state.copyWith(isLoading: true);
 
     try {
       // Mock implementation - replace with actual API call
@@ -454,8 +429,8 @@ class SimplifiedCredentialsNotifier
 
   /// Clears the list of simplified credentials.
   void clearSimplifiedCredentials() {
-    state = state.copyWith(credentials: [], isLoading: false, clearError: true);
+    state = state.copyWith(credentials: [], isLoading: false);
   }
 
-  // Add other methods if needed (e.g., load, save, delete simplified credentials)
+  // TODO: Add other methods if needed (e.g., load, save, delete simplified credentials)
 }

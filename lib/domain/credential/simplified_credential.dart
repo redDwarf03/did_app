@@ -1,3 +1,8 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'simplified_credential.freezed.dart';
+part 'simplified_credential.g.dart';
+
 /// Enum representing simplified, application-specific types of credentials.
 /// Note: This is distinct from the more detailed `CredentialType` in `lib/domain/credential/credential.dart`.
 enum SimplifiedCredentialType {
@@ -29,53 +34,40 @@ enum SimplifiedCredentialType {
 /// W3C-compliant `Credential` model defined in `lib/domain/credential/credential.dart`.
 /// It might be used for UI display, internal storage representations, or simpler use cases
 /// where full W3C compliance is not immediately needed.
-class SimplifiedCredential {
+@freezed
+class SimplifiedCredential with _$SimplifiedCredential {
   /// Creates a simplified Credential instance.
-  SimplifiedCredential({
+  const factory SimplifiedCredential({
     /// A unique identifier for this credential instance (e.g., a UUID or database ID).
-    required this.id,
+    required String id,
 
     /// The application-specific type of the credential. See [SimplifiedCredentialType].
-    required this.type,
+    required SimplifiedCredentialType type,
 
     /// An identifier (e.g., name, URI, or DID) of the entity that issued the credential.
-    required this.issuer,
+    required String issuer,
 
     /// The date and time when the credential was issued.
-    required this.issuanceDate,
+    required DateTime issuanceDate,
 
     /// The date and time when the credential expires.
-    required this.expirationDate,
+    required DateTime expirationDate,
 
     /// A map containing the core claims or attributes of the credential.
     /// The structure depends on the credential `type`.
-    required this.attributes,
+    required Map<String, dynamic> attributes,
 
     /// A simple flag indicating if this credential representation has been locally verified.
     /// This does not necessarily imply full cryptographic verification according to W3C standards.
-    this.isVerified = false,
-  });
+    @Default(false) bool isVerified,
+  }) = _SimplifiedCredential;
 
-  /// The unique identifier for this credential.
-  final String id;
+  /// Private constructor for implementing custom getters or methods (if needed).
+  const SimplifiedCredential._();
 
-  /// The application-specific type of the credential.
-  final SimplifiedCredentialType type;
-
-  /// The identifier of the issuer.
-  final String issuer;
-
-  /// The date and time of issuance.
-  final DateTime issuanceDate;
-
-  /// The date and time of expiration.
-  final DateTime expirationDate;
-
-  /// The core attributes or claims of the credential.
-  final Map<String, dynamic> attributes;
-
-  /// Local verification status flag.
-  final bool isVerified;
+  /// Factory constructor to create a [SimplifiedCredential] instance from a JSON map.
+  factory SimplifiedCredential.fromJson(Map<String, dynamic> json) =>
+      _$SimplifiedCredentialFromJson(json);
 
   /// Checks if the credential has expired based on the current time and `expirationDate`.
   /// Returns `true` if the current time is after the `expirationDate`.
@@ -88,28 +80,5 @@ class SimplifiedCredential {
     final daysUntilExpiration =
         expirationDate.difference(DateTime.now()).inDays;
     return !isExpired && daysUntilExpiration <= 30;
-  }
-
-  /// Creates a copy of this SimplifiedCredential instance with potentially modified fields.
-  ///
-  /// Useful for updating immutable SimplifiedCredential objects.
-  SimplifiedCredential copyWith({
-    String? id,
-    SimplifiedCredentialType? type,
-    String? issuer,
-    DateTime? issuanceDate,
-    DateTime? expirationDate,
-    Map<String, dynamic>? attributes,
-    bool? isVerified,
-  }) {
-    return SimplifiedCredential(
-      id: id ?? this.id,
-      type: type ?? this.type,
-      issuer: issuer ?? this.issuer,
-      issuanceDate: issuanceDate ?? this.issuanceDate,
-      expirationDate: expirationDate ?? this.expirationDate,
-      attributes: attributes ?? this.attributes,
-      isVerified: isVerified ?? this.isVerified,
-    );
   }
 }

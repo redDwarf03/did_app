@@ -56,23 +56,9 @@ mixin _$Credential {
   /// Corresponds to the `expirationDate` property in the W3C VC Data Model.
   DateTime? get expirationDate => throw _privateConstructorUsedError;
 
-  /// **DEPRECATED:** Use the `status` field instead.
-  /// URL pointing to the Status List 2021 credential used for revocation checks.
-  /// Part of the `credentialStatus` mechanism (StatusList2021Entry type).
-  /// See: https://w3c-ccg.github.io/vc-status-list-2021/
-  @Deprecated(
-      'Use status field instead which contains the full StatusList2021Entry object')
-  String? get statusListUrl => throw _privateConstructorUsedError;
-
-  /// **DEPRECATED:** Use the `status` field instead.
-  /// Index within the Status List 2021 bitstring.
-  /// Part of the `credentialStatus` mechanism (StatusList2021Entry type).
-  @Deprecated(
-      'Use status field instead which contains the full StatusList2021Entry object')
-  int? get statusListIndex => throw _privateConstructorUsedError;
-
-  /// The current verification status of the credential (a local assessment). OPTIONAL.
-  /// This is application-specific and not part of the core W3C VC model's properties.
+  /// The current *local* verification status of the credential.
+  /// Reflects checks like signature validity and expiration.
+  /// See [VerificationStatus] documentation for details and distinction from external status checks.
   VerificationStatus get verificationStatus =>
       throw _privateConstructorUsedError;
 
@@ -136,12 +122,6 @@ abstract class $CredentialCopyWith<$Res> {
       String? subject,
       DateTime issuanceDate,
       DateTime? expirationDate,
-      @Deprecated(
-          'Use status field instead which contains the full StatusList2021Entry object')
-      String? statusListUrl,
-      @Deprecated(
-          'Use status field instead which contains the full StatusList2021Entry object')
-      int? statusListIndex,
       VerificationStatus verificationStatus,
       Map<String, dynamic>? credentialSchema,
       Map<String, dynamic>? status,
@@ -174,8 +154,6 @@ class _$CredentialCopyWithImpl<$Res, $Val extends Credential>
     Object? subject = freezed,
     Object? issuanceDate = null,
     Object? expirationDate = freezed,
-    Object? statusListUrl = freezed,
-    Object? statusListIndex = freezed,
     Object? verificationStatus = null,
     Object? credentialSchema = freezed,
     Object? status = freezed,
@@ -217,14 +195,6 @@ class _$CredentialCopyWithImpl<$Res, $Val extends Credential>
           ? _value.expirationDate
           : expirationDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      statusListUrl: freezed == statusListUrl
-          ? _value.statusListUrl
-          : statusListUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      statusListIndex: freezed == statusListIndex
-          ? _value.statusListIndex
-          : statusListIndex // ignore: cast_nullable_to_non_nullable
-              as int?,
       verificationStatus: null == verificationStatus
           ? _value.verificationStatus
           : verificationStatus // ignore: cast_nullable_to_non_nullable
@@ -274,12 +244,6 @@ abstract class _$$CredentialImplCopyWith<$Res>
       String? subject,
       DateTime issuanceDate,
       DateTime? expirationDate,
-      @Deprecated(
-          'Use status field instead which contains the full StatusList2021Entry object')
-      String? statusListUrl,
-      @Deprecated(
-          'Use status field instead which contains the full StatusList2021Entry object')
-      int? statusListIndex,
       VerificationStatus verificationStatus,
       Map<String, dynamic>? credentialSchema,
       Map<String, dynamic>? status,
@@ -310,8 +274,6 @@ class __$$CredentialImplCopyWithImpl<$Res>
     Object? subject = freezed,
     Object? issuanceDate = null,
     Object? expirationDate = freezed,
-    Object? statusListUrl = freezed,
-    Object? statusListIndex = freezed,
     Object? verificationStatus = null,
     Object? credentialSchema = freezed,
     Object? status = freezed,
@@ -353,14 +315,6 @@ class __$$CredentialImplCopyWithImpl<$Res>
           ? _value.expirationDate
           : expirationDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      statusListUrl: freezed == statusListUrl
-          ? _value.statusListUrl
-          : statusListUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      statusListIndex: freezed == statusListIndex
-          ? _value.statusListIndex
-          : statusListIndex // ignore: cast_nullable_to_non_nullable
-              as int?,
       verificationStatus: null == verificationStatus
           ? _value.verificationStatus
           : verificationStatus // ignore: cast_nullable_to_non_nullable
@@ -405,12 +359,6 @@ class _$CredentialImpl extends _Credential with DiagnosticableTreeMixin {
       this.subject,
       required this.issuanceDate,
       this.expirationDate,
-      @Deprecated(
-          'Use status field instead which contains the full StatusList2021Entry object')
-      this.statusListUrl,
-      @Deprecated(
-          'Use status field instead which contains the full StatusList2021Entry object')
-      this.statusListIndex,
       this.verificationStatus = VerificationStatus.unverified,
       final Map<String, dynamic>? credentialSchema,
       final Map<String, dynamic>? status,
@@ -484,25 +432,9 @@ class _$CredentialImpl extends _Credential with DiagnosticableTreeMixin {
   @override
   final DateTime? expirationDate;
 
-  /// **DEPRECATED:** Use the `status` field instead.
-  /// URL pointing to the Status List 2021 credential used for revocation checks.
-  /// Part of the `credentialStatus` mechanism (StatusList2021Entry type).
-  /// See: https://w3c-ccg.github.io/vc-status-list-2021/
-  @override
-  @Deprecated(
-      'Use status field instead which contains the full StatusList2021Entry object')
-  final String? statusListUrl;
-
-  /// **DEPRECATED:** Use the `status` field instead.
-  /// Index within the Status List 2021 bitstring.
-  /// Part of the `credentialStatus` mechanism (StatusList2021Entry type).
-  @override
-  @Deprecated(
-      'Use status field instead which contains the full StatusList2021Entry object')
-  final int? statusListIndex;
-
-  /// The current verification status of the credential (a local assessment). OPTIONAL.
-  /// This is application-specific and not part of the core W3C VC model's properties.
+  /// The current *local* verification status of the credential.
+  /// Reflects checks like signature validity and expiration.
+  /// See [VerificationStatus] documentation for details and distinction from external status checks.
   @override
   @JsonKey()
   final VerificationStatus verificationStatus;
@@ -610,7 +542,7 @@ class _$CredentialImpl extends _Credential with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Credential(id: $id, type: $type, issuer: $issuer, name: $name, description: $description, subject: $subject, issuanceDate: $issuanceDate, expirationDate: $expirationDate, statusListUrl: $statusListUrl, statusListIndex: $statusListIndex, verificationStatus: $verificationStatus, credentialSchema: $credentialSchema, status: $status, supportsZkp: $supportsZkp, credentialSubject: $credentialSubject, context: $context, proof: $proof)';
+    return 'Credential(id: $id, type: $type, issuer: $issuer, name: $name, description: $description, subject: $subject, issuanceDate: $issuanceDate, expirationDate: $expirationDate, verificationStatus: $verificationStatus, credentialSchema: $credentialSchema, status: $status, supportsZkp: $supportsZkp, credentialSubject: $credentialSubject, context: $context, proof: $proof)';
   }
 
   @override
@@ -626,8 +558,6 @@ class _$CredentialImpl extends _Credential with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('subject', subject))
       ..add(DiagnosticsProperty('issuanceDate', issuanceDate))
       ..add(DiagnosticsProperty('expirationDate', expirationDate))
-      ..add(DiagnosticsProperty('statusListUrl', statusListUrl))
-      ..add(DiagnosticsProperty('statusListIndex', statusListIndex))
       ..add(DiagnosticsProperty('verificationStatus', verificationStatus))
       ..add(DiagnosticsProperty('credentialSchema', credentialSchema))
       ..add(DiagnosticsProperty('status', status))
@@ -653,10 +583,6 @@ class _$CredentialImpl extends _Credential with DiagnosticableTreeMixin {
                 other.issuanceDate == issuanceDate) &&
             (identical(other.expirationDate, expirationDate) ||
                 other.expirationDate == expirationDate) &&
-            (identical(other.statusListUrl, statusListUrl) ||
-                other.statusListUrl == statusListUrl) &&
-            (identical(other.statusListIndex, statusListIndex) ||
-                other.statusListIndex == statusListIndex) &&
             (identical(other.verificationStatus, verificationStatus) ||
                 other.verificationStatus == verificationStatus) &&
             const DeepCollectionEquality()
@@ -682,8 +608,6 @@ class _$CredentialImpl extends _Credential with DiagnosticableTreeMixin {
       subject,
       issuanceDate,
       expirationDate,
-      statusListUrl,
-      statusListIndex,
       verificationStatus,
       const DeepCollectionEquality().hash(_credentialSchema),
       const DeepCollectionEquality().hash(_status),
@@ -718,12 +642,6 @@ abstract class _Credential extends Credential {
       final String? subject,
       required final DateTime issuanceDate,
       final DateTime? expirationDate,
-      @Deprecated(
-          'Use status field instead which contains the full StatusList2021Entry object')
-      final String? statusListUrl,
-      @Deprecated(
-          'Use status field instead which contains the full StatusList2021Entry object')
-      final int? statusListIndex,
       final VerificationStatus verificationStatus,
       final Map<String, dynamic>? credentialSchema,
       final Map<String, dynamic>? status,
@@ -778,25 +696,9 @@ abstract class _Credential extends Credential {
   @override
   DateTime? get expirationDate;
 
-  /// **DEPRECATED:** Use the `status` field instead.
-  /// URL pointing to the Status List 2021 credential used for revocation checks.
-  /// Part of the `credentialStatus` mechanism (StatusList2021Entry type).
-  /// See: https://w3c-ccg.github.io/vc-status-list-2021/
-  @override
-  @Deprecated(
-      'Use status field instead which contains the full StatusList2021Entry object')
-  String? get statusListUrl;
-
-  /// **DEPRECATED:** Use the `status` field instead.
-  /// Index within the Status List 2021 bitstring.
-  /// Part of the `credentialStatus` mechanism (StatusList2021Entry type).
-  @override
-  @Deprecated(
-      'Use status field instead which contains the full StatusList2021Entry object')
-  int? get statusListIndex;
-
-  /// The current verification status of the credential (a local assessment). OPTIONAL.
-  /// This is application-specific and not part of the core W3C VC model's properties.
+  /// The current *local* verification status of the credential.
+  /// Reflects checks like signature validity and expiration.
+  /// See [VerificationStatus] documentation for details and distinction from external status checks.
   @override
   VerificationStatus get verificationStatus;
 

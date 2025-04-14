@@ -13,20 +13,20 @@ import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-/// Extensions pour ajouter des méthodes utiles à Credential
+/// Extensions to add useful methods to Credential
 extension CredentialExtension on Credential {
-  /// Vérifie si l'attestation est révoquée
-  bool get isRevoked => false; // À implémenter avec les données de révocation
+  /// Checks if the credential is revoked
+  bool get isRevoked => false; // To be implemented with revocation data
 
-  /// Vérifie si l'attestation est valide (non expirée)
+  /// Checks if the credential is valid (not expired)
   bool get isValid =>
       expirationDate == null || expirationDate!.isAfter(DateTime.now());
 
-  /// Vérifie si l'attestation est vérifiée
+  /// Checks if the credential is verified
   bool get isVerified => proof.isNotEmpty;
 }
 
-/// Écran affichant les détails d'une attestation vérifiable
+/// Screen displaying the details of a verifiable credential
 class CredentialDetailScreen extends ConsumerWidget {
   const CredentialDetailScreen({
     super.key,
@@ -45,11 +45,11 @@ class CredentialDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.credentialDetailTitle),
         actions: [
-          // Action pour convertir au format eIDAS
+          // Action to convert to eIDAS format
           credentialAsync.maybeWhen(
             data: (credential) {
               if (credential != null) {
-                // Si l'attestation est déjà compatible eIDAS, afficher un badge
+                // If the credential is already eIDAS compatible, display a badge
                 if (eidasNotifier.isEidasCompatible(credential)) {
                   return Tooltip(
                     message: l10n.eidasCompatibleTooltip,
@@ -62,7 +62,7 @@ class CredentialDetailScreen extends ConsumerWidget {
                     ),
                   );
                 } else {
-                  // Sinon, afficher un bouton pour convertir
+                  // Otherwise, display a button to convert
                   return IconButton(
                     icon: const Icon(Icons.euro_symbol),
                     tooltip: l10n.convertToEidasTooltip,
@@ -148,7 +148,7 @@ class CredentialDetailScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                // Bouton de gestion de révocation
+                // Revocation management button
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
@@ -173,7 +173,7 @@ class CredentialDetailScreen extends ConsumerWidget {
     );
   }
 
-  // Méthode pour convertir une attestation au format eIDAS
+  // Method to convert a credential to eIDAS format
   Future<void> _convertToEidas(
     BuildContext context,
     WidgetRef ref,
@@ -187,7 +187,7 @@ class CredentialDetailScreen extends ConsumerWidget {
       final eidasCredential =
           await eidasNotifier.makeEidasCompatible(credential);
       if (eidasCredential != null) {
-        // Mettre à jour l'attestation
+        // Update the credential
         final success = await credentialNotifier.addCredential(eidasCredential);
 
         if (context.mounted) {
@@ -199,7 +199,7 @@ class CredentialDetailScreen extends ConsumerWidget {
               ),
             );
 
-            // Ouvrir l'écran d'interopérabilité eIDAS
+            // Open eIDAS interoperability screen
             await Navigator.push(
               context,
               MaterialPageRoute(
@@ -552,7 +552,7 @@ class CredentialDetailScreen extends ConsumerWidget {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    // Action de partage
+                    // Share action
                   },
                   icon: const Icon(Icons.share),
                   label: Text(l10n.shareButton),
@@ -565,7 +565,7 @@ class CredentialDetailScreen extends ConsumerWidget {
     );
   }
 
-  /// Affiche une aide pour les débutants expliquant les attestations
+  /// Shows beginner help explaining credentials
   void _showBeginnerHelp(BuildContext context, AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
@@ -637,7 +637,7 @@ class CredentialDetailScreen extends ConsumerWidget {
     );
   }
 
-  /// Construit une section d'aide avec titre, contenu et icône
+  /// Builds a help section with title, content, and icon
   Widget _buildHelpSection(
     BuildContext context,
     String title,

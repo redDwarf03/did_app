@@ -27,7 +27,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Détecter l'onglet actif en fonction de l'URL actuelle
     final location = GoRouterState.of(context).uri.path;
 
     if (location == '/main') {
@@ -48,10 +47,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     ref.watch(
       sessionNotifierProvider.select((session) => session.isConnected),
     );
-    final l10n = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context)!;
 
     return Scaffold(
-      body: widget.child ?? _buildScreen(_selectedIndex, l10n),
+      body: widget.child ?? _buildScreen(_selectedIndex),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) {
@@ -59,7 +58,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             _selectedIndex = index;
           });
 
-          // Utiliser la navigation par URL, mais sans remplacer le MainScreen
           switch (index) {
             case 0:
               GoRouter.of(context).go('/main');
@@ -82,34 +80,35 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           NavigationDestination(
             icon: const Icon(Icons.home_outlined),
             selectedIcon: const Icon(Icons.home),
-            label: l10n.navHome,
+            label: localizations.navHome,
           ),
           NavigationDestination(
             icon: const Icon(Icons.badge_outlined),
             selectedIcon: const Icon(Icons.badge),
-            label: l10n.navIdentity,
+            label: localizations.navIdentity,
           ),
           NavigationDestination(
             icon: const Icon(Icons.card_membership_outlined),
             selectedIcon: const Icon(Icons.card_membership),
-            label: l10n.navCredentials,
+            label: localizations.navCredentials,
           ),
           NavigationDestination(
             icon: const Icon(Icons.folder_outlined),
             selectedIcon: const Icon(Icons.folder),
-            label: l10n.navDocuments,
+            label: localizations.navDocuments,
           ),
           NavigationDestination(
             icon: const Icon(Icons.verified_user_outlined),
             selectedIcon: const Icon(Icons.verified_user),
-            label: l10n.navVerification,
+            label: localizations.navVerification,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildScreen(int index, AppLocalizations l10n) {
+  Widget _buildScreen(int index) {
+    final localizations = AppLocalizations.of(context)!;
     switch (index) {
       case 0:
         return Center(
@@ -123,7 +122,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                l10n.didWalletTitle,
+                localizations.didWalletTitle,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -131,7 +130,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                l10n.didWalletSubtitle,
+                localizations.didWalletSubtitle,
                 style: const TextStyle(fontSize: 16),
               ),
             ],
@@ -146,7 +145,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       case 4:
         return const VerificationScreen();
       default:
-        return Center(child: Text(l10n.pageNotFound));
+        return Center(child: Text(localizations.pageNotFound));
     }
   }
 }

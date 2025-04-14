@@ -6,7 +6,7 @@ import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-/// Écran de gestion des révocations d'attestations
+/// Screen for managing credential revocations
 class RevocationManagementScreen extends ConsumerStatefulWidget {
   const RevocationManagementScreen({
     super.key,
@@ -49,10 +49,10 @@ class _RevocationManagementScreenState
     try {
       final revocationService = ref.read(revocationServiceProvider);
 
-      // Vérifier si l'attestation est révoquée
+      // Check if the credential is revoked
       _isRevoked = await revocationService.isRevoked(widget.credentialId);
 
-      // Charger l'historique de révocation
+      // Load revocation history
       _history =
           await revocationService.getRevocationHistory(widget.credentialId);
 

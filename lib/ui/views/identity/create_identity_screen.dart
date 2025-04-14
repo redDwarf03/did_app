@@ -29,7 +29,7 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
   Widget build(BuildContext context) {
     // Watch identity state to get loading status and errors
     final identityState = ref.watch(identityNotifierProvider);
-    final l10n = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context)!;
 
     // If identity was created successfully, show success dialog and return
     if (!_isSubmitting && identityState.identity != null) {
@@ -39,15 +39,15 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
-            title: Text(l10n.identityCreatedDialogTitle),
-            content: Text(l10n.identityCreatedDialogContent),
+            title: Text(localizations.identityCreatedDialogTitle),
+            content: Text(localizations.identityCreatedDialogContent),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop(); // Close dialog
                   Navigator.of(context).pop(); // Return to previous screen
                 },
-                child: Text(l10n.okButton),
+                child: Text(localizations.okButton),
               ),
             ],
           ),
@@ -64,8 +64,8 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:
-                Text(l10n.genericErrorMessage(identityState.errorMessage!)),
+            content: Text(
+                localizations.genericErrorMessage(identityState.errorMessage!)),
             backgroundColor: Colors.redAccent,
           ),
         );
@@ -74,7 +74,7 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.createIdentityScreenTitle),
+        title: Text(localizations.createIdentityScreenTitle),
       ),
       body: Form(
         key: _formKey,
@@ -84,7 +84,7 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                l10n.basicInfoTitleForm,
+                localizations.basicInfoTitleForm,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -95,13 +95,13 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
               // Display name field
               TextFormField(
                 decoration: InputDecoration(
-                  labelText: l10n.displayNameLabel,
-                  helperText: l10n.displayNameHelperText,
+                  labelText: localizations.displayNameLabel,
+                  helperText: localizations.displayNameHelperText,
                   border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return l10n.displayNameValidationError;
+                    return localizations.displayNameValidationError;
                   }
                   return null;
                 },
@@ -112,13 +112,13 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
               // Full name field
               TextFormField(
                 decoration: InputDecoration(
-                  labelText: l10n.fullNameLabel,
-                  helperText: l10n.fullNameHelperText,
+                  labelText: localizations.fullNameLabel,
+                  helperText: localizations.fullNameHelperText,
                   border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return l10n.fullNameValidationError;
+                    return localizations.fullNameValidationError;
                   }
                   return null;
                 },
@@ -129,19 +129,19 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
               // Email field
               TextFormField(
                 decoration: InputDecoration(
-                  labelText: l10n.emailLabel,
-                  helperText: l10n.emailHelperText,
+                  labelText: localizations.emailLabel,
+                  helperText: localizations.emailHelperText,
                   border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return l10n.emailValidationErrorRequired;
+                    return localizations.emailValidationErrorRequired;
                   }
 
                   // Simple email validation
                   if (!value.contains('@') || !value.contains('.')) {
-                    return l10n.emailValidationErrorInvalid;
+                    return localizations.emailValidationErrorInvalid;
                   }
 
                   return null;
@@ -153,8 +153,8 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
               // Phone number field (optional)
               TextFormField(
                 decoration: InputDecoration(
-                  labelText: l10n.phoneLabel,
-                  helperText: l10n.phoneHelperText,
+                  labelText: localizations.phoneLabel,
+                  helperText: localizations.phoneHelperText,
                   border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.phone,
@@ -166,7 +166,7 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
               const SizedBox(height: 24),
 
               Text(
-                l10n.additionalInfoTitleForm,
+                localizations.additionalInfoTitleForm,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -180,8 +180,8 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
                 child: AbsorbPointer(
                   child: TextFormField(
                     decoration: InputDecoration(
-                      labelText: l10n.dobLabel,
-                      helperText: l10n.dobHelperText,
+                      labelText: localizations.dobLabel,
+                      helperText: localizations.dobHelperText,
                       border: const OutlineInputBorder(),
                       suffixIcon: const Icon(Icons.calendar_today),
                     ),
@@ -198,7 +198,7 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
               // Nationality field (optional)
               TextFormField(
                 decoration: InputDecoration(
-                  labelText: l10n.nationalityLabel,
+                  labelText: localizations.nationalityLabel,
                   border: const OutlineInputBorder(),
                 ),
                 onSaved: (value) => _nationality = value,
@@ -216,7 +216,7 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
                   child: identityState.isLoading
                       ? const CircularProgressIndicator()
                       : Text(
-                          l10n.createIdentityButtonForm,
+                          localizations.createIdentityButtonForm,
                           style: const TextStyle(fontSize: 16),
                         ),
                 ),
@@ -225,7 +225,7 @@ class _CreateIdentityScreenState extends ConsumerState<CreateIdentityScreen> {
 
               // Privacy notice
               Text(
-                l10n.privacyNotice,
+                localizations.privacyNotice,
                 style: const TextStyle(
                   fontSize: 12,
                   color: Colors.grey,

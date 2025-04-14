@@ -22,26 +22,29 @@ StatusList2021Credential _$StatusList2021CredentialFromJson(
 /// @nodoc
 mixin _$StatusList2021Credential {
   /// The unique identifier (URI) for this Status List credential.
+  /// This is the URL that other credentials reference in their `statusListCredential` field.
   String get id => throw _privateConstructorUsedError;
 
-  /// The JSON-LD context(s). Must include the VC context and the StatusList2021 context.
-  /// e.g., ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/vc/status-list/2021/v1"]
+  /// The JSON-LD context(s). Must include the base VC context (`https://www.w3.org/2018/credentials/v1`)
+  /// and the StatusList2021 context (`https://w3id.org/vc/status-list/2021/v1`).
   @JsonKey(name: '@context')
   List<String> get context => throw _privateConstructorUsedError;
 
-  /// The type(s) of the credential. Must include "VerifiableCredential" and "StatusList2021Credential".
+  /// The type(s) of the credential. Must include `VerifiableCredential` and `StatusList2021Credential`.
   List<String> get type => throw _privateConstructorUsedError;
 
-  /// The DID or URI of the issuer of this status list credential.
+  /// The DID or URI of the issuer responsible for creating and maintaining this status list.
   String get issuer => throw _privateConstructorUsedError;
 
-  /// The date and time when this status list credential was issued.
+  /// The date and time when this specific version of the status list credential was issued.
+  /// Verifiers use this to determine the freshness of the status information.
   DateTime get issuanceDate => throw _privateConstructorUsedError;
 
-  /// An optional date and time after which this status list credential is no longer valid.
+  /// An optional date and time after which this status list credential (and the statuses it represents)
+  /// should no longer be considered valid.
   DateTime? get expirationDate => throw _privateConstructorUsedError;
 
-  /// An optional human-readable description of the status list.
+  /// An optional human-readable description of the status list (e.g., "Revocation List for Employee Badges").
   String? get description => throw _privateConstructorUsedError;
 
   /// The main subject of the credential, containing the actual status list data.
@@ -49,8 +52,8 @@ mixin _$StatusList2021Credential {
   StatusList2021Subject get credentialSubject =>
       throw _privateConstructorUsedError;
 
-  /// The cryptographic proof (e.g., digital signature) that binds the credential
-  /// contents to the issuer and ensures integrity.
+  /// The cryptographic proof (e.g., digital signature) that ensures the integrity and authenticity
+  /// of the status list credential, binding its contents to the issuer.
   /// See [StatusList2021Proof].
   StatusList2021Proof get proof => throw _privateConstructorUsedError;
 
@@ -285,15 +288,16 @@ class _$StatusList2021CredentialImpl implements _StatusList2021Credential {
       _$$StatusList2021CredentialImplFromJson(json);
 
   /// The unique identifier (URI) for this Status List credential.
+  /// This is the URL that other credentials reference in their `statusListCredential` field.
   @override
   final String id;
 
-  /// The JSON-LD context(s). Must include the VC context and the StatusList2021 context.
-  /// e.g., ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/vc/status-list/2021/v1"]
+  /// The JSON-LD context(s). Must include the base VC context (`https://www.w3.org/2018/credentials/v1`)
+  /// and the StatusList2021 context (`https://w3id.org/vc/status-list/2021/v1`).
   final List<String> _context;
 
-  /// The JSON-LD context(s). Must include the VC context and the StatusList2021 context.
-  /// e.g., ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/vc/status-list/2021/v1"]
+  /// The JSON-LD context(s). Must include the base VC context (`https://www.w3.org/2018/credentials/v1`)
+  /// and the StatusList2021 context (`https://w3id.org/vc/status-list/2021/v1`).
   @override
   @JsonKey(name: '@context')
   List<String> get context {
@@ -302,10 +306,10 @@ class _$StatusList2021CredentialImpl implements _StatusList2021Credential {
     return EqualUnmodifiableListView(_context);
   }
 
-  /// The type(s) of the credential. Must include "VerifiableCredential" and "StatusList2021Credential".
+  /// The type(s) of the credential. Must include `VerifiableCredential` and `StatusList2021Credential`.
   final List<String> _type;
 
-  /// The type(s) of the credential. Must include "VerifiableCredential" and "StatusList2021Credential".
+  /// The type(s) of the credential. Must include `VerifiableCredential` and `StatusList2021Credential`.
   @override
   List<String> get type {
     if (_type is EqualUnmodifiableListView) return _type;
@@ -313,19 +317,21 @@ class _$StatusList2021CredentialImpl implements _StatusList2021Credential {
     return EqualUnmodifiableListView(_type);
   }
 
-  /// The DID or URI of the issuer of this status list credential.
+  /// The DID or URI of the issuer responsible for creating and maintaining this status list.
   @override
   final String issuer;
 
-  /// The date and time when this status list credential was issued.
+  /// The date and time when this specific version of the status list credential was issued.
+  /// Verifiers use this to determine the freshness of the status information.
   @override
   final DateTime issuanceDate;
 
-  /// An optional date and time after which this status list credential is no longer valid.
+  /// An optional date and time after which this status list credential (and the statuses it represents)
+  /// should no longer be considered valid.
   @override
   final DateTime? expirationDate;
 
-  /// An optional human-readable description of the status list.
+  /// An optional human-readable description of the status list (e.g., "Revocation List for Employee Badges").
   @override
   final String? description;
 
@@ -334,8 +340,8 @@ class _$StatusList2021CredentialImpl implements _StatusList2021Credential {
   @override
   final StatusList2021Subject credentialSubject;
 
-  /// The cryptographic proof (e.g., digital signature) that binds the credential
-  /// contents to the issuer and ensures integrity.
+  /// The cryptographic proof (e.g., digital signature) that ensures the integrity and authenticity
+  /// of the status list credential, binding its contents to the issuer.
   /// See [StatusList2021Proof].
   @override
   final StatusList2021Proof proof;
@@ -413,32 +419,35 @@ abstract class _StatusList2021Credential implements StatusList2021Credential {
       _$StatusList2021CredentialImpl.fromJson;
 
   /// The unique identifier (URI) for this Status List credential.
+  /// This is the URL that other credentials reference in their `statusListCredential` field.
   @override
   String get id;
 
-  /// The JSON-LD context(s). Must include the VC context and the StatusList2021 context.
-  /// e.g., ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/vc/status-list/2021/v1"]
+  /// The JSON-LD context(s). Must include the base VC context (`https://www.w3.org/2018/credentials/v1`)
+  /// and the StatusList2021 context (`https://w3id.org/vc/status-list/2021/v1`).
   @override
   @JsonKey(name: '@context')
   List<String> get context;
 
-  /// The type(s) of the credential. Must include "VerifiableCredential" and "StatusList2021Credential".
+  /// The type(s) of the credential. Must include `VerifiableCredential` and `StatusList2021Credential`.
   @override
   List<String> get type;
 
-  /// The DID or URI of the issuer of this status list credential.
+  /// The DID or URI of the issuer responsible for creating and maintaining this status list.
   @override
   String get issuer;
 
-  /// The date and time when this status list credential was issued.
+  /// The date and time when this specific version of the status list credential was issued.
+  /// Verifiers use this to determine the freshness of the status information.
   @override
   DateTime get issuanceDate;
 
-  /// An optional date and time after which this status list credential is no longer valid.
+  /// An optional date and time after which this status list credential (and the statuses it represents)
+  /// should no longer be considered valid.
   @override
   DateTime? get expirationDate;
 
-  /// An optional human-readable description of the status list.
+  /// An optional human-readable description of the status list (e.g., "Revocation List for Employee Badges").
   @override
   String? get description;
 
@@ -447,8 +456,8 @@ abstract class _StatusList2021Credential implements StatusList2021Credential {
   @override
   StatusList2021Subject get credentialSubject;
 
-  /// The cryptographic proof (e.g., digital signature) that binds the credential
-  /// contents to the issuer and ensures integrity.
+  /// The cryptographic proof (e.g., digital signature) that ensures the integrity and authenticity
+  /// of the status list credential, binding its contents to the issuer.
   /// See [StatusList2021Proof].
   @override
   StatusList2021Proof get proof;
@@ -468,25 +477,28 @@ StatusList2021Subject _$StatusList2021SubjectFromJson(
 
 /// @nodoc
 mixin _$StatusList2021Subject {
-  /// An identifier for the subject, often the same as the credential ID or related.
+  /// An identifier for the subject, often constructed from the credential ID (e.g., `credentialId#list`).
   String get id => throw _privateConstructorUsedError;
 
-  /// The type of the credential subject. Must be "StatusList2021".
+  /// The type of the credential subject. Must be `StatusList2021`.
   String get type => throw _privateConstructorUsedError;
 
-  /// Specifies the purpose of the status entries (e.g., revocation, suspension).
+  /// Specifies the purpose of the status entries in this list (e.g., revocation, suspension).
+  /// This determines how the bits in the `encodedList` are interpreted.
   /// See [StatusPurpose].
   StatusPurpose get statusPurpose => throw _privateConstructorUsedError;
 
-  /// The encoding format used for the `encodedList`. Defaults to "base64url".
-  /// Other potential values might include "base64", although "base64url" is common.
+  /// Specifies the encoding format used for the `encodedList`. While the spec allows flexibility,
+  /// it's typically expected to be a format like base64url combined with a compression algorithm (e.g., GZip).
+  /// The exact method (compression + encoding) should ideally be discoverable or standardized.
+  /// Defaulting to 'base64url' assumes the consumer knows about potential compression.
   String get encoding => throw _privateConstructorUsedError;
 
-  /// The core status list, represented as a compressed bitstring, encoded according
-  /// to the specified `encoding` (typically base64url).
-  /// Each bit in the decoded list corresponds to a specific `statusListIndex` from a
-  /// [StatusList2021Entry]. A '1' usually indicates the status applies (e.g., revoked),
-  /// while a '0' indicates it does not.
+  /// The core status list, represented as a compressed bitstring, typically encoded
+  /// using base64url after compression (e.g., GZip).
+  /// After decoding and decompressing, this yields a sequence of bits.
+  /// Each bit corresponds to a specific `statusListIndex` from a [StatusList2021Entry].
+  /// If `statusPurpose` is `revocation`, a '1' bit usually means revoked, '0' means not revoked.
   String get encodedList => throw _privateConstructorUsedError;
 
   /// Serializes this StatusList2021Subject to a JSON map.
@@ -635,30 +647,33 @@ class _$StatusList2021SubjectImpl implements _StatusList2021Subject {
   factory _$StatusList2021SubjectImpl.fromJson(Map<String, dynamic> json) =>
       _$$StatusList2021SubjectImplFromJson(json);
 
-  /// An identifier for the subject, often the same as the credential ID or related.
+  /// An identifier for the subject, often constructed from the credential ID (e.g., `credentialId#list`).
   @override
   final String id;
 
-  /// The type of the credential subject. Must be "StatusList2021".
+  /// The type of the credential subject. Must be `StatusList2021`.
   @override
   final String type;
 
-  /// Specifies the purpose of the status entries (e.g., revocation, suspension).
+  /// Specifies the purpose of the status entries in this list (e.g., revocation, suspension).
+  /// This determines how the bits in the `encodedList` are interpreted.
   /// See [StatusPurpose].
   @override
   final StatusPurpose statusPurpose;
 
-  /// The encoding format used for the `encodedList`. Defaults to "base64url".
-  /// Other potential values might include "base64", although "base64url" is common.
+  /// Specifies the encoding format used for the `encodedList`. While the spec allows flexibility,
+  /// it's typically expected to be a format like base64url combined with a compression algorithm (e.g., GZip).
+  /// The exact method (compression + encoding) should ideally be discoverable or standardized.
+  /// Defaulting to 'base64url' assumes the consumer knows about potential compression.
   @override
   @JsonKey()
   final String encoding;
 
-  /// The core status list, represented as a compressed bitstring, encoded according
-  /// to the specified `encoding` (typically base64url).
-  /// Each bit in the decoded list corresponds to a specific `statusListIndex` from a
-  /// [StatusList2021Entry]. A '1' usually indicates the status applies (e.g., revoked),
-  /// while a '0' indicates it does not.
+  /// The core status list, represented as a compressed bitstring, typically encoded
+  /// using base64url after compression (e.g., GZip).
+  /// After decoding and decompressing, this yields a sequence of bits.
+  /// Each bit corresponds to a specific `statusListIndex` from a [StatusList2021Entry].
+  /// If `statusPurpose` is `revocation`, a '1' bit usually means revoked, '0' means not revoked.
   @override
   final String encodedList;
 
@@ -715,29 +730,32 @@ abstract class _StatusList2021Subject implements StatusList2021Subject {
   factory _StatusList2021Subject.fromJson(Map<String, dynamic> json) =
       _$StatusList2021SubjectImpl.fromJson;
 
-  /// An identifier for the subject, often the same as the credential ID or related.
+  /// An identifier for the subject, often constructed from the credential ID (e.g., `credentialId#list`).
   @override
   String get id;
 
-  /// The type of the credential subject. Must be "StatusList2021".
+  /// The type of the credential subject. Must be `StatusList2021`.
   @override
   String get type;
 
-  /// Specifies the purpose of the status entries (e.g., revocation, suspension).
+  /// Specifies the purpose of the status entries in this list (e.g., revocation, suspension).
+  /// This determines how the bits in the `encodedList` are interpreted.
   /// See [StatusPurpose].
   @override
   StatusPurpose get statusPurpose;
 
-  /// The encoding format used for the `encodedList`. Defaults to "base64url".
-  /// Other potential values might include "base64", although "base64url" is common.
+  /// Specifies the encoding format used for the `encodedList`. While the spec allows flexibility,
+  /// it's typically expected to be a format like base64url combined with a compression algorithm (e.g., GZip).
+  /// The exact method (compression + encoding) should ideally be discoverable or standardized.
+  /// Defaulting to 'base64url' assumes the consumer knows about potential compression.
   @override
   String get encoding;
 
-  /// The core status list, represented as a compressed bitstring, encoded according
-  /// to the specified `encoding` (typically base64url).
-  /// Each bit in the decoded list corresponds to a specific `statusListIndex` from a
-  /// [StatusList2021Entry]. A '1' usually indicates the status applies (e.g., revoked),
-  /// while a '0' indicates it does not.
+  /// The core status list, represented as a compressed bitstring, typically encoded
+  /// using base64url after compression (e.g., GZip).
+  /// After decoding and decompressing, this yields a sequence of bits.
+  /// Each bit corresponds to a specific `statusListIndex` from a [StatusList2021Entry].
+  /// If `statusPurpose` is `revocation`, a '1' bit usually means revoked, '0' means not revoked.
   @override
   String get encodedList;
 
@@ -755,20 +773,23 @@ StatusList2021Proof _$StatusList2021ProofFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$StatusList2021Proof {
-  /// The type of the cryptographic suite used for the proof (e.g., "Ed25519Signature2020").
+  /// The type of the cryptographic suite used for the proof (e.g., `Ed25519Signature2020`).
+  /// Determines the algorithms used for signing and verification.
   String get type => throw _privateConstructorUsedError;
 
-  /// The timestamp when the proof was generated.
+  /// The timestamp when the proof (signature) was generated.
   DateTime get created => throw _privateConstructorUsedError;
 
-  /// The DID URL identifying the verification method (e.g., public key) used to create the proof.
-  /// This is used by verifiers to check the signature.
+  /// The DID URL identifying the specific public key (verification method) of the issuer
+  /// used to create the proof. This is essential for verifiers to locate the correct key.
   String get verificationMethod => throw _privateConstructorUsedError;
 
-  /// The purpose for which the proof was created (e.g., "assertionMethod").
+  /// The relationship between the verification method and the issuer (e.g., `assertionMethod`)
+  /// indicating the purpose for which the key is authorized.
   String get proofPurpose => throw _privateConstructorUsedError;
 
-  /// The digital signature or proof value itself, typically encoded in base64url or multibase.
+  /// The digital signature or proof value itself, typically encoded in base64url or multibase format.
+  /// This value is verified against the credential data using the issuer's public key.
   String get proofValue => throw _privateConstructorUsedError;
 
   /// Serializes this StatusList2021Proof to a JSON map.
@@ -914,24 +935,27 @@ class _$StatusList2021ProofImpl implements _StatusList2021Proof {
   factory _$StatusList2021ProofImpl.fromJson(Map<String, dynamic> json) =>
       _$$StatusList2021ProofImplFromJson(json);
 
-  /// The type of the cryptographic suite used for the proof (e.g., "Ed25519Signature2020").
+  /// The type of the cryptographic suite used for the proof (e.g., `Ed25519Signature2020`).
+  /// Determines the algorithms used for signing and verification.
   @override
   final String type;
 
-  /// The timestamp when the proof was generated.
+  /// The timestamp when the proof (signature) was generated.
   @override
   final DateTime created;
 
-  /// The DID URL identifying the verification method (e.g., public key) used to create the proof.
-  /// This is used by verifiers to check the signature.
+  /// The DID URL identifying the specific public key (verification method) of the issuer
+  /// used to create the proof. This is essential for verifiers to locate the correct key.
   @override
   final String verificationMethod;
 
-  /// The purpose for which the proof was created (e.g., "assertionMethod").
+  /// The relationship between the verification method and the issuer (e.g., `assertionMethod`)
+  /// indicating the purpose for which the key is authorized.
   @override
   final String proofPurpose;
 
-  /// The digital signature or proof value itself, typically encoded in base64url or multibase.
+  /// The digital signature or proof value itself, typically encoded in base64url or multibase format.
+  /// This value is verified against the credential data using the issuer's public key.
   @override
   final String proofValue;
 
@@ -988,24 +1012,27 @@ abstract class _StatusList2021Proof implements StatusList2021Proof {
   factory _StatusList2021Proof.fromJson(Map<String, dynamic> json) =
       _$StatusList2021ProofImpl.fromJson;
 
-  /// The type of the cryptographic suite used for the proof (e.g., "Ed25519Signature2020").
+  /// The type of the cryptographic suite used for the proof (e.g., `Ed25519Signature2020`).
+  /// Determines the algorithms used for signing and verification.
   @override
   String get type;
 
-  /// The timestamp when the proof was generated.
+  /// The timestamp when the proof (signature) was generated.
   @override
   DateTime get created;
 
-  /// The DID URL identifying the verification method (e.g., public key) used to create the proof.
-  /// This is used by verifiers to check the signature.
+  /// The DID URL identifying the specific public key (verification method) of the issuer
+  /// used to create the proof. This is essential for verifiers to locate the correct key.
   @override
   String get verificationMethod;
 
-  /// The purpose for which the proof was created (e.g., "assertionMethod").
+  /// The relationship between the verification method and the issuer (e.g., `assertionMethod`)
+  /// indicating the purpose for which the key is authorized.
   @override
   String get proofPurpose;
 
-  /// The digital signature or proof value itself, typically encoded in base64url or multibase.
+  /// The digital signature or proof value itself, typically encoded in base64url or multibase format.
+  /// This value is verified against the credential data using the issuer's public key.
   @override
   String get proofValue;
 
@@ -1023,23 +1050,27 @@ StatusList2021Entry _$StatusList2021EntryFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$StatusList2021Entry {
-  /// The identifier for this status entry, typically the VC ID + '#status-<index>'.
+  /// A unique identifier for this status entry itself. Conventionally, this might be
+  /// constructed as `<statusListCredential_URL>#<statusListIndex>`.
   String get id => throw _privateConstructorUsedError;
 
-  /// The type of this status entry. Must be "StatusList2021".
-  /// (Note: The spec defines this as "StatusList2021", not "StatusList2021Entry").
+  /// The type of this status entry object. Must be `StatusList2021` according to the standard.
+  /// (Note: The class name is `StatusList2021Entry` for clarity in Dart, but the `type` field
+  /// in the JSON representation should be `StatusList2021`).
   String get type => throw _privateConstructorUsedError;
 
-  /// The purpose of the status check (e.g., "revocation"). Should match the
-  /// `statusPurpose` of the referenced [StatusList2021Credential].
+  /// The purpose of the status check (e.g., "revocation"). This MUST match the
+  /// `statusPurpose` declared in the `credentialSubject` of the referenced
+  /// [StatusList2021Credential] for the check to be valid.
   /// See [StatusPurpose].
   StatusPurpose get statusPurpose => throw _privateConstructorUsedError;
 
-  /// The URL (typically the `id`) of the [StatusList2021Credential] containing the relevant status list.
+  /// The URL (or DID) identifying the [StatusList2021Credential] that holds the
+  /// actual bitstring list relevant to this credential.
   String get statusListCredential => throw _privateConstructorUsedError;
 
-  /// The zero-based index of the bit within the `encodedList` (after decoding)
-  /// that represents the status of the credential containing this entry.
+  /// The zero-based index of the bit within the `encodedList` (after decoding and decompression)
+  /// of the credential at `statusListCredential`. This bit represents the status.
   int get statusListIndex => throw _privateConstructorUsedError;
 
   /// Serializes this StatusList2021Entry to a JSON map.
@@ -1185,28 +1216,32 @@ class _$StatusList2021EntryImpl implements _StatusList2021Entry {
   factory _$StatusList2021EntryImpl.fromJson(Map<String, dynamic> json) =>
       _$$StatusList2021EntryImplFromJson(json);
 
-  /// The identifier for this status entry, typically the VC ID + '#status-<index>'.
+  /// A unique identifier for this status entry itself. Conventionally, this might be
+  /// constructed as `<statusListCredential_URL>#<statusListIndex>`.
   @override
   final String id;
 
-  /// The type of this status entry. Must be "StatusList2021".
-  /// (Note: The spec defines this as "StatusList2021", not "StatusList2021Entry").
+  /// The type of this status entry object. Must be `StatusList2021` according to the standard.
+  /// (Note: The class name is `StatusList2021Entry` for clarity in Dart, but the `type` field
+  /// in the JSON representation should be `StatusList2021`).
   @override
   @JsonKey()
   final String type;
 
-  /// The purpose of the status check (e.g., "revocation"). Should match the
-  /// `statusPurpose` of the referenced [StatusList2021Credential].
+  /// The purpose of the status check (e.g., "revocation"). This MUST match the
+  /// `statusPurpose` declared in the `credentialSubject` of the referenced
+  /// [StatusList2021Credential] for the check to be valid.
   /// See [StatusPurpose].
   @override
   final StatusPurpose statusPurpose;
 
-  /// The URL (typically the `id`) of the [StatusList2021Credential] containing the relevant status list.
+  /// The URL (or DID) identifying the [StatusList2021Credential] that holds the
+  /// actual bitstring list relevant to this credential.
   @override
   final String statusListCredential;
 
-  /// The zero-based index of the bit within the `encodedList` (after decoding)
-  /// that represents the status of the credential containing this entry.
+  /// The zero-based index of the bit within the `encodedList` (after decoding and decompression)
+  /// of the credential at `statusListCredential`. This bit represents the status.
   @override
   final int statusListIndex;
 
@@ -1263,27 +1298,31 @@ abstract class _StatusList2021Entry implements StatusList2021Entry {
   factory _StatusList2021Entry.fromJson(Map<String, dynamic> json) =
       _$StatusList2021EntryImpl.fromJson;
 
-  /// The identifier for this status entry, typically the VC ID + '#status-<index>'.
+  /// A unique identifier for this status entry itself. Conventionally, this might be
+  /// constructed as `<statusListCredential_URL>#<statusListIndex>`.
   @override
   String get id;
 
-  /// The type of this status entry. Must be "StatusList2021".
-  /// (Note: The spec defines this as "StatusList2021", not "StatusList2021Entry").
+  /// The type of this status entry object. Must be `StatusList2021` according to the standard.
+  /// (Note: The class name is `StatusList2021Entry` for clarity in Dart, but the `type` field
+  /// in the JSON representation should be `StatusList2021`).
   @override
   String get type;
 
-  /// The purpose of the status check (e.g., "revocation"). Should match the
-  /// `statusPurpose` of the referenced [StatusList2021Credential].
+  /// The purpose of the status check (e.g., "revocation"). This MUST match the
+  /// `statusPurpose` declared in the `credentialSubject` of the referenced
+  /// [StatusList2021Credential] for the check to be valid.
   /// See [StatusPurpose].
   @override
   StatusPurpose get statusPurpose;
 
-  /// The URL (typically the `id`) of the [StatusList2021Credential] containing the relevant status list.
+  /// The URL (or DID) identifying the [StatusList2021Credential] that holds the
+  /// actual bitstring list relevant to this credential.
   @override
   String get statusListCredential;
 
-  /// The zero-based index of the bit within the `encodedList` (after decoding)
-  /// that represents the status of the credential containing this entry.
+  /// The zero-based index of the bit within the `encodedList` (after decoding and decompression)
+  /// of the credential at `statusListCredential`. This bit represents the status.
   @override
   int get statusListIndex;
 

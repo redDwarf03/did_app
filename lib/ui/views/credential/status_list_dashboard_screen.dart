@@ -5,7 +5,7 @@ import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-/// Écran de gestion des listes de statut Status List 2021
+/// Screen for managing Status List 2021 status lists
 class StatusListDashboardScreen extends ConsumerStatefulWidget {
   const StatusListDashboardScreen({super.key});
 
@@ -34,9 +34,9 @@ class _StatusListDashboardScreenState
     super.dispose();
   }
 
-  /// Charge les listes de statut sauvegardées
+  /// Load saved status lists
   Future<void> _loadSavedStatusLists() async {
-    // Dans une implémentation réelle, charger depuis une source de données persistante
+    // In a real implementation, load from a persistent data source
     setState(() {
       _statusListUrls.addAll([
         'https://example.com/status/list1',
@@ -45,12 +45,12 @@ class _StatusListDashboardScreenState
     });
   }
 
-  /// Ajoute une nouvelle liste de statut
+  /// Add a new status list
   Future<void> _addStatusList() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
       setState(() {
-        _error = 'Veuillez entrer une URL valide';
+        _error = 'Please enter a valid URL';
       });
       return;
     }
@@ -81,7 +81,7 @@ class _StatusListDashboardScreenState
     }
   }
 
-  /// Charge les détails d'une liste de statut
+  /// Load the details of a status list
   Future<void> _loadStatusListDetails(String url) async {
     setState(() {
       _isLoading = true;
@@ -106,7 +106,7 @@ class _StatusListDashboardScreenState
     }
   }
 
-  /// Supprime une liste de statut
+  /// Remove a status list
   void _removeStatusList(String url) {
     setState(() {
       _statusListUrls.remove(url);

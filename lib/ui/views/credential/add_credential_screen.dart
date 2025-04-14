@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Écran d'ajout d'une nouvelle attestation
+/// Screen for adding a new credential
 class AddCredentialScreen extends ConsumerWidget {
   const AddCredentialScreen({super.key});
 

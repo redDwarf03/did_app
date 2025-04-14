@@ -14,6 +14,10 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
+EidasState _$EidasStateFromJson(Map<String, dynamic> json) {
+  return _EidasState.fromJson(json);
+}
+
 /// @nodoc
 mixin _$EidasState {
   /// Indicates if an eIDAS-related operation is currently in progress.
@@ -33,8 +37,7 @@ mixin _$EidasState {
 
   /// Stores the revocation status checked during the last verification.
   /// Uses the local RevocationStatus from the infrastructure service, accessed via prefix.
-  revocation.RevocationStatus? get revocationStatus =>
-      throw _privateConstructorUsedError;
+  RevocationStatus? get revocationStatus => throw _privateConstructorUsedError;
 
   /// Timestamp of the last successful synchronization with the EU Trust Registry.
   DateTime? get lastSyncDate => throw _privateConstructorUsedError;
@@ -56,6 +59,9 @@ mixin _$EidasState {
   /// The country code currently selected for filtering issuers (e.g., 'FR', 'DE').
   String? get selectedCountry => throw _privateConstructorUsedError;
 
+  /// Serializes this EidasState to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
   /// Create a copy of EidasState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -74,7 +80,7 @@ abstract class $EidasStateCopyWith<$Res> {
       String? errorMessage,
       bool isEudiWalletAvailable,
       VerificationResult? verificationResult,
-      revocation.RevocationStatus? revocationStatus,
+      RevocationStatus? revocationStatus,
       DateTime? lastSyncDate,
       Map<String, dynamic>? trustListReport,
       Map<String, dynamic>? interoperabilityReport,
@@ -83,6 +89,7 @@ abstract class $EidasStateCopyWith<$Res> {
       String? selectedCountry});
 
   $VerificationResultCopyWith<$Res>? get verificationResult;
+  $RevocationStatusCopyWith<$Res>? get revocationStatus;
 }
 
 /// @nodoc
@@ -132,7 +139,7 @@ class _$EidasStateCopyWithImpl<$Res, $Val extends EidasState>
       revocationStatus: freezed == revocationStatus
           ? _value.revocationStatus
           : revocationStatus // ignore: cast_nullable_to_non_nullable
-              as revocation.RevocationStatus?,
+              as RevocationStatus?,
       lastSyncDate: freezed == lastSyncDate
           ? _value.lastSyncDate
           : lastSyncDate // ignore: cast_nullable_to_non_nullable
@@ -174,6 +181,20 @@ class _$EidasStateCopyWithImpl<$Res, $Val extends EidasState>
       return _then(_value.copyWith(verificationResult: value) as $Val);
     });
   }
+
+  /// Create a copy of EidasState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RevocationStatusCopyWith<$Res>? get revocationStatus {
+    if (_value.revocationStatus == null) {
+      return null;
+    }
+
+    return $RevocationStatusCopyWith<$Res>(_value.revocationStatus!, (value) {
+      return _then(_value.copyWith(revocationStatus: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -189,7 +210,7 @@ abstract class _$$EidasStateImplCopyWith<$Res>
       String? errorMessage,
       bool isEudiWalletAvailable,
       VerificationResult? verificationResult,
-      revocation.RevocationStatus? revocationStatus,
+      RevocationStatus? revocationStatus,
       DateTime? lastSyncDate,
       Map<String, dynamic>? trustListReport,
       Map<String, dynamic>? interoperabilityReport,
@@ -199,6 +220,8 @@ abstract class _$$EidasStateImplCopyWith<$Res>
 
   @override
   $VerificationResultCopyWith<$Res>? get verificationResult;
+  @override
+  $RevocationStatusCopyWith<$Res>? get revocationStatus;
 }
 
 /// @nodoc
@@ -246,7 +269,7 @@ class __$$EidasStateImplCopyWithImpl<$Res>
       revocationStatus: freezed == revocationStatus
           ? _value.revocationStatus
           : revocationStatus // ignore: cast_nullable_to_non_nullable
-              as revocation.RevocationStatus?,
+              as RevocationStatus?,
       lastSyncDate: freezed == lastSyncDate
           ? _value.lastSyncDate
           : lastSyncDate // ignore: cast_nullable_to_non_nullable
@@ -276,8 +299,8 @@ class __$$EidasStateImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
-class _$EidasStateImpl implements _EidasState {
+@JsonSerializable()
+class _$EidasStateImpl extends _EidasState {
   const _$EidasStateImpl(
       {this.isLoading = false,
       this.errorMessage,
@@ -292,7 +315,11 @@ class _$EidasStateImpl implements _EidasState {
       this.selectedCountry})
       : _trustListReport = trustListReport,
         _interoperabilityReport = interoperabilityReport,
-        _trustedIssuers = trustedIssuers;
+        _trustedIssuers = trustedIssuers,
+        super._();
+
+  factory _$EidasStateImpl.fromJson(Map<String, dynamic> json) =>
+      _$$EidasStateImplFromJson(json);
 
   /// Indicates if an eIDAS-related operation is currently in progress.
   @override
@@ -317,7 +344,7 @@ class _$EidasStateImpl implements _EidasState {
   /// Stores the revocation status checked during the last verification.
   /// Uses the local RevocationStatus from the infrastructure service, accessed via prefix.
   @override
-  final revocation.RevocationStatus? revocationStatus;
+  final RevocationStatus? revocationStatus;
 
   /// Timestamp of the last successful synchronization with the EU Trust Registry.
   @override
@@ -404,6 +431,7 @@ class _$EidasStateImpl implements _EidasState {
                 other.selectedCountry == selectedCountry));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -426,21 +454,32 @@ class _$EidasStateImpl implements _EidasState {
   @pragma('vm:prefer-inline')
   _$$EidasStateImplCopyWith<_$EidasStateImpl> get copyWith =>
       __$$EidasStateImplCopyWithImpl<_$EidasStateImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$EidasStateImplToJson(
+      this,
+    );
+  }
 }
 
-abstract class _EidasState implements EidasState {
+abstract class _EidasState extends EidasState {
   const factory _EidasState(
       {final bool isLoading,
       final String? errorMessage,
       final bool isEudiWalletAvailable,
       final VerificationResult? verificationResult,
-      final revocation.RevocationStatus? revocationStatus,
+      final RevocationStatus? revocationStatus,
       final DateTime? lastSyncDate,
       final Map<String, dynamic>? trustListReport,
       final Map<String, dynamic>? interoperabilityReport,
       final List<TrustedIssuer> trustedIssuers,
       final TrustLevel? selectedTrustLevel,
       final String? selectedCountry}) = _$EidasStateImpl;
+  const _EidasState._() : super._();
+
+  factory _EidasState.fromJson(Map<String, dynamic> json) =
+      _$EidasStateImpl.fromJson;
 
   /// Indicates if an eIDAS-related operation is currently in progress.
   @override
@@ -463,7 +502,7 @@ abstract class _EidasState implements EidasState {
   /// Stores the revocation status checked during the last verification.
   /// Uses the local RevocationStatus from the infrastructure service, accessed via prefix.
   @override
-  revocation.RevocationStatus? get revocationStatus;
+  RevocationStatus? get revocationStatus;
 
   /// Timestamp of the last successful synchronization with the EU Trust Registry.
   @override

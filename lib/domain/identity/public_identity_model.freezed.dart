@@ -14,6 +14,10 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
+PublicIdentityModel _$PublicIdentityModelFromJson(Map<String, dynamic> json) {
+  return _PublicIdentityModel.fromJson(json);
+}
+
 /// @nodoc
 mixin _$PublicIdentityModel {
   /// The unique blockchain address or Decentralized Identifier (DID) for this identity.
@@ -34,6 +38,9 @@ mixin _$PublicIdentityModel {
   /// A list of service endpoints associated with this identity.
   /// See [IdentityService].
   List<IdentityService> get services => throw _privateConstructorUsedError;
+
+  /// Serializes this PublicIdentityModel to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of PublicIdentityModel
   /// with the given fields replaced by the non-null parameter values.
@@ -175,7 +182,7 @@ class __$$PublicIdentityModelImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _$PublicIdentityModelImpl extends _PublicIdentityModel {
   const _$PublicIdentityModelImpl(
       {required this.address,
@@ -186,6 +193,9 @@ class _$PublicIdentityModelImpl extends _PublicIdentityModel {
       final List<IdentityService> services = const []})
       : _services = services,
         super._();
+
+  factory _$PublicIdentityModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PublicIdentityModelImplFromJson(json);
 
   /// The unique blockchain address or Decentralized Identifier (DID) for this identity.
   @override
@@ -242,6 +252,7 @@ class _$PublicIdentityModelImpl extends _PublicIdentityModel {
             const DeepCollectionEquality().equals(other._services, _services));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, address, name, publicName,
       profileImage, createdAt, const DeepCollectionEquality().hash(_services));
@@ -254,6 +265,13 @@ class _$PublicIdentityModelImpl extends _PublicIdentityModel {
   _$$PublicIdentityModelImplCopyWith<_$PublicIdentityModelImpl> get copyWith =>
       __$$PublicIdentityModelImplCopyWithImpl<_$PublicIdentityModelImpl>(
           this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PublicIdentityModelImplToJson(
+      this,
+    );
+  }
 }
 
 abstract class _PublicIdentityModel extends PublicIdentityModel {
@@ -265,6 +283,9 @@ abstract class _PublicIdentityModel extends PublicIdentityModel {
       required final DateTime createdAt,
       final List<IdentityService> services}) = _$PublicIdentityModelImpl;
   const _PublicIdentityModel._() : super._();
+
+  factory _PublicIdentityModel.fromJson(Map<String, dynamic> json) =
+      _$PublicIdentityModelImpl.fromJson;
 
   /// The unique blockchain address or Decentralized Identifier (DID) for this identity.
   @override
@@ -299,6 +320,10 @@ abstract class _PublicIdentityModel extends PublicIdentityModel {
       throw _privateConstructorUsedError;
 }
 
+IdentityService _$IdentityServiceFromJson(Map<String, dynamic> json) {
+  return _IdentityService.fromJson(json);
+}
+
 /// @nodoc
 mixin _$IdentityService {
   /// A unique identifier for the service endpoint within the context of the identity.
@@ -311,6 +336,9 @@ mixin _$IdentityService {
 
   /// The URL or URI where the service can be accessed.
   String get endpoint => throw _privateConstructorUsedError;
+
+  /// Serializes this IdentityService to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of IdentityService
   /// with the given fields replaced by the non-null parameter values.
@@ -410,10 +438,13 @@ class __$$IdentityServiceImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _$IdentityServiceImpl implements _IdentityService {
   const _$IdentityServiceImpl(
       {required this.id, required this.type, required this.endpoint});
+
+  factory _$IdentityServiceImpl.fromJson(Map<String, dynamic> json) =>
+      _$$IdentityServiceImplFromJson(json);
 
   /// A unique identifier for the service endpoint within the context of the identity.
   /// Often formatted as `did:example:123#service-1`.
@@ -445,6 +476,7 @@ class _$IdentityServiceImpl implements _IdentityService {
                 other.endpoint == endpoint));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, type, endpoint);
 
@@ -456,6 +488,13 @@ class _$IdentityServiceImpl implements _IdentityService {
   _$$IdentityServiceImplCopyWith<_$IdentityServiceImpl> get copyWith =>
       __$$IdentityServiceImplCopyWithImpl<_$IdentityServiceImpl>(
           this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$IdentityServiceImplToJson(
+      this,
+    );
+  }
 }
 
 abstract class _IdentityService implements IdentityService {
@@ -463,6 +502,9 @@ abstract class _IdentityService implements IdentityService {
       {required final String id,
       required final String type,
       required final String endpoint}) = _$IdentityServiceImpl;
+
+  factory _IdentityService.fromJson(Map<String, dynamic> json) =
+      _$IdentityServiceImpl.fromJson;
 
   /// A unique identifier for the service endpoint within the context of the identity.
   /// Often formatted as `did:example:123#service-1`.

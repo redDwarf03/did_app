@@ -20,38 +20,43 @@ CredentialStatus _$CredentialStatusFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$CredentialStatus {
-  /// The unique ID of the credential whose status this object represents.
+  /// The unique ID of the Verifiable Credential whose status this object represents.
   String get credentialId => throw _privateConstructorUsedError;
 
-  /// The determined status of the credential. See [CredentialStatusType].
+  /// The determined status of the credential after performing checks.
+  /// See [CredentialStatusType].
   CredentialStatusType get status => throw _privateConstructorUsedError;
 
   /// The timestamp when the credential's status was last successfully checked
-  /// against its status mechanism (e.g., StatusList2021).
+  /// against its designated status mechanism (e.g., by fetching the list at
+  /// [statusListUrl] and checking the bit at [statusListIndex]).
   DateTime get lastChecked => throw _privateConstructorUsedError;
 
-  /// If the status is [CredentialStatusType.revoked], the timestamp when the revocation occurred.
+  /// If the status is [CredentialStatusType.revoked], the timestamp when the revocation
+  /// was recorded or became effective (may be derived from the status list update time).
   DateTime? get revokedAt => throw _privateConstructorUsedError;
 
   /// If the status is [CredentialStatusType.revoked], the reason for revocation.
   /// See [RevocationReason].
   RevocationReason? get revocationReason => throw _privateConstructorUsedError;
 
-  /// Optional additional details regarding the revocation.
+  /// Optional additional human-readable details regarding the revocation.
   String? get revocationDetails => throw _privateConstructorUsedError;
 
-  /// The URL of the status list credential (e.g., a StatusList2021Credential)
-  /// used to determine the status.
+  /// The URL or DID identifying the Verifiable Credential containing the status list
+  /// (e.g., a StatusList2021Credential or BitstringStatusListCredential).
+  /// This is the source used to determine the status via the [statusListIndex].
   String get statusListUrl => throw _privateConstructorUsedError;
 
-  /// The index within the referenced status list that corresponds to this credential.
+  /// The zero-based index within the referenced status list ([statusListUrl])
+  /// that corresponds to this specific credential's status.
   int get statusListIndex => throw _privateConstructorUsedError;
 
-  /// The expiration date of the credential itself, if applicable.
+  /// The expiration date defined within the Verifiable Credential itself, if present.
   DateTime? get expiresAt => throw _privateConstructorUsedError;
 
-  /// The timestamp when the status of this credential should be checked again.
-  /// Useful for managing cache validity or polling frequency.
+  /// The timestamp indicating when the status of this credential should ideally be
+  /// checked again. Useful for managing cache validity or scheduling polling.
   DateTime get nextCheck => throw _privateConstructorUsedError;
 
   /// Serializes this CredentialStatus to a JSON map.
@@ -262,20 +267,23 @@ class _$CredentialStatusImpl implements _CredentialStatus {
   factory _$CredentialStatusImpl.fromJson(Map<String, dynamic> json) =>
       _$$CredentialStatusImplFromJson(json);
 
-  /// The unique ID of the credential whose status this object represents.
+  /// The unique ID of the Verifiable Credential whose status this object represents.
   @override
   final String credentialId;
 
-  /// The determined status of the credential. See [CredentialStatusType].
+  /// The determined status of the credential after performing checks.
+  /// See [CredentialStatusType].
   @override
   final CredentialStatusType status;
 
   /// The timestamp when the credential's status was last successfully checked
-  /// against its status mechanism (e.g., StatusList2021).
+  /// against its designated status mechanism (e.g., by fetching the list at
+  /// [statusListUrl] and checking the bit at [statusListIndex]).
   @override
   final DateTime lastChecked;
 
-  /// If the status is [CredentialStatusType.revoked], the timestamp when the revocation occurred.
+  /// If the status is [CredentialStatusType.revoked], the timestamp when the revocation
+  /// was recorded or became effective (may be derived from the status list update time).
   @override
   final DateTime? revokedAt;
 
@@ -284,25 +292,27 @@ class _$CredentialStatusImpl implements _CredentialStatus {
   @override
   final RevocationReason? revocationReason;
 
-  /// Optional additional details regarding the revocation.
+  /// Optional additional human-readable details regarding the revocation.
   @override
   final String? revocationDetails;
 
-  /// The URL of the status list credential (e.g., a StatusList2021Credential)
-  /// used to determine the status.
+  /// The URL or DID identifying the Verifiable Credential containing the status list
+  /// (e.g., a StatusList2021Credential or BitstringStatusListCredential).
+  /// This is the source used to determine the status via the [statusListIndex].
   @override
   final String statusListUrl;
 
-  /// The index within the referenced status list that corresponds to this credential.
+  /// The zero-based index within the referenced status list ([statusListUrl])
+  /// that corresponds to this specific credential's status.
   @override
   final int statusListIndex;
 
-  /// The expiration date of the credential itself, if applicable.
+  /// The expiration date defined within the Verifiable Credential itself, if present.
   @override
   final DateTime? expiresAt;
 
-  /// The timestamp when the status of this credential should be checked again.
-  /// Useful for managing cache validity or polling frequency.
+  /// The timestamp indicating when the status of this credential should ideally be
+  /// checked again. Useful for managing cache validity or scheduling polling.
   @override
   final DateTime nextCheck;
 
@@ -385,20 +395,23 @@ abstract class _CredentialStatus implements CredentialStatus {
   factory _CredentialStatus.fromJson(Map<String, dynamic> json) =
       _$CredentialStatusImpl.fromJson;
 
-  /// The unique ID of the credential whose status this object represents.
+  /// The unique ID of the Verifiable Credential whose status this object represents.
   @override
   String get credentialId;
 
-  /// The determined status of the credential. See [CredentialStatusType].
+  /// The determined status of the credential after performing checks.
+  /// See [CredentialStatusType].
   @override
   CredentialStatusType get status;
 
   /// The timestamp when the credential's status was last successfully checked
-  /// against its status mechanism (e.g., StatusList2021).
+  /// against its designated status mechanism (e.g., by fetching the list at
+  /// [statusListUrl] and checking the bit at [statusListIndex]).
   @override
   DateTime get lastChecked;
 
-  /// If the status is [CredentialStatusType.revoked], the timestamp when the revocation occurred.
+  /// If the status is [CredentialStatusType.revoked], the timestamp when the revocation
+  /// was recorded or became effective (may be derived from the status list update time).
   @override
   DateTime? get revokedAt;
 
@@ -407,25 +420,27 @@ abstract class _CredentialStatus implements CredentialStatus {
   @override
   RevocationReason? get revocationReason;
 
-  /// Optional additional details regarding the revocation.
+  /// Optional additional human-readable details regarding the revocation.
   @override
   String? get revocationDetails;
 
-  /// The URL of the status list credential (e.g., a StatusList2021Credential)
-  /// used to determine the status.
+  /// The URL or DID identifying the Verifiable Credential containing the status list
+  /// (e.g., a StatusList2021Credential or BitstringStatusListCredential).
+  /// This is the source used to determine the status via the [statusListIndex].
   @override
   String get statusListUrl;
 
-  /// The index within the referenced status list that corresponds to this credential.
+  /// The zero-based index within the referenced status list ([statusListUrl])
+  /// that corresponds to this specific credential's status.
   @override
   int get statusListIndex;
 
-  /// The expiration date of the credential itself, if applicable.
+  /// The expiration date defined within the Verifiable Credential itself, if present.
   @override
   DateTime? get expiresAt;
 
-  /// The timestamp when the status of this credential should be checked again.
-  /// Useful for managing cache validity or polling frequency.
+  /// The timestamp indicating when the status of this credential should ideally be
+  /// checked again. Useful for managing cache validity or scheduling polling.
   @override
   DateTime get nextCheck;
 
@@ -443,23 +458,26 @@ StatusList _$StatusListFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$StatusList {
-  /// The identifier (usually the URL) of the source StatusList2021Credential.
-  String get id =>
-      throw _privateConstructorUsedError; // Corresponds to statusListUrl in CredentialStatus
-// /// The URL of the status list (potentially redundant with id).
-// required String url,
-  /// Timestamp indicating when this local representation of the list was last updated
-  /// from the source.
+  /// The identifier (usually the URL or DID) of the source Status List Credential.
+  /// This corresponds to the `statusListCredential` property in the VCs referencing this list.
+  String get id => throw _privateConstructorUsedError;
+
+  /// Timestamp indicating when this local, decoded representation of the list
+  /// was last updated or fetched from the source credential at [id].
   DateTime get lastUpdated => throw _privateConstructorUsedError;
 
-  /// The decoded status information, mapping the status index to its boolean status
-  /// (e.g., true might mean revoked/suspended, false means active).
+  /// The decoded status information derived from the `encodedList` of the source credential.
+  /// Maps the status index (key) to its boolean status (value).
+  /// The interpretation of `true`/`false` depends on the `statusPurpose`
+  /// (e.g., for `revocation`, `true` often means revoked, `false` means not revoked).
   Map<int, bool> get statuses => throw _privateConstructorUsedError;
 
-  /// The total number of status entries (bits) in the list.
+  /// The total number of status entries (bits) declared or inferred from the source list.
+  /// Used for validation and ensuring indices are within bounds.
   int get size => throw _privateConstructorUsedError;
 
-  /// Optional version identifier for the status list, if provided by the source.
+  /// Optional version identifier for the status list, if provided by the source credential.
+  /// Useful for tracking updates to the list.
   String? get version => throw _privateConstructorUsedError;
 
   /// Serializes this StatusList to a JSON map.
@@ -606,23 +624,26 @@ class _$StatusListImpl implements _StatusList {
   factory _$StatusListImpl.fromJson(Map<String, dynamic> json) =>
       _$$StatusListImplFromJson(json);
 
-  /// The identifier (usually the URL) of the source StatusList2021Credential.
+  /// The identifier (usually the URL or DID) of the source Status List Credential.
+  /// This corresponds to the `statusListCredential` property in the VCs referencing this list.
   @override
   final String id;
-// Corresponds to statusListUrl in CredentialStatus
-// /// The URL of the status list (potentially redundant with id).
-// required String url,
-  /// Timestamp indicating when this local representation of the list was last updated
-  /// from the source.
+
+  /// Timestamp indicating when this local, decoded representation of the list
+  /// was last updated or fetched from the source credential at [id].
   @override
   final DateTime lastUpdated;
 
-  /// The decoded status information, mapping the status index to its boolean status
-  /// (e.g., true might mean revoked/suspended, false means active).
+  /// The decoded status information derived from the `encodedList` of the source credential.
+  /// Maps the status index (key) to its boolean status (value).
+  /// The interpretation of `true`/`false` depends on the `statusPurpose`
+  /// (e.g., for `revocation`, `true` often means revoked, `false` means not revoked).
   final Map<int, bool> _statuses;
 
-  /// The decoded status information, mapping the status index to its boolean status
-  /// (e.g., true might mean revoked/suspended, false means active).
+  /// The decoded status information derived from the `encodedList` of the source credential.
+  /// Maps the status index (key) to its boolean status (value).
+  /// The interpretation of `true`/`false` depends on the `statusPurpose`
+  /// (e.g., for `revocation`, `true` often means revoked, `false` means not revoked).
   @override
   Map<int, bool> get statuses {
     if (_statuses is EqualUnmodifiableMapView) return _statuses;
@@ -630,11 +651,13 @@ class _$StatusListImpl implements _StatusList {
     return EqualUnmodifiableMapView(_statuses);
   }
 
-  /// The total number of status entries (bits) in the list.
+  /// The total number of status entries (bits) declared or inferred from the source list.
+  /// Used for validation and ensuring indices are within bounds.
   @override
   final int size;
 
-  /// Optional version identifier for the status list, if provided by the source.
+  /// Optional version identifier for the status list, if provided by the source credential.
+  /// Useful for tracking updates to the list.
   @override
   final String? version;
 
@@ -688,26 +711,30 @@ abstract class _StatusList implements StatusList {
   factory _StatusList.fromJson(Map<String, dynamic> json) =
       _$StatusListImpl.fromJson;
 
-  /// The identifier (usually the URL) of the source StatusList2021Credential.
+  /// The identifier (usually the URL or DID) of the source Status List Credential.
+  /// This corresponds to the `statusListCredential` property in the VCs referencing this list.
   @override
-  String get id; // Corresponds to statusListUrl in CredentialStatus
-// /// The URL of the status list (potentially redundant with id).
-// required String url,
-  /// Timestamp indicating when this local representation of the list was last updated
-  /// from the source.
+  String get id;
+
+  /// Timestamp indicating when this local, decoded representation of the list
+  /// was last updated or fetched from the source credential at [id].
   @override
   DateTime get lastUpdated;
 
-  /// The decoded status information, mapping the status index to its boolean status
-  /// (e.g., true might mean revoked/suspended, false means active).
+  /// The decoded status information derived from the `encodedList` of the source credential.
+  /// Maps the status index (key) to its boolean status (value).
+  /// The interpretation of `true`/`false` depends on the `statusPurpose`
+  /// (e.g., for `revocation`, `true` often means revoked, `false` means not revoked).
   @override
   Map<int, bool> get statuses;
 
-  /// The total number of status entries (bits) in the list.
+  /// The total number of status entries (bits) declared or inferred from the source list.
+  /// Used for validation and ensuring indices are within bounds.
   @override
   int get size;
 
-  /// Optional version identifier for the status list, if provided by the source.
+  /// Optional version identifier for the status list, if provided by the source credential.
+  /// Useful for tracking updates to the list.
   @override
   String? get version;
 
@@ -734,7 +761,8 @@ mixin _$StatusCheckResult {
   /// The timestamp when the check was performed.
   DateTime get checkedAt => throw _privateConstructorUsedError;
 
-  /// Optional details about the verification process or the result.
+  /// Optional human-readable details about the verification process or the result
+  /// (e.g., "Successfully verified against status list", "Expired", "Status list fetch failed").
   String? get details => throw _privateConstructorUsedError;
 
   /// Optional error message if the status check failed.
@@ -895,7 +923,8 @@ class _$StatusCheckResultImpl implements _StatusCheckResult {
   @override
   final DateTime checkedAt;
 
-  /// Optional details about the verification process or the result.
+  /// Optional human-readable details about the verification process or the result
+  /// (e.g., "Successfully verified against status list", "Expired", "Status list fetch failed").
   @override
   final String? details;
 
@@ -967,7 +996,8 @@ abstract class _StatusCheckResult implements StatusCheckResult {
   @override
   DateTime get checkedAt;
 
-  /// Optional details about the verification process or the result.
+  /// Optional human-readable details about the verification process or the result
+  /// (e.g., "Successfully verified against status list", "Expired", "Status list fetch failed").
   @override
   String? get details;
 

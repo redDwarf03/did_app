@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'public_identity_model.freezed.dart';
+part 'public_identity_model.g.dart';
 
 /// Represents a core digital identity, structured similarly to a W3C DID Document.
 ///
@@ -46,6 +47,9 @@ class PublicIdentityModel with _$PublicIdentityModel {
   // Private constructor for enabling custom methods/getters.
   const PublicIdentityModel._();
 
+  factory PublicIdentityModel.fromJson(Map<String, dynamic> json) =>
+      _$PublicIdentityModelFromJson(json);
+
   /// Returns the name to be displayed publicly.
   /// Uses [publicName] if available, otherwise falls back to the primary [name].
   String get displayName => publicName ?? name;
@@ -71,6 +75,6 @@ class IdentityService with _$IdentityService {
     required String endpoint,
   }) = _IdentityService;
 
-  // Add fromJson factory for IdentityService if needed for serialization
-  // factory IdentityService.fromJson(Map<String, dynamic> json) => _$IdentityServiceFromJson(json);
+  factory IdentityService.fromJson(Map<String, dynamic> json) =>
+      _$IdentityServiceFromJson(json);
 }

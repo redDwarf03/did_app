@@ -5,13 +5,12 @@ import 'package:did_app/infrastructure/credential/eidas_credential_service.dart'
     as infra_eidas_service;
 import 'package:did_app/infrastructure/credential/eidas_trust_list.dart';
 import 'package:did_app/infrastructure/credential/eu_trust_registry_service.dart';
-import 'package:did_app/infrastructure/credential/revocation_status.dart'
-    as revocation;
+import 'package:did_app/infrastructure/credential/revocation_status.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'eidas_provider.freezed.dart';
-// part 'eidas_provider.g.dart'; // Removed as fromJson is not used yet
+part 'eidas_provider.g.dart';
 
 /// Provides an instance of the [infra_eidas_service.EidasCredentialService].
 ///
@@ -43,7 +42,7 @@ class EidasState with _$EidasState {
 
     /// Stores the revocation status checked during the last verification.
     /// Uses the local RevocationStatus from the infrastructure service, accessed via prefix.
-    revocation.RevocationStatus? revocationStatus,
+    RevocationStatus? revocationStatus,
 
     /// Timestamp of the last successful synchronization with the EU Trust Registry.
     DateTime? lastSyncDate,
@@ -64,12 +63,10 @@ class EidasState with _$EidasState {
     String? selectedCountry,
   }) = _EidasState;
 
-  // Private constructor needed for Freezed
-  // const EidasState._();
+  const EidasState._();
 
-  /// Creates an [EidasState] instance from a JSON map.
-  /// Add .g.dart part file and run build_runner if needed.
-  // factory EidasState.fromJson(Map<String, dynamic> json) => _$EidasStateFromJson(json);
+  factory EidasState.fromJson(Map<String, dynamic> json) =>
+      _$EidasStateFromJson(json);
 }
 
 /// Provider for the StateNotifier managing eIDAS-related state and logic.
@@ -270,7 +267,7 @@ class EidasNotifier extends StateNotifier<EidasState> {
       final verificationResult =
           await _eidasService.verifyEidasCredential(credential);
 
-      revocation.RevocationStatus? revocationStatus;
+      RevocationStatus? revocationStatus;
       if (verificationResult.isValid) {
         // Use the injected _eidasService instance
         revocationStatus =
@@ -279,9 +276,8 @@ class EidasNotifier extends StateNotifier<EidasState> {
         if (revocationStatus.isRevoked) {
           final updatedResult = VerificationResult(
             isValid: false,
-            message: (verificationResult.message ?? "Verification OK") +
-                "; " +
-                revocationStatus.message, // Access properties directly
+            message:
+                '${verificationResult.message ?? 'Verification OK'}; ${revocationStatus.message}', // Access properties directly
           );
           state = state.copyWith(
             isLoading: false,
@@ -304,28 +300,36 @@ class EidasNotifier extends StateNotifier<EidasState> {
         isLoading: false,
         errorMessage: 'Error verifying eIDAS credential: $e',
         verificationResult: VerificationResult(
-            isValid: false, message: 'Verification failed: $e'),
+          isValid: false,
+          message: 'Verification failed: $e',
+        ),
         revocationStatus: null, // Reset revocation status on error
       );
     }
   }
 
   /// Filters the list of trusted issuers based on the selected country and/or trust level.
-  Future<void> filterTrustedIssuers(
-      {String? country, TrustLevel? level}) async {
+  Future<void> filterTrustedIssuers({
+    String? country,
+    TrustLevel? level,
+  }) async {
     state = state.copyWith(
-        isLoading: true, selectedCountry: country, selectedTrustLevel: level);
+      isLoading: true,
+      selectedCountry: country,
+      selectedTrustLevel: level,
+    );
     try {
       // Use the injected _trustList instance
       final allIssuers = await _trustList.getAllTrustedIssuers();
 
-      List<TrustedIssuer> filteredIssuers = allIssuers;
+      var filteredIssuers = allIssuers;
 
       // Apply country filter
       if (country != null && country.isNotEmpty) {
         filteredIssuers = filteredIssuers
-            .where((issuer) =>
-                issuer.country.toLowerCase() == country.toLowerCase())
+            .where(
+              (issuer) => issuer.country.toLowerCase() == country.toLowerCase(),
+            )
             .toList();
       }
 
@@ -385,7 +389,7 @@ class EidasNotifier extends StateNotifier<EidasState> {
       final report = {
         'reportGenerated': DateTime.now().toIso8601String(),
         'status': 'Simulated - Requires Implementation',
-        'summary': 'Analyzes trust list for interoperability metrics.'
+        'summary': 'Analyzes trust list for interoperability metrics.',
       };
 
       state = state.copyWith(

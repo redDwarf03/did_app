@@ -1,6 +1,7 @@
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 /// Widget réutilisable pour afficher une carte d'attestation dans l'application
 class CredentialCard extends StatelessWidget {
@@ -34,6 +35,9 @@ class CredentialCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations =
+        Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+
     // Formatter les dates
     final dateFormat = DateFormat('dd/MM/yyyy');
     final issuedAt = credential.issuedAt != null
@@ -41,7 +45,7 @@ class CredentialCard extends StatelessWidget {
         : dateFormat.format(credential.issuanceDate);
     final expiresAt = credential.expiresAt != null
         ? dateFormat.format(credential.expiresAt!)
-        : 'Illimité';
+        : localizations.unlimited;
 
     // Couleur basée sur le statut de vérification
     final statusColor = _getStatusColor(credential.verificationStatus);
@@ -68,7 +72,7 @@ class CredentialCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      credential.name ?? 'Attestation',
+                      credential.name ?? localizations.defaultCredentialName,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -91,7 +95,7 @@ class CredentialCard extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(right: 4),
                             child: Tooltip(
-                              message: 'Supporte la preuve à divulgation nulle',
+                              message: localizations.zkpSupportTooltip,
                               child: Icon(
                                 Icons.lock,
                                 size: 14,
@@ -102,6 +106,7 @@ class CredentialCard extends StatelessWidget {
                         Text(
                           _getVerificationStatusText(
                             credential.verificationStatus,
+                            localizations,
                           ),
                           style: TextStyle(
                             fontSize: 12,
@@ -137,7 +142,7 @@ class CredentialCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        'Émetteur: ${credential.issuer}',
+                        '${localizations.issuerLabel}: ${credential.issuer}',
                         style: const TextStyle(fontSize: 14),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -156,7 +161,7 @@ class CredentialCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Émise le: $issuedAt',
+                      '${localizations.issuanceDateLabel}: $issuedAt',
                       style: const TextStyle(fontSize: 14),
                     ),
                     const SizedBox(width: 16),
@@ -170,7 +175,7 @@ class CredentialCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Expire le: $expiresAt',
+                            '${localizations.expirationDateLabel}: $expiresAt',
                             style: const TextStyle(fontSize: 14),
                           ),
                         ],
@@ -193,14 +198,14 @@ class CredentialCard extends StatelessWidget {
                   if (onPresent != null)
                     IconButton(
                       icon: const Icon(Icons.qr_code),
-                      tooltip: 'Présenter',
+                      tooltip: localizations.presentButton,
                       onPressed: onPresent,
                     ),
                   // Bouton de vérification
                   if (onVerify != null)
                     IconButton(
                       icon: const Icon(Icons.verified_user),
-                      tooltip: 'Vérifier authenticité',
+                      tooltip: localizations.verifyStatusButton,
                       onPressed: onVerify,
                     ),
                   // Menu pour édition et suppression
@@ -212,9 +217,9 @@ class CredentialCard extends StatelessWidget {
                         }
                       },
                       itemBuilder: (context) => [
-                        const PopupMenuItem<String>(
+                        PopupMenuItem<String>(
                           value: 'delete',
-                          child: Text('Supprimer'),
+                          child: Text(localizations.deleteButton),
                         ),
                       ],
                     ),
@@ -229,6 +234,8 @@ class CredentialCard extends StatelessWidget {
 
   // Construit un aperçu des claims (attributs) de l'attestation
   Widget _buildClaimsPreview(BuildContext context) {
+    final localizations =
+        Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     final claims = credential.claims;
     if (claims == null || claims.isEmpty) {
       return const SizedBox.shrink();
@@ -247,9 +254,9 @@ class CredentialCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Attributs:',
-            style: TextStyle(
+          Text(
+            localizations.credentialAttributesLabel,
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
               color: Colors.grey,
@@ -266,7 +273,7 @@ class CredentialCard extends StatelessWidget {
           // Afficher indication s'il y a d'autres attributs
           if (claims.length > 3)
             Text(
-              '+ ${claims.length - 3} autres',
+              '+ ${claims.length - 3} ${localizations.moreAttributes}',
               style: TextStyle(
                 fontSize: 10,
                 fontStyle: FontStyle.italic,
@@ -321,18 +328,19 @@ class CredentialCard extends StatelessWidget {
     }
   }
 
-  String _getVerificationStatusText(VerificationStatus status) {
+  String _getVerificationStatusText(
+      VerificationStatus status, AppLocalizations localizations) {
     switch (status) {
       case VerificationStatus.unverified:
-        return 'Non vérifié';
+        return localizations.notVerifiedStatus;
       case VerificationStatus.verified:
-        return 'Vérifié';
+        return localizations.verifiedStatus;
       case VerificationStatus.invalid:
-        return 'Invalide';
+        return localizations.invalidStatus;
       case VerificationStatus.expired:
-        return 'Expiré';
+        return localizations.expiredStatus;
       case VerificationStatus.revoked:
-        return 'Révoqué';
+        return localizations.revokedStatus;
     }
   }
 

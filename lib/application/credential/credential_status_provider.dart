@@ -169,7 +169,7 @@ class CredentialStatusNotifier extends StateNotifier<CredentialStatusState> {
     final needsRenewal = <Credential>{}; // Use a Set to avoid duplicates
 
     for (final credential in credentials) {
-      bool needsRenewalFlag = false;
+      var needsRenewalFlag = false;
       // 1. Check expiration date
       if (credential.expirationDate != null) {
         final timeToExpiry = credential.expirationDate!.difference(now);

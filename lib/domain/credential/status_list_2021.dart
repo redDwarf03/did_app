@@ -3,44 +3,52 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'status_list_2021.freezed.dart';
 part 'status_list_2021.g.dart';
 
-/// Represents a Verifiable Credential of type "StatusList2021Credential".
+/// Represents a Verifiable Credential of type `StatusList2021Credential`.
 ///
-/// This specific type of Verifiable Credential contains a bitstring (the status list)
-/// used to check the status (e.g., revoked, suspended) of other Verifiable Credentials.
-/// It provides a highly efficient way to manage the status of a large number of credentials.
+/// This specific type of Verifiable Credential acts as a container for a status list,
+/// typically represented as a compressed bitstring (the `encodedList` within its subject).
+/// It is used to efficiently check the status (e.g., revoked, suspended) of other
+/// Verifiable Credentials that reference it.
 ///
-/// Specification: https://w3c-ccg.github.io/vc-status-list-2021/
+/// Verifiers fetch this credential (using the URL provided in the `statusListCredential`
+/// property of a `StatusList2021Entry`) and check the bit at the specified `statusListIndex`
+/// within the decoded `encodedList` to determine the status.
+///
+/// Specification: <https://w3c-ccg.github.io/vc-status-list-2021/>
 @freezed
 class StatusList2021Credential with _$StatusList2021Credential {
   const factory StatusList2021Credential({
     /// The unique identifier (URI) for this Status List credential.
+    /// This is the URL that other credentials reference in their `statusListCredential` field.
     required String id,
 
-    /// The JSON-LD context(s). Must include the VC context and the StatusList2021 context.
-    /// e.g., ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/vc/status-list/2021/v1"]
+    /// The JSON-LD context(s). Must include the base VC context (`https://www.w3.org/2018/credentials/v1`)
+    /// and the StatusList2021 context (`https://w3id.org/vc/status-list/2021/v1`).
     @JsonKey(name: '@context') required List<String> context,
 
-    /// The type(s) of the credential. Must include "VerifiableCredential" and "StatusList2021Credential".
+    /// The type(s) of the credential. Must include `VerifiableCredential` and `StatusList2021Credential`.
     required List<String> type,
 
-    /// The DID or URI of the issuer of this status list credential.
+    /// The DID or URI of the issuer responsible for creating and maintaining this status list.
     required String issuer,
 
-    /// The date and time when this status list credential was issued.
+    /// The date and time when this specific version of the status list credential was issued.
+    /// Verifiers use this to determine the freshness of the status information.
     required DateTime issuanceDate,
 
-    /// An optional date and time after which this status list credential is no longer valid.
+    /// An optional date and time after which this status list credential (and the statuses it represents)
+    /// should no longer be considered valid.
     DateTime? expirationDate,
 
-    /// An optional human-readable description of the status list.
+    /// An optional human-readable description of the status list (e.g., "Revocation List for Employee Badges").
     String? description,
 
     /// The main subject of the credential, containing the actual status list data.
     /// See [StatusList2021Subject].
     required StatusList2021Subject credentialSubject,
 
-    /// The cryptographic proof (e.g., digital signature) that binds the credential
-    /// contents to the issuer and ensures integrity.
+    /// The cryptographic proof (e.g., digital signature) that ensures the integrity and authenticity
+    /// of the status list credential, binding its contents to the issuer.
     /// See [StatusList2021Proof].
     required StatusList2021Proof proof,
   }) = _StatusList2021Credential;
@@ -52,30 +60,33 @@ class StatusList2021Credential with _$StatusList2021Credential {
 
 /// Represents the `credentialSubject` property of a [StatusList2021Credential].
 ///
-/// This contains the core information about the status list itself, including the
-/// encoded bitstring representing the statuses.
+/// This object contains the core information about the status list itself, most importantly
+/// the `encodedList` which is a compressed bitstring representing the individual statuses.
 @freezed
 class StatusList2021Subject with _$StatusList2021Subject {
   const factory StatusList2021Subject({
-    /// An identifier for the subject, often the same as the credential ID or related.
+    /// An identifier for the subject, often constructed from the credential ID (e.g., `credentialId#list`).
     required String id,
 
-    /// The type of the credential subject. Must be "StatusList2021".
+    /// The type of the credential subject. Must be `StatusList2021`.
     required String type,
 
-    /// Specifies the purpose of the status entries (e.g., revocation, suspension).
+    /// Specifies the purpose of the status entries in this list (e.g., revocation, suspension).
+    /// This determines how the bits in the `encodedList` are interpreted.
     /// See [StatusPurpose].
     required StatusPurpose statusPurpose,
 
-    /// The encoding format used for the `encodedList`. Defaults to "base64url".
-    /// Other potential values might include "base64", although "base64url" is common.
+    /// Specifies the encoding format used for the `encodedList`. While the spec allows flexibility,
+    /// it's typically expected to be a format like base64url combined with a compression algorithm (e.g., GZip).
+    /// The exact method (compression + encoding) should ideally be discoverable or standardized.
+    /// Defaulting to 'base64url' assumes the consumer knows about potential compression.
     @Default('base64url') String encoding,
 
-    /// The core status list, represented as a compressed bitstring, encoded according
-    /// to the specified `encoding` (typically base64url).
-    /// Each bit in the decoded list corresponds to a specific `statusListIndex` from a
-    /// [StatusList2021Entry]. A '1' usually indicates the status applies (e.g., revoked),
-    /// while a '0' indicates it does not.
+    /// The core status list, represented as a compressed bitstring, typically encoded
+    /// using base64url after compression (e.g., GZip).
+    /// After decoding and decompressing, this yields a sequence of bits.
+    /// Each bit corresponds to a specific `statusListIndex` from a [StatusList2021Entry].
+    /// If `statusPurpose` is `revocation`, a '1' bit usually means revoked, '0' means not revoked.
     required String encodedList,
 
     // /// **Deprecated in Spec:** Optional validity period specifically for the status list.
@@ -93,27 +104,31 @@ class StatusList2021Subject with _$StatusList2021Subject {
       _$StatusList2021SubjectFromJson(json);
 }
 
-/// Represents the `proof` property of a [StatusList2021Credential].
+/// Represents the `proof` property required by a Verifiable Credential,
+/// specifically for a [StatusList2021Credential].
 ///
-/// Contains the cryptographic proof details, such as the signature type, creation date,
-/// verification method (issuer's key), proof purpose, and the signature value.
+/// Contains the details necessary to verify the integrity and authenticity of the
+/// status list credential, typically via a digital signature linked to the issuer.
 @freezed
 class StatusList2021Proof with _$StatusList2021Proof {
   const factory StatusList2021Proof({
-    /// The type of the cryptographic suite used for the proof (e.g., "Ed25519Signature2020").
+    /// The type of the cryptographic suite used for the proof (e.g., `Ed25519Signature2020`).
+    /// Determines the algorithms used for signing and verification.
     required String type,
 
-    /// The timestamp when the proof was generated.
+    /// The timestamp when the proof (signature) was generated.
     required DateTime created,
 
-    /// The DID URL identifying the verification method (e.g., public key) used to create the proof.
-    /// This is used by verifiers to check the signature.
+    /// The DID URL identifying the specific public key (verification method) of the issuer
+    /// used to create the proof. This is essential for verifiers to locate the correct key.
     required String verificationMethod,
 
-    /// The purpose for which the proof was created (e.g., "assertionMethod").
+    /// The relationship between the verification method and the issuer (e.g., `assertionMethod`)
+    /// indicating the purpose for which the key is authorized.
     required String proofPurpose,
 
-    /// The digital signature or proof value itself, typically encoded in base64url or multibase.
+    /// The digital signature or proof value itself, typically encoded in base64url or multibase format.
+    /// This value is verified against the credential data using the issuer's public key.
     required String proofValue,
   }) = _StatusList2021Proof;
 
@@ -138,45 +153,54 @@ class StatusList2021Proof with _$StatusList2021Proof {
 //       _$StatusList2021ValidityFromJson(json);
 // }
 
-/// Defines the intended meaning of the status values in the list.
+/// Defines the intended semantic meaning of the status values encoded in the status list.
+///
+/// This helps interpret the boolean value associated with a specific index in the decoded list.
 enum StatusPurpose {
   /// Indicates the status list is used to signal credential revocation.
-  /// A '1' at the corresponding index means the credential is revoked.
+  /// A '1' at the corresponding index typically means the credential IS revoked.
+  /// A '0' typically means the credential IS NOT revoked.
   @JsonValue('revocation')
   revocation,
 
   /// Indicates the status list is used to signal credential suspension.
-  /// A '1' at the corresponding index means the credential is suspended.
-  /// (Note: Suspension is less common and support may vary).
+  /// A '1' at the corresponding index typically means the credential IS suspended.
+  /// A '0' typically means the credential IS NOT suspended.
+  /// (Note: Suspension purpose might be less commonly implemented than revocation).
   @JsonValue('suspension')
   suspension,
 }
 
-/// Represents the `credentialStatus` property within a Verifiable Credential
-/// that points to an entry in a [StatusList2021Credential].
+/// Represents the `credentialStatus` property as found within a standard Verifiable Credential
+/// when it uses the `StatusList2021` mechanism.
 ///
-/// This object tells a verifier where (which list and which index) to check
-/// the status of the credential it is embedded within.
+/// This object acts as a pointer, directing a verifier to the specific
+/// [StatusList2021Credential] (`statusListCredential`) and the exact position (`statusListIndex`)
+/// within that list to check for the status of the credential containing this entry.
 @freezed
 class StatusList2021Entry with _$StatusList2021Entry {
   const factory StatusList2021Entry({
-    /// The identifier for this status entry, typically the VC ID + '#status-<index>'.
+    /// A unique identifier for this status entry itself. Conventionally, this might be
+    /// constructed as `<statusListCredential_URL>#<statusListIndex>`.
     required String id,
 
-    /// The type of this status entry. Must be "StatusList2021".
-    /// (Note: The spec defines this as "StatusList2021", not "StatusList2021Entry").
+    /// The type of this status entry object. Must be `StatusList2021` according to the standard.
+    /// (Note: The class name is `StatusList2021Entry` for clarity in Dart, but the `type` field
+    /// in the JSON representation should be `StatusList2021`).
     @Default('StatusList2021') String type,
 
-    /// The purpose of the status check (e.g., "revocation"). Should match the
-    /// `statusPurpose` of the referenced [StatusList2021Credential].
+    /// The purpose of the status check (e.g., "revocation"). This MUST match the
+    /// `statusPurpose` declared in the `credentialSubject` of the referenced
+    /// [StatusList2021Credential] for the check to be valid.
     /// See [StatusPurpose].
     required StatusPurpose statusPurpose,
 
-    /// The URL (typically the `id`) of the [StatusList2021Credential] containing the relevant status list.
+    /// The URL (or DID) identifying the [StatusList2021Credential] that holds the
+    /// actual bitstring list relevant to this credential.
     required String statusListCredential,
 
-    /// The zero-based index of the bit within the `encodedList` (after decoding)
-    /// that represents the status of the credential containing this entry.
+    /// The zero-based index of the bit within the `encodedList` (after decoding and decompression)
+    /// of the credential at `statusListCredential`. This bit represents the status.
     required int statusListIndex,
   }) = _StatusList2021Entry;
 

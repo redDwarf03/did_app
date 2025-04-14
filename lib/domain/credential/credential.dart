@@ -5,21 +5,34 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'credential.freezed.dart';
 part 'credential.g.dart';
 
-/// Represents the verification status of a Verifiable Credential.
+/// Represents the verification status of a Verifiable Credential, typically reflecting
+/// *local* checks performed by the application.
+///
+/// This status covers aspects like signature verification, structural validity,
+/// and expiration based on the credential's own data. It might also reflect the
+/// revocation status known from the *last* external check.
+///
+/// **Important:** For the *current, authoritative* revocation status, the mechanism
+/// specified in the credential's `status` field (e.g., StatusList2021) MUST be checked.
+/// The detailed result of such an external check is typically stored and managed
+/// using the [CredentialStatus] model (from `credential_status.dart`).
 enum VerificationStatus {
-  /// The verification status has not been determined yet.
+  /// The verification status has not been determined yet (initial state).
   unverified,
 
-  /// The credential has been successfully verified.
+  /// The credential's signature and structure have been successfully verified locally.
+  /// This does *not* guarantee the credential is not revoked or expired.
   verified,
 
-  /// The credential failed verification (e.g., signature mismatch, invalid structure).
+  /// The credential failed local verification (e.g., signature mismatch, invalid structure).
   invalid,
 
   /// The credential has expired based on its `expirationDate`.
   expired,
 
-  /// The credential has been revoked by the issuer.
+  /// The credential was found to be revoked during the *last* external status check.
+  /// **Note:** This status might be stale. Always consult the associated [CredentialStatus]
+  /// object for the latest revocation information and check timestamp.
   revoked,
 }
 
@@ -109,25 +122,9 @@ class Credential with _$Credential {
     /// Corresponds to the `expirationDate` property in the W3C VC Data Model.
     DateTime? expirationDate,
 
-    /// **DEPRECATED:** Use the `status` field instead.
-    /// URL pointing to the Status List 2021 credential used for revocation checks.
-    /// Part of the `credentialStatus` mechanism (StatusList2021Entry type).
-    /// See: https://w3c-ccg.github.io/vc-status-list-2021/
-    @Deprecated(
-      'Use status field instead which contains the full StatusList2021Entry object',
-    )
-    String? statusListUrl,
-
-    /// **DEPRECATED:** Use the `status` field instead.
-    /// Index within the Status List 2021 bitstring.
-    /// Part of the `credentialStatus` mechanism (StatusList2021Entry type).
-    @Deprecated(
-      'Use status field instead which contains the full StatusList2021Entry object',
-    )
-    int? statusListIndex,
-
-    /// The current verification status of the credential (a local assessment). OPTIONAL.
-    /// This is application-specific and not part of the core W3C VC model's properties.
+    /// The current *local* verification status of the credential.
+    /// Reflects checks like signature validity and expiration.
+    /// See [VerificationStatus] documentation for details and distinction from external status checks.
     @Default(VerificationStatus.unverified)
     VerificationStatus verificationStatus,
 

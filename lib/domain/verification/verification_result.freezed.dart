@@ -14,6 +14,10 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
+VerificationResult _$VerificationResultFromJson(Map<String, dynamic> json) {
+  return _VerificationResult.fromJson(json);
+}
+
 /// @nodoc
 mixin _$VerificationResult {
   /// Whether the verification was successful.
@@ -21,6 +25,9 @@ mixin _$VerificationResult {
 
   /// An optional message providing details about the verification outcome (e.g., error reason).
   String? get message => throw _privateConstructorUsedError;
+
+  /// Serializes this VerificationResult to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of VerificationResult
   /// with the given fields replaced by the non-null parameter values.
@@ -110,10 +117,13 @@ class __$$VerificationResultImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _$VerificationResultImpl extends _VerificationResult {
   const _$VerificationResultImpl({required this.isValid, this.message})
       : super._();
+
+  factory _$VerificationResultImpl.fromJson(Map<String, dynamic> json) =>
+      _$$VerificationResultImplFromJson(json);
 
   /// Whether the verification was successful.
   @override
@@ -137,6 +147,7 @@ class _$VerificationResultImpl extends _VerificationResult {
             (identical(other.message, message) || other.message == message));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, isValid, message);
 
@@ -148,6 +159,13 @@ class _$VerificationResultImpl extends _VerificationResult {
   _$$VerificationResultImplCopyWith<_$VerificationResultImpl> get copyWith =>
       __$$VerificationResultImplCopyWithImpl<_$VerificationResultImpl>(
           this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$VerificationResultImplToJson(
+      this,
+    );
+  }
 }
 
 abstract class _VerificationResult extends VerificationResult {
@@ -155,6 +173,9 @@ abstract class _VerificationResult extends VerificationResult {
       {required final bool isValid,
       final String? message}) = _$VerificationResultImpl;
   const _VerificationResult._() : super._();
+
+  factory _VerificationResult.fromJson(Map<String, dynamic> json) =
+      _$VerificationResultImpl.fromJson;
 
   /// Whether the verification was successful.
   @override
