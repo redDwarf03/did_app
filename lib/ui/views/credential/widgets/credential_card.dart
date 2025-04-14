@@ -40,9 +40,7 @@ class CredentialCard extends StatelessWidget {
 
     // Formatter les dates
     final dateFormat = DateFormat('dd/MM/yyyy');
-    final issuedAt = credential.issuedAt != null
-        ? dateFormat.format(credential.issuedAt!)
-        : dateFormat.format(credential.issuanceDate);
+    final issuedAt = dateFormat.format(credential.issuedAt);
     final expiresAt = credential.expiresAt != null
         ? dateFormat.format(credential.expiresAt!)
         : localizations.unlimited;
@@ -237,7 +235,7 @@ class CredentialCard extends StatelessWidget {
     final localizations =
         Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     final claims = credential.claims;
-    if (claims == null || claims.isEmpty) {
+    if (claims.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -368,34 +366,6 @@ class CredentialCard extends StatelessWidget {
       return CredentialType.professionalBadge;
     } else {
       return CredentialType.other;
-    }
-  }
-
-  /// Obtient la couleur associée au type d'attestation
-  Color _getTypeColor(CredentialType type) {
-    switch (type) {
-      case CredentialType.identity:
-        return Colors.blue;
-      case CredentialType.diploma:
-        return Colors.amber;
-      case CredentialType.drivingLicense:
-        return Colors.green;
-      case CredentialType.ageVerification:
-        return Colors.purple;
-      case CredentialType.addressProof:
-        return Colors.brown;
-      case CredentialType.employmentProof:
-        return Colors.teal;
-      case CredentialType.professionalBadge:
-        return Colors.deepOrange;
-      case CredentialType.membershipCard:
-        return Colors.indigo;
-      case CredentialType.healthInsurance:
-        return Colors.red;
-      case CredentialType.medicalCertificate:
-        return Colors.pink;
-      case CredentialType.other:
-        return Colors.grey;
     }
   }
 }

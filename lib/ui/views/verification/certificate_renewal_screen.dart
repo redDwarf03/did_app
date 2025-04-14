@@ -349,12 +349,6 @@ class _CertificateRenewalScreenState
         final queryParams = <String, String>{};
 
         // Convert complex object to simple string parameters
-        final processJson = verificationProcess.toJson()
-          ..forEach((key, value) {
-            if (value != null) {
-              queryParams[key] = value.toString();
-            }
-          });
 
         await context.pushNamed(
           'verificationProcess',

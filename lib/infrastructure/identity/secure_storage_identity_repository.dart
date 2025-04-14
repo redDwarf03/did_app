@@ -10,6 +10,7 @@ import 'package:uuid/uuid.dart';
 /// for persisting the user's core [DigitalIdentity] profile.
 ///
 /// Stores the single identity profile as a JSON string under a specific key.
+/// Follows SSI principles by storing minimal identity data, with no PII directly included.
 class SecureStorageIdentityRepository implements IdentityRepository {
   /// Creates an instance of [SecureStorageIdentityRepository].
   /// Requires an instance of [FlutterSecureStorage].
@@ -25,7 +26,6 @@ class SecureStorageIdentityRepository implements IdentityRepository {
   @override
   Future<DigitalIdentity> createIdentity({
     required String displayName,
-    required PersonalInfo personalInfo,
   }) async {
     _logger.info('Attempting to create identity...');
     if (await hasIdentity()) {
@@ -41,18 +41,19 @@ class SecureStorageIdentityRepository implements IdentityRepository {
     final identity = DigitalIdentity(
       identityAddress: identityAddress,
       displayName: displayName,
-      personalInfo: personalInfo,
       createdAt: now,
       updatedAt: now,
+      // Default verification status
+      verificationStatus: IdentityVerificationStatus.unverified,
     );
 
     await _writeIdentity(identity);
     _logger.info(
-      'Successfully created and saved identity with address: $identityAddress',
-    );
+        'Successfully created and saved identity with address: $identityAddress');
     return identity;
   }
 
+  @override
   Future<void> deleteIdentity() async {
     _logger.info('Deleting identity...');
     if (!await hasIdentity()) {
@@ -89,9 +90,8 @@ class SecureStorageIdentityRepository implements IdentityRepository {
   }
 
   @override
-  Future<DigitalIdentity> updateIdentity({
-    required DigitalIdentity identity,
-  }) async {
+  Future<DigitalIdentity> updateIdentity(
+      {required DigitalIdentity identity}) async {
     _logger.info('Updating identity with address: ${identity.identityAddress}');
     if (!await hasIdentity()) {
       _logger.warning('Update failed: No identity found to update.');
@@ -121,10 +121,7 @@ class SecureStorageIdentityRepository implements IdentityRepository {
       return identity;
     } catch (e, stackTrace) {
       _logger.severe(
-        'Failed to read or parse identity from storage',
-        e,
-        stackTrace,
-      );
+          'Failed to read or parse identity from storage', e, stackTrace);
       // Optionally, delete corrupted data?
       // await _secureStorage.delete(key: _identityStorageKey);
       return null; // Return null on error
@@ -140,10 +137,7 @@ class SecureStorageIdentityRepository implements IdentityRepository {
       _logger.fine('Successfully wrote identity to storage.');
     } catch (e, stackTrace) {
       _logger.severe(
-        'Failed to encode or write identity to storage',
-        e,
-        stackTrace,
-      );
+          'Failed to encode or write identity to storage', e, stackTrace);
       throw Exception('Failed to save identity securely: $e');
     }
   }

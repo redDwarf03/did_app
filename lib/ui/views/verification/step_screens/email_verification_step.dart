@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:did_app/application/credential/providers.dart';
 import 'package:did_app/application/identity/providers.dart';
 import 'package:did_app/application/verification/providers.dart';
+import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/verification/verification_process.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -59,7 +61,24 @@ class _EmailVerificationStepState extends ConsumerState<EmailVerificationStep> {
   @override
   Widget build(BuildContext context) {
     final identityState = ref.watch(identityNotifierProvider);
-    final email = identityState.identity?.personalInfo.email ?? 'your email';
+    final credentialState = ref.watch(credentialNotifierProvider);
+
+    // Extract email from credentials
+    String email = 'your email';
+    if (identityState.identity != null && !credentialState.isLoading) {
+      // Get the identity's ID to find its credentials
+      final identityId = identityState.identity!.identityAddress;
+
+      // Find email credential for this identity
+      final emailCredential = credentialState.credentials.firstWhere(
+        (credential) =>
+            credential.credentialSubject['id'] == identityId &&
+            credential.type.contains('EmailCredential'),
+        orElse: Credential.empty,
+      );
+      email =
+          emailCredential.credentialSubject['email'] as String? ?? 'your email';
+    }
     final l10n = AppLocalizations.of(context)!;
 
     return Form(
@@ -314,7 +333,8 @@ class _EmailVerificationStepState extends ConsumerState<EmailVerificationStep> {
         await ref
             .read(verificationNotifierProvider.notifier)
             .submitVerificationStep(
-                documentPaths: []); // Pass empty list for documentPaths
+          documentPaths: [],
+        ); // Pass empty list for documentPaths
         // .submitVerificationStep(formData: {'email': _emailController.text, 'code': enteredCode}); // Alternative if formData was used
 
         // Show success message

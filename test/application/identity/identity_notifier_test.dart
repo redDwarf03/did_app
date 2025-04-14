@@ -8,15 +8,12 @@ import 'package:mocktail/mocktail.dart';
 // Create a mock IdentityRepository
 class MockIdentityRepository extends Mock implements IdentityRepository {}
 
-// Create Fake classes for Fallback registration
-class FakePersonalInfo extends Fake implements PersonalInfo {}
-
+// Create Fake class for Fallback registration
 class FakeDigitalIdentity extends Fake implements DigitalIdentity {}
 
 void main() {
   // Register fallback values BEFORE tests run
   setUpAll(() {
-    registerFallbackValue(FakePersonalInfo());
     registerFallbackValue(FakeDigitalIdentity());
   });
 
@@ -24,17 +21,10 @@ void main() {
   late ProviderContainer container;
   late IdentityNotifier notifier;
 
-  // Sample PersonalInfo for testing
-  const testPersonalInfo = PersonalInfo(
-    fullName: 'Test User',
-    email: 'test@example.com',
-  );
-
   // Sample DigitalIdentity for testing
   final testIdentity = DigitalIdentity(
     identityAddress: 'did:mock:123',
     displayName: 'Tester',
-    personalInfo: testPersonalInfo,
     createdAt: DateTime.now(),
     updatedAt: DateTime.now(),
   );
@@ -63,7 +53,6 @@ void main() {
     when(
       () => mockRepository.createIdentity(
         displayName: any(named: 'displayName'),
-        personalInfo: any(named: 'personalInfo'),
       ),
     ).thenAnswer((_) async => testIdentity);
     when(() => mockRepository.updateIdentity(identity: any(named: 'identity')))
@@ -117,7 +106,6 @@ void main() {
       when(
         () => mockRepository.createIdentity(
           displayName: any(named: 'displayName'),
-          personalInfo: any(named: 'personalInfo'),
         ),
       ).thenAnswer((_) async => testIdentity);
 
@@ -136,7 +124,6 @@ void main() {
       verify(
         () => mockRepository.createIdentity(
           displayName: 'Tester',
-          personalInfo: testPersonalInfo,
         ),
       ).called(1);
     });
@@ -174,7 +161,6 @@ void main() {
       verifyNever(
         () => mockRepository.createIdentity(
           displayName: any(named: 'displayName'),
-          personalInfo: any(named: 'personalInfo'),
         ),
       );
     });
@@ -186,7 +172,6 @@ void main() {
       when(
         () => mockRepository.createIdentity(
           displayName: any(named: 'displayName'),
-          personalInfo: any(named: 'personalInfo'),
         ),
       ).thenThrow(exception);
 
@@ -208,10 +193,9 @@ void main() {
 
     test('updateIdentity successful path', () async {
       // Arrange:
-      final updatedPersonalInfo =
-          testPersonalInfo.copyWith(fullName: 'Updated User');
       final updatedIdentity =
-          testIdentity.copyWith(personalInfo: updatedPersonalInfo);
+          testIdentity.copyWith(displayName: 'Updated Tester');
+
       // Override updateIdentity mock for success
       when(
         () => mockRepository.updateIdentity(identity: any(named: 'identity')),
@@ -222,13 +206,14 @@ void main() {
 
       // Act: Call updateIdentity
       await notifier.updateIdentity(
-        fullName: 'Updated User',
+        displayName: 'Updated Tester',
       );
 
       // Assert: Check state reflects the updated identity
       expect(notifier.state.isLoading, false);
       expect(notifier.state.identity, updatedIdentity);
       expect(notifier.state.errorMessage, null);
+
       // Verify that updateIdentity was called with the correctly updated object
       final captured = verify(
         () => mockRepository.updateIdentity(
@@ -237,10 +222,10 @@ void main() {
       ).captured;
       expect(captured.length, 1);
       final passedIdentity = captured.first as DigitalIdentity;
-      expect(passedIdentity.personalInfo.fullName, 'Updated User');
+      expect(passedIdentity.displayName, 'Updated Tester');
       expect(
-        passedIdentity.displayName,
-        testIdentity.displayName,
+        passedIdentity.identityAddress,
+        testIdentity.identityAddress,
       ); // Ensure non-updated fields remain
     });
 
@@ -260,7 +245,7 @@ void main() {
       // Assert: Check state shows error, identity is still null
       expect(notifier.state.isLoading, false);
       expect(notifier.state.identity, null);
-      expect(notifier.state.errorMessage, 'No identity found to update.');
+      expect(notifier.state.errorMessage, 'No identity exists to update.');
       verifyNever(
         () => mockRepository.updateIdentity(identity: any(named: 'identity')),
       );

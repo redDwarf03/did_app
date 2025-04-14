@@ -304,7 +304,6 @@ class CredentialStatusScreen extends ConsumerWidget {
       case CredentialType.professionalBadge:
         return Icons.badge;
       case CredentialType.other:
-      default:
         return Icons.badge;
     }
   }

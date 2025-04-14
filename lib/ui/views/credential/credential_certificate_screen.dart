@@ -293,7 +293,6 @@ class CredentialCertificateScreen extends ConsumerWidget {
     BuildContext context,
     AppLocalizations l10n,
   ) {
-    final theme = Theme.of(context);
     final subjectData = credential.credentialSubject;
     final widgets = <Widget>[];
 
@@ -484,9 +483,6 @@ class CredentialCertificateScreen extends ConsumerWidget {
   }
 
   Widget _buildCertificateInfo(BuildContext context, AppLocalizations l10n) {
-    final theme = Theme.of(context);
-    final dateFormat = DateFormat('dd/MM/yyyy');
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -526,7 +522,6 @@ class CredentialCertificateScreen extends ConsumerWidget {
   }
 
   Widget _buildValidityInfo(BuildContext context, AppLocalizations l10n) {
-    final theme = Theme.of(context);
     final dateFormat = DateFormat('dd/MM/yyyy');
 
     return Card(
@@ -639,7 +634,6 @@ class CredentialCertificateScreen extends ConsumerWidget {
       case CredentialType.professionalBadge:
         return Icons.badge;
       case CredentialType.other:
-      default:
         return Icons.badge;
     }
   }

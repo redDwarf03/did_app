@@ -141,8 +141,7 @@ class CertificateDetailsScreen extends ConsumerWidget {
                             certificate.signature,
                             l10n.proofSignatureLabel,
                           ),
-                          tooltip:
-                              l10n.copySignatureTooltip ?? 'Copy Signature',
+                          tooltip: l10n.copySignatureTooltip,
                           constraints: const BoxConstraints(),
                           padding: EdgeInsets.zero,
                         ),

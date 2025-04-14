@@ -199,7 +199,7 @@ class CertificatesDashboardScreen extends ConsumerWidget {
                           onPressed: () =>
                               _renewCertificate(context, certificate, l10n),
                           icon: const Icon(Icons.refresh, size: 18),
-                          label: Text(l10n.requestButton ?? 'Renew'),
+                          label: Text(l10n.requestButton),
                         ),
                     ],
                   ),

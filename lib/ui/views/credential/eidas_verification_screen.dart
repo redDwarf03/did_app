@@ -43,8 +43,9 @@ class _EidasVerificationScreenState
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(AppLocalizations.of(context)!.notEidasCredential),
-            backgroundColor: Colors.orange),
+          content: Text(AppLocalizations.of(context)!.notEidasCredential),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
@@ -259,9 +260,9 @@ class _EidasVerificationScreenState
                 _buildDetailRow(
                   l10n,
                   l10n.issuanceDateLabel,
-                  widget.credential.issuanceDate != null
-                      ? _formatDateTime(widget.credential.issuanceDate!)
-                      : 'N/A',
+                  _formatDateTime(
+                    widget.credential.issuanceDate,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 _buildDetailRow(
@@ -363,10 +364,10 @@ class _EidasVerificationScreenState
                         child: Row(
                           children: [
                             SizedBox(
-                                width: 20,
-                                height: 20,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2)),
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
                             SizedBox(width: 8),
                             Text('Checking issuer trust...'),
                           ],
@@ -375,7 +376,9 @@ class _EidasVerificationScreenState
                     }
                     final isTrusted = snapshot.data ?? false;
                     return _buildComplianceCheck(
-                        l10n.verifiedIssuer, isTrusted);
+                      l10n.verifiedIssuer,
+                      isTrusted,
+                    );
                   },
                 ),
 

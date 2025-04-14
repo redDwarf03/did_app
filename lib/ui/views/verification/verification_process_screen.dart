@@ -264,7 +264,7 @@ class _VerificationProcessScreenState
                 ),
                 ElevatedButton(
                   onPressed: () => _mockStepSubmission(l10n, currentStepIndex),
-                  child: Text(l10n.submitButton ?? 'Submit'),
+                  child: Text(l10n.submitButton),
                 ),
               ],
             ),
@@ -284,8 +284,7 @@ class _VerificationProcessScreenState
         ),
         content: SingleChildScrollView(
           child: Text(
-            'Help text for step ${step.id}' ??
-                'No specific help available for this step.',
+            'Help text for step ${step.id}',
           ),
         ),
         actions: [

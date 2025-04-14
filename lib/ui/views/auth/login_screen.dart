@@ -230,7 +230,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         label = 'Login with Iris Scan';
         break;
       case BiometricType.none:
-      default:
         icon = Icons.security;
         label = l10n.biometricsLogin;
         break;
@@ -249,12 +248,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget _buildDivider(AppLocalizations l10n) {
     return Row(
       children: [
-        Expanded(child: Divider()),
+        const Expanded(child: Divider()),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text(l10n.or, style: TextStyle(color: Colors.grey)),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(l10n.or, style: const TextStyle(color: Colors.grey)),
         ),
-        Expanded(child: Divider()),
+        const Expanded(child: Divider()),
       ],
     );
   }

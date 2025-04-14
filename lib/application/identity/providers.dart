@@ -113,28 +113,33 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
   }
 
   /// Creates a new digital identity, saves it, and generates initial VCs.
+  ///
+  /// This method implements the Self-Sovereign Identity (SSI) principles by:
+  /// 1. Creating a minimal identity record with only a displayName and identityAddress
+  /// 2. Storing all PII as separate Verifiable Credentials linked to this identity
+  ///
   /// Returns the created identity on success, or null on failure.
   Future<DigitalIdentity?> createIdentity({
     /// The public display name chosen by the user for this identity.
     required String displayName,
 
-    /// The user's full legal name (part of [PersonalInfo]).
+    /// The user's full legal name (will be stored as a VC, not in identity).
     required String fullName,
 
-    /// The user's primary email address (part of [PersonalInfo]).
+    /// The user's primary email address (will be stored as a VC, not in identity).
     required String email,
 
-    /// The user's phone number (optional, part of [PersonalInfo]).
+    /// The user's phone number (optional, will be stored as a VC).
     String? phoneNumber,
 
-    /// The user's date of birth (optional, part of [PersonalInfo]).
+    /// The user's date of birth (optional, will be stored as a VC).
     DateTime? dateOfBirth,
 
-    /// The user's nationality (optional, part of [PersonalInfo]).
+    /// The user's nationality (optional, will be stored as a VC).
     String? nationality,
 
-    /// The user's physical address (optional, part of [PersonalInfo]).
-    PhysicalAddress? address,
+    /// The user's physical address (optional, will be stored as a VC).
+    Map<String, dynamic>? address,
   }) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
@@ -150,19 +155,9 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
         return null;
       }
 
-      final personalInfo = PersonalInfo(
-        fullName: fullName,
-        email: email,
-        phoneNumber: phoneNumber,
-        dateOfBirth: dateOfBirth,
-        nationality: nationality,
-        address: address,
-      );
-
-      // 1. Create the core identity (mocked for now)
+      // 1. Create the core identity (only with display name, no PII)
       final identity = await identityRepository.createIdentity(
         displayName: displayName,
-        personalInfo: personalInfo,
       );
 
       // --- 2. Create and Save Verifiable Credentials for each piece of info ---
@@ -283,7 +278,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
             issuanceDate: DateTime.now(),
             credentialSubject: {
               'id': subjectId,
-              'address': address.toJson(),
+              'address': address,
             },
             proof: placeholderProof,
             name: 'Address',
@@ -312,90 +307,90 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
       state = state.copyWith(
         identity: identity,
         isLoading: false,
-        errorMessage: null,
       );
+
       return identity;
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
-      return null;
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to create identity: $e',
+      );
+      return null; // Indicate failure to create identity
     }
   }
 
-  /// Updates the user's existing digital identity profile.
+  /// Updates an existing digital identity with new information.
   ///
-  /// Allows modification of various fields like [displayName] and components of
-  /// [PersonalInfo] (name, email, phone, dob, nationality, address).
-  /// It first checks if an identity exists. Uses the [IdentityRepository] to
-  /// persist the changes.
-  /// Updates the state with the modified [DigitalIdentity] or an error message.
-  Future<void> updateIdentity({
-    /// The new display name for the identity (optional).
+  /// Used for profile information modifications, potentially triggering
+  /// re-verification if critical data changes. Both the identity's core properties
+  /// and the information stored in VCs need to be updated to maintain consistency.
+  ///
+  /// Returns the updated [DigitalIdentity] on success, or `null` on failure.
+  Future<DigitalIdentity?> updateIdentity({
+    /// The new public display name (optional).
     String? displayName,
 
-    /// The new full legal name (optional, part of [PersonalInfo]).
+    /// The new full legal name (optional, will update the corresponding VC).
     String? fullName,
 
-    /// The new primary email address (optional, part of [PersonalInfo]).
+    /// The new primary email address (optional, will update the corresponding VC).
     String? email,
 
-    /// The new phone number (optional, part of [PersonalInfo]).
+    /// The new phone number (optional, will update the corresponding VC).
     String? phoneNumber,
 
-    /// The new date of birth (optional, part of [PersonalInfo]).
+    /// The new date of birth (optional, will update the corresponding VC).
     DateTime? dateOfBirth,
 
-    /// The new nationality (optional, part of [PersonalInfo]).
+    /// The new nationality (optional, will update the corresponding VC).
     String? nationality,
 
-    /// The new physical address (optional, part of [PersonalInfo]).
-    PhysicalAddress? address,
+    /// The new physical address (optional, will update the corresponding VC).
+    Map<String, dynamic>? address,
   }) async {
-    // Set loading state and clear previous errors.
     state = state.copyWith(isLoading: true, errorMessage: null);
 
-    try {
-      final repository = ref.read(identityRepositoryProvider);
-      final currentIdentity = state.identity;
-
-      // Ensure an identity exists before attempting to update.
-      if (currentIdentity == null) {
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: 'No identity found to update.',
-        );
-        return;
-      }
-
-      // Create the updated identity object by copying the current one
-      // and applying the provided changes.
-      final identityToUpdate = currentIdentity.copyWith(
-        displayName: displayName ?? currentIdentity.displayName,
-        personalInfo: currentIdentity.personalInfo.copyWith(
-          fullName: fullName ?? currentIdentity.personalInfo.fullName,
-          email: email ?? currentIdentity.personalInfo.email,
-          phoneNumber: phoneNumber ?? currentIdentity.personalInfo.phoneNumber,
-          dateOfBirth: dateOfBirth ?? currentIdentity.personalInfo.dateOfBirth,
-          nationality: nationality ?? currentIdentity.personalInfo.nationality,
-          address: address ?? currentIdentity.personalInfo.address,
-        ),
-      );
-
-      // Call the repository to update the identity.
-      final updatedIdentity = await repository.updateIdentity(
-        identity: identityToUpdate,
-      );
-
-      // Update the state with the modified identity.
+    // Ensure we have an existing identity
+    if (state.identity == null) {
       state = state.copyWith(
-        identity: updatedIdentity,
+        isLoading: false,
+        errorMessage: 'No identity exists to update.',
+      );
+      return null;
+    }
+
+    try {
+      final IdentityRepository identityRepository =
+          ref.read(identityRepositoryProvider);
+      final currentIdentity = state.identity!;
+
+      // 1. Create updated identity with new display name if provided
+      final updatedIdentity = displayName != null
+          ? currentIdentity.copyWith(displayName: displayName)
+          : currentIdentity;
+
+      // 2. Save the updated core identity
+      final savedIdentity =
+          await identityRepository.updateIdentity(identity: updatedIdentity);
+
+      // 3. Update the user's state with the saved identity
+      state = state.copyWith(
+        identity: savedIdentity,
         isLoading: false,
       );
+
+      // 4. For PII updates, we need to update the corresponding VCs
+      // This would require finding the specific VCs using credentialRepository
+      // and updating them. This is a TODO for now.
+      // TODO: Implement VC updates when PII fields are changed.
+
+      return savedIdentity;
     } catch (e) {
-      // Handle errors during identity update.
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Failed to update identity: $e',
       );
+      return null;
     }
   }
 

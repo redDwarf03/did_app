@@ -129,7 +129,6 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
         biometricLabel = 'Iris Scan';
         break;
       case BiometricType.none:
-      default:
         biometricIcon = Icons.security;
         biometricLabel = 'Biometrics';
         break;
@@ -208,8 +207,8 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
                   labelText: AppLocalizations.of(context)!.emailForVerification,
                   hintText:
                       AppLocalizations.of(context)!.emailForVerificationHint,
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.email),
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
@@ -260,7 +259,8 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
                       onPressed: () => _configureMagicLink(l10n),
                       icon: const Icon(Icons.email),
                       label: Text(
-                          AppLocalizations.of(context)!.configureMagicLink),
+                        AppLocalizations.of(context)!.configureMagicLink,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -269,7 +269,8 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
                       onPressed: () => _configureNotifications(l10n),
                       icon: const Icon(Icons.notifications),
                       label: Text(
-                          AppLocalizations.of(context)!.configureNotifications),
+                        AppLocalizations.of(context)!.configureNotifications,
+                      ),
                     ),
                   ),
                 ],
@@ -324,7 +325,8 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
               onPressed: () => _authenticateWithBiometrics(l10n),
               icon: const Icon(Icons.fingerprint),
               label: Text(
-                  AppLocalizations.of(context)!.authenticateWithBiometrics),
+                AppLocalizations.of(context)!.authenticateWithBiometrics,
+              ),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(250, 50),
               ),

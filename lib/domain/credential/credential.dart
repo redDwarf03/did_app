@@ -174,6 +174,19 @@ class Credential with _$Credential {
   factory Credential.fromJson(Map<String, dynamic> json) =>
       _$CredentialFromJson(json);
 
+  /// Creates an empty Credential instance with minimal required fields.
+  /// Useful as a placeholder when no credential is available.
+  static Credential empty() {
+    return Credential(
+      id: '',
+      type: ['VerifiableCredential'],
+      issuer: '',
+      issuanceDate: DateTime.now(),
+      credentialSubject: {},
+      proof: {},
+    );
+  }
+
   /// Alias for `issuanceDate`. Provides semantic alternative.
   DateTime get issuedAt => issuanceDate;
 
