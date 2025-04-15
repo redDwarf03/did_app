@@ -350,3 +350,207 @@ abstract class _CredentialState implements CredentialState {
   _$$CredentialStateImplCopyWith<_$CredentialStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
+
+/// @nodoc
+mixin _$SimplifiedCredentialsState {
+  /// List of simplified credentials.
+  List<SimplifiedCredential> get credentials =>
+      throw _privateConstructorUsedError;
+
+  /// Loading indicator for simplified credential operations.
+  bool get isLoading => throw _privateConstructorUsedError;
+
+  /// Potential error message for simplified credential operations.
+  String? get error => throw _privateConstructorUsedError;
+
+  /// Create a copy of SimplifiedCredentialsState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $SimplifiedCredentialsStateCopyWith<SimplifiedCredentialsState>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SimplifiedCredentialsStateCopyWith<$Res> {
+  factory $SimplifiedCredentialsStateCopyWith(SimplifiedCredentialsState value,
+          $Res Function(SimplifiedCredentialsState) then) =
+      _$SimplifiedCredentialsStateCopyWithImpl<$Res,
+          SimplifiedCredentialsState>;
+  @useResult
+  $Res call(
+      {List<SimplifiedCredential> credentials, bool isLoading, String? error});
+}
+
+/// @nodoc
+class _$SimplifiedCredentialsStateCopyWithImpl<$Res,
+        $Val extends SimplifiedCredentialsState>
+    implements $SimplifiedCredentialsStateCopyWith<$Res> {
+  _$SimplifiedCredentialsStateCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of SimplifiedCredentialsState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? credentials = null,
+    Object? isLoading = null,
+    Object? error = freezed,
+  }) {
+    return _then(_value.copyWith(
+      credentials: null == credentials
+          ? _value.credentials
+          : credentials // ignore: cast_nullable_to_non_nullable
+              as List<SimplifiedCredential>,
+      isLoading: null == isLoading
+          ? _value.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      error: freezed == error
+          ? _value.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$SimplifiedCredentialsStateImplCopyWith<$Res>
+    implements $SimplifiedCredentialsStateCopyWith<$Res> {
+  factory _$$SimplifiedCredentialsStateImplCopyWith(
+          _$SimplifiedCredentialsStateImpl value,
+          $Res Function(_$SimplifiedCredentialsStateImpl) then) =
+      __$$SimplifiedCredentialsStateImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {List<SimplifiedCredential> credentials, bool isLoading, String? error});
+}
+
+/// @nodoc
+class __$$SimplifiedCredentialsStateImplCopyWithImpl<$Res>
+    extends _$SimplifiedCredentialsStateCopyWithImpl<$Res,
+        _$SimplifiedCredentialsStateImpl>
+    implements _$$SimplifiedCredentialsStateImplCopyWith<$Res> {
+  __$$SimplifiedCredentialsStateImplCopyWithImpl(
+      _$SimplifiedCredentialsStateImpl _value,
+      $Res Function(_$SimplifiedCredentialsStateImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of SimplifiedCredentialsState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? credentials = null,
+    Object? isLoading = null,
+    Object? error = freezed,
+  }) {
+    return _then(_$SimplifiedCredentialsStateImpl(
+      credentials: null == credentials
+          ? _value._credentials
+          : credentials // ignore: cast_nullable_to_non_nullable
+              as List<SimplifiedCredential>,
+      isLoading: null == isLoading
+          ? _value.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      error: freezed == error
+          ? _value.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SimplifiedCredentialsStateImpl implements _SimplifiedCredentialsState {
+  const _$SimplifiedCredentialsStateImpl(
+      {final List<SimplifiedCredential> credentials = const [],
+      this.isLoading = false,
+      this.error})
+      : _credentials = credentials;
+
+  /// List of simplified credentials.
+  final List<SimplifiedCredential> _credentials;
+
+  /// List of simplified credentials.
+  @override
+  @JsonKey()
+  List<SimplifiedCredential> get credentials {
+    if (_credentials is EqualUnmodifiableListView) return _credentials;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_credentials);
+  }
+
+  /// Loading indicator for simplified credential operations.
+  @override
+  @JsonKey()
+  final bool isLoading;
+
+  /// Potential error message for simplified credential operations.
+  @override
+  final String? error;
+
+  @override
+  String toString() {
+    return 'SimplifiedCredentialsState(credentials: $credentials, isLoading: $isLoading, error: $error)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SimplifiedCredentialsStateImpl &&
+            const DeepCollectionEquality()
+                .equals(other._credentials, _credentials) &&
+            (identical(other.isLoading, isLoading) ||
+                other.isLoading == isLoading) &&
+            (identical(other.error, error) || other.error == error));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType,
+      const DeepCollectionEquality().hash(_credentials), isLoading, error);
+
+  /// Create a copy of SimplifiedCredentialsState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SimplifiedCredentialsStateImplCopyWith<_$SimplifiedCredentialsStateImpl>
+      get copyWith => __$$SimplifiedCredentialsStateImplCopyWithImpl<
+          _$SimplifiedCredentialsStateImpl>(this, _$identity);
+}
+
+abstract class _SimplifiedCredentialsState
+    implements SimplifiedCredentialsState {
+  const factory _SimplifiedCredentialsState(
+      {final List<SimplifiedCredential> credentials,
+      final bool isLoading,
+      final String? error}) = _$SimplifiedCredentialsStateImpl;
+
+  /// List of simplified credentials.
+  @override
+  List<SimplifiedCredential> get credentials;
+
+  /// Loading indicator for simplified credential operations.
+  @override
+  bool get isLoading;
+
+  /// Potential error message for simplified credential operations.
+  @override
+  String? get error;
+
+  /// Create a copy of SimplifiedCredentialsState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$SimplifiedCredentialsStateImplCopyWith<_$SimplifiedCredentialsStateImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}

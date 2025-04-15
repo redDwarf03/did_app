@@ -3,8 +3,10 @@ import 'package:did_app/domain/credential/credential_status.dart';
 import 'package:did_app/infrastructure/credential/credential_status_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'credential_status_provider.freezed.dart';
+part 'credential_status_provider.g.dart';
 
 /// Provides an instance of [CredentialStatusService].
 ///
@@ -43,15 +45,21 @@ class CredentialStatusState with _$CredentialStatusState {
 /// It orchestrates status checks for single or multiple credentials,
 /// handles refreshing status lists, manages the state ([CredentialStatusState]),
 /// and provides helper methods related to credential validity and renewal.
-class CredentialStatusNotifier extends StateNotifier<CredentialStatusState> {
+@riverpod
+class CredentialStatusNotifier extends _$CredentialStatusNotifier {
   /// Creates an instance of [CredentialStatusNotifier].
   ///
   /// Requires a [Ref] to access other providers, primarily [credentialStatusServiceProvider].
   /// Initializes with an empty map of check results.
-  CredentialStatusNotifier(this._service)
-      : super(const CredentialStatusState(checkResults: {}));
+  @override
+  CredentialStatusState build() {
+    // Initial state
+    return const CredentialStatusState(checkResults: {});
+  }
 
-  final CredentialStatusService _service;
+  // Helper to get the service
+  CredentialStatusService get _service =>
+      ref.read(credentialStatusServiceProvider);
 
   /// Checks the revocation status of a single [Credential].
   ///
@@ -226,10 +234,3 @@ class CredentialStatusNotifier extends StateNotifier<CredentialStatusState> {
     }
   }
 }
-
-/// Provider for the [CredentialStatusNotifier].
-final credentialStatusNotifierProvider =
-    StateNotifierProvider<CredentialStatusNotifier, CredentialStatusState>(
-        (ref) {
-  return CredentialStatusNotifier(ref.read(credentialStatusServiceProvider));
-});

@@ -3,10 +3,11 @@ import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/credential/credential_repository.dart';
 import 'package:did_app/domain/credential/simplified_credential.dart';
 import 'package:did_app/infrastructure/credential/secure_storage_credential_repository.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.freezed.dart';
+part 'providers.g.dart';
 
 /// Provider for the implementation of [CredentialRepository].
 /// Handles operations for W3C Verifiable Credentials.
@@ -54,20 +55,20 @@ class CredentialState with _$CredentialState {
 }
 
 /// Provider for the StateNotifier that manages W3C Credentials.
-final credentialNotifierProvider =
-    StateNotifierProvider<CredentialNotifier, CredentialState>((ref) {
-  return CredentialNotifier(ref);
-});
 
 /// StateNotifier for managing W3C Verifiable Credentials and Presentations.
 /// Interacts with the [CredentialRepository] to perform CRUD operations
 /// and presentation creation.
-class CredentialNotifier extends StateNotifier<CredentialState> {
-  CredentialNotifier(this.ref) : super(const CredentialState()) {
-    loadCredentials();
+@Riverpod(keepAlive: true)
+class CredentialNotifier extends _$CredentialNotifier {
+  @override
+  CredentialState build() {
+    // Implement build method
+    // Load credentials asynchronously after initial build
+    Future.microtask(loadCredentials);
+    // Return the initial state
+    return const CredentialState();
   }
-
-  final Ref ref;
 
   /// Retrieves the list of W3C credentials, loading them if necessary.
   Future<List<Credential>> getCredentials() async {
@@ -344,47 +345,31 @@ final credentialsProvider = FutureProvider<List<Credential>>((ref) async {
 
 /// Provider for simplified credential state management.
 /// Handles basic, non-W3C credential structures used internally.
-final simplifiedCredentialsNotifierProvider = StateNotifierProvider<
-    SimplifiedCredentialsNotifier, SimplifiedCredentialsState>((ref) {
-  return SimplifiedCredentialsNotifier();
-});
 
 /// State class for simplified credentials.
-class SimplifiedCredentialsState {
-  SimplifiedCredentialsState({
-    this.credentials = const [],
-    this.isLoading = false,
-    this.error,
-  });
+@freezed
+class SimplifiedCredentialsState with _$SimplifiedCredentialsState {
+  const factory SimplifiedCredentialsState({
+    /// List of simplified credentials.
+    @Default([]) List<SimplifiedCredential> credentials,
 
-  /// List of simplified credentials.
-  final List<SimplifiedCredential> credentials;
+    /// Loading indicator for simplified credential operations.
+    @Default(false) bool isLoading,
 
-  /// Loading indicator for simplified credential operations.
-  final bool isLoading;
-
-  /// Potential error message for simplified credential operations.
-  final String? error;
-
-  SimplifiedCredentialsState copyWith({
-    List<SimplifiedCredential>? credentials,
-    bool? isLoading,
+    /// Potential error message for simplified credential operations.
     String? error,
-    bool? clearError,
-  }) {
-    return SimplifiedCredentialsState(
-      credentials: credentials ?? this.credentials,
-      isLoading: isLoading ?? this.isLoading,
-      error: clearError == true ? null : error ?? this.error,
-    );
-  }
+  }) = _SimplifiedCredentialsState;
 }
 
 /// Notifier class for simplified credential operations.
 /// Manages the state of internal, simplified credentials.
-class SimplifiedCredentialsNotifier
-    extends StateNotifier<SimplifiedCredentialsState> {
-  SimplifiedCredentialsNotifier() : super(SimplifiedCredentialsState());
+@riverpod
+class SimplifiedCredentialsNotifier extends _$SimplifiedCredentialsNotifier {
+  @override
+  SimplifiedCredentialsState build() {
+    // Return initial state
+    return const SimplifiedCredentialsState();
+  }
 
   // TODO: Implement actual logic if these simplified credentials need loading/saving.
   // Currently only has a mock request function.

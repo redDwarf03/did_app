@@ -8,6 +8,7 @@ import 'package:did_app/infrastructure/credential/eu_trust_registry_service.dart
 import 'package:did_app/infrastructure/credential/revocation_status.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'eidas_provider.freezed.dart';
 part 'eidas_provider.g.dart';
@@ -70,43 +71,36 @@ class EidasState with _$EidasState {
 }
 
 /// Provider for the StateNotifier managing eIDAS-related state and logic.
-final eidasNotifierProvider =
-    StateNotifierProvider<EidasNotifier, EidasState>((ref) {
-  // Read dependencies
-  final eidasService = ref.watch(eidasCredentialServiceProvider);
-  // Directly use the singleton for the real app, or read from a provider:
-  // final trustList = ref.watch(eidasTrustListProvider);
-  final trustList = EidasTrustList.instance; // Keep using singleton for now
-
-  // Inject dependencies into the notifier
-  return EidasNotifier(eidasService, trustList);
-});
-
-/// Manages state and orchestrates operations related to eIDAS compliance
-/// and interoperability features.
-///
-/// Interacts with [eidasCredentialServiceProvider], [EidasTrustList],
-/// and [EuTrustRegistryService] to perform tasks like verification,
-/// synchronization, filtering, and simulated EUDI Wallet interactions.
-class EidasNotifier extends StateNotifier<EidasState> {
+@riverpod
+class EidasNotifier extends _$EidasNotifier {
   /// Creates an instance of [EidasNotifier].
   ///
   /// Requires a [Ref] to access other providers.
   /// Immediately triggers checks for EUDI Wallet availability (simulated)
   /// and loads initial Trust List data.
-  EidasNotifier(
-    this._eidasService, // Inject EidasCredentialService
-    this._trustList, // Inject EidasTrustList
-  ) : super(const EidasState()) {
-    // On initialization, check EUDI Wallet availability
-    _checkEudiWalletAvailability();
-    // Load initial Trust List data using injected instance
-    _loadTrustListData();
+  @override
+  EidasState build() {
+    // Read dependencies inside build
+    // Note: Using watch here might cause rebuilds if dependencies change,
+    // consider using read if dependencies are stable or accessed only in methods.
+    final eidasService = ref.watch(eidasCredentialServiceProvider);
+    final trustList = EidasTrustList.instance; // Keep singleton for now
+
+    // Perform initial async setup
+    Future.microtask(() {
+      _checkEudiWalletAvailability();
+      _loadTrustListData(trustList); // Pass trustList
+    });
+
+    // Initial state
+    return const EidasState();
   }
 
-  final infra_eidas_service.EidasCredentialService
-      _eidasService; // Store injected service
-  final EidasTrustList _trustList; // Store injected trust list
+  // Accessors for dependencies
+  infra_eidas_service.EidasCredentialService get _eidasService =>
+      ref.read(eidasCredentialServiceProvider);
+  // Use singleton instance for now, or introduce a provider if needed
+  EidasTrustList get _trustList => EidasTrustList.instance;
 
   /// Simulates checking if the EUDI Wallet application is installed/available.
   /// In a real implementation, this would use platform-specific APIs.
@@ -118,13 +112,13 @@ class EidasNotifier extends StateNotifier<EidasState> {
 
   /// Loads initial data from the local Trust List cache.
   /// Fetches the last sync date, all issuers, and generates a report.
-  Future<void> _loadTrustListData() async {
+  Future<void> _loadTrustListData(EidasTrustList trustList) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      // Use the injected _trustList instance
-      final lastSyncDate = await _trustList.getLastSyncDate();
-      final trustedIssuers = await _trustList.getAllTrustedIssuers();
-      final trustListReport = await _trustList.generateTrustListReport();
+      // Use the passed trustList instance
+      final lastSyncDate = await trustList.getLastSyncDate();
+      final trustedIssuers = await trustList.getAllTrustedIssuers();
+      final trustListReport = await trustList.generateTrustListReport();
 
       state = state.copyWith(
         isLoading: false,
@@ -144,7 +138,8 @@ class EidasNotifier extends StateNotifier<EidasState> {
   /// Reloads data from the local Trust List cache.
   /// Same as the initial load, useful for manual refresh.
   Future<void> loadTrustList() async {
-    return _loadTrustListData();
+    // Access trustList via getter
+    return _loadTrustListData(_trustList);
   }
 
   /// Imports a credential from an eIDAS-formatted JSON string.
@@ -363,7 +358,7 @@ class EidasNotifier extends StateNotifier<EidasState> {
 
       if (syncSuccess) {
         // Reload local data after successful sync
-        await _loadTrustListData();
+        await _loadTrustListData(_trustList);
         // No need to call state.copyWith here as _loadTrustListData handles it
       } else {
         throw Exception('Synchronization with EU Trust Registry failed');
@@ -414,6 +409,6 @@ class EidasNotifier extends StateNotifier<EidasState> {
   void resetState() {
     state = const EidasState();
     _checkEudiWalletAvailability(); // Re-check availability
-    _loadTrustListData(); // Reload initial data
+    _loadTrustListData(_trustList); // Reload initial data
   }
 }

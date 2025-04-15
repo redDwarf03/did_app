@@ -84,7 +84,7 @@ class _CredentialPresentationScreenState
       ),
       body: Consumer(
         builder: (context, ref, child) {
-          final state = ref.watch(credentialPresentationProvider);
+          final state = ref.watch(credentialPresentationNotifierProvider);
 
           return Column(
             children: [

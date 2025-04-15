@@ -5,8 +5,10 @@ import 'package:did_app/domain/document/document_repository.dart';
 import 'package:did_app/infrastructure/document/mock_document_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.freezed.dart';
+part 'providers.g.dart';
 
 /// Provides an instance of [DocumentRepository].
 ///
@@ -50,28 +52,31 @@ class DocumentState with _$DocumentState {
 }
 
 /// Provider for the [DocumentNotifier] which manages the [DocumentState].
-final documentNotifierProvider =
-    StateNotifierProvider<DocumentNotifier, DocumentState>((ref) {
-  return DocumentNotifier(ref);
-});
 
 /// Manages the state and orchestrates operations related to user documents.
 ///
 /// Interacts with the [DocumentRepository] to load, add, update, delete,
 /// share, and manage document versions and access.
-class DocumentNotifier extends StateNotifier<DocumentState> {
+@riverpod
+class DocumentNotifier extends _$DocumentNotifier {
   /// Creates an instance of [DocumentNotifier].
   /// Requires a [Ref] to access the [documentRepositoryProvider].
-  DocumentNotifier(this.ref) : super(const DocumentState());
 
-  final Ref ref;
+  @override
+  DocumentState build() {
+    // Implement build method
+    // Initial state
+    return const DocumentState();
+  }
+
+  // Helper to get repository
+  DocumentRepository get _repository => ref.read(documentRepositoryProvider);
 
   /// Loads the list of documents owned by the specified identity.
   Future<void> loadDocuments(String identityAddress) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final repository = ref.read(documentRepositoryProvider);
-      final documents = await repository.getDocuments(identityAddress);
+      final documents = await _repository.getDocuments(identityAddress);
       state = state.copyWith(documents: documents, isLoading: false);
     } catch (e) {
       state = state.copyWith(
@@ -86,13 +91,12 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
     state = state.copyWith(
         isLoading: true, errorMessage: null, selectedDocument: null);
     try {
-      final repository = ref.read(documentRepositoryProvider);
-      final document = await repository.getDocument(documentId);
+      final document = await _repository.getDocument(documentId);
 
       if (document != null) {
         // Also load associated versions and shares created by the owner.
-        final versions = await repository.getDocumentVersions(documentId);
-        final shares = await repository.getDocumentShares(documentId);
+        final versions = await _repository.getDocumentVersions(documentId);
+        final shares = await _repository.getDocumentShares(documentId);
         state = state.copyWith(
           selectedDocument: document,
           documentVersions: versions,
@@ -133,8 +137,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
   }) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final repository = ref.read(documentRepositoryProvider);
-      final document = await repository.addDocument(
+      final document = await _repository.addDocument(
         identityAddress: identityAddress,
         fileBytes: fileBytes,
         fileName: fileName,
@@ -187,8 +190,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
   }) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final repository = ref.read(documentRepositoryProvider);
-      final updatedDocument = await repository.updateDocument(
+      final updatedDocument = await _repository.updateDocument(
         documentId: documentId,
         fileBytes: fileBytes,
         title: title,
@@ -208,7 +210,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
         final updatedDocuments = [...state.documents];
         updatedDocuments[index] = updatedDocument;
         // Reload versions to include the new one.
-        final versions = await repository.getDocumentVersions(documentId);
+        final versions = await _repository.getDocumentVersions(documentId);
         state = state.copyWith(
           documents: updatedDocuments,
           selectedDocument: updatedDocument,
@@ -237,8 +239,8 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
   Future<bool> deleteDocument(String documentId) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final repository = ref.read(documentRepositoryProvider);
-      final success = await repository.deleteDocument(documentId);
+      // final repository = ref.read(documentRepositoryProvider);
+      final success = await _repository.deleteDocument(documentId);
 
       if (success) {
         // Remove the document from the local list.
@@ -274,8 +276,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
   Future<Uint8List?> getDocumentContent(String documentId) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final repository = ref.read(documentRepositoryProvider);
-      final content = await repository.getDocumentContent(documentId);
+      final content = await _repository.getDocumentContent(documentId);
       state = state.copyWith(isLoading: false);
       return content;
     } catch (e) {
@@ -294,9 +295,8 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
   ) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final repository = ref.read(documentRepositoryProvider);
       final content =
-          await repository.getDocumentVersionContent(documentId, versionId);
+          await _repository.getDocumentVersionContent(documentId, versionId);
       state = state.copyWith(isLoading: false);
       return content;
     } catch (e) {
@@ -340,8 +340,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
 
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final repository = ref.read(documentRepositoryProvider);
-      final share = await repository.shareDocument(
+      final share = await _repository.shareDocument(
         documentId: documentId,
         recipientDescription: recipientDescription,
         recipientId: recipientId,
@@ -369,8 +368,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
   Future<bool> revokeShare(String shareId) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final repository = ref.read(documentRepositoryProvider);
-      final success = await repository.revokeDocumentShare(shareId);
+      final success = await _repository.revokeDocumentShare(shareId);
 
       if (success) {
         // Remove the share from the local list.
@@ -397,9 +395,8 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
   Future<void> loadSharedWithMe(String identityAddress) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final repository = ref.read(documentRepositoryProvider);
       // Fetches share records pointing to the current user.
-      final shares = await repository.getSharedWithMe(identityAddress);
+      final shares = await _repository.getSharedWithMe(identityAddress);
       state = state.copyWith(sharedWithMe: shares, isLoading: false);
     } catch (e) {
       state = state.copyWith(
@@ -417,8 +414,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
   ) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final repository = ref.read(documentRepositoryProvider);
-      final status = await repository.verifyDocumentAuthenticity(documentId);
+      final status = await _repository.verifyDocumentAuthenticity(documentId);
       state = state.copyWith(isLoading: false);
       // Note: Status is returned but not stored directly in the main state.
       // UI might display it temporarily.
@@ -441,8 +437,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
   }) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final repository = ref.read(documentRepositoryProvider);
-      final signedDocument = await repository.signDocument(
+      final signedDocument = await _repository.signDocument(
         documentId: documentId,
         signerIdentityAddress: signerIdentityAddress,
       );
@@ -480,9 +475,8 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
   ) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final repository = ref.read(documentRepositoryProvider);
       final document =
-          await repository.accessSharedDocument(shareUrl, accessCode);
+          await _repository.accessSharedDocument(shareUrl, accessCode);
 
       if (document != null) {
         // Document accessed successfully, potentially store it or display details.

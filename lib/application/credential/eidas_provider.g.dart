@@ -54,3 +54,28 @@ const _$TrustLevelEnumMap = {
   TrustLevel.substantial: 'substantial',
   TrustLevel.high: 'high',
 };
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$eidasNotifierHash() => r'd5ac15e3c89bf8705d9eb1a853cf5ee3b768f456';
+
+/// Provider for the StateNotifier managing eIDAS-related state and logic.
+///
+/// Copied from [EidasNotifier].
+@ProviderFor(EidasNotifier)
+final eidasNotifierProvider =
+    AutoDisposeNotifierProvider<EidasNotifier, EidasState>.internal(
+  EidasNotifier.new,
+  name: r'eidasNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$eidasNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$EidasNotifier = AutoDisposeNotifier<EidasState>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -3,8 +3,10 @@ import 'package:did_app/domain/verification/verification_repository.dart';
 import 'package:did_app/infrastructure/verification/mock_verification_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.freezed.dart';
+part 'providers.g.dart';
 // part 'providers.g.dart'; // Uncomment if serialization needed
 
 /// Provides an instance of [VerificationRepository].
@@ -62,29 +64,23 @@ class VerificationState with _$VerificationState {
   VerificationCertificate? get certificate {
     return verificationProcess?.certificate;
   }
-
-  // If serialization is needed:
-  // factory VerificationState.fromJson(Map<String, dynamic> json) =>
-  //     _$VerificationStateFromJson(json);
 }
 
-/// Provider for the [VerificationNotifier] which manages the [VerificationState].
-final verificationNotifierProvider =
-    StateNotifierProvider<VerificationNotifier, VerificationState>((ref) {
-  return VerificationNotifier(ref);
-});
-
-/// Manages the state and orchestrates operations related to the user identity
-/// verification process (e.g., KYC/AML).
-///
 /// Interacts with the [VerificationRepository] to load, start, and progress
 /// through verification steps.
-class VerificationNotifier extends StateNotifier<VerificationState> {
+@riverpod
+class VerificationNotifier extends _$VerificationNotifier {
   /// Creates an instance of [VerificationNotifier].
   /// Requires a [Ref] to access the [verificationRepositoryProvider].
-  VerificationNotifier(this.ref) : super(const VerificationState());
+  @override
+  VerificationState build() {
+    // Initial state
+    return const VerificationState();
+  }
 
-  final Ref ref;
+  // Helper to get repository
+  VerificationRepository get _repository =>
+      ref.read(verificationRepositoryProvider);
 
   /// Loads the current or most recent verification process associated with the given [identityAddress].
   ///
@@ -94,11 +90,10 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final repository = ref.read(verificationRepositoryProvider);
       final verification =
-          await repository.getVerificationProcess(identityAddress);
+          await _repository.getVerificationProcess(identityAddress);
 
-      int currentStepIndex = 0;
+      var currentStepIndex = 0;
       if (verification != null && verification.steps.isNotEmpty) {
         // Find the index of the first step not marked as completed.
         currentStepIndex = verification.steps.indexWhere(
@@ -133,10 +128,9 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final repository = ref.read(verificationRepositoryProvider);
-
       // Check if there's already an active verification process
-      final hasActive = await repository.hasActiveVerification(identityAddress);
+      final hasActive =
+          await _repository.hasActiveVerification(identityAddress);
       if (hasActive) {
         // Load the existing one instead of starting anew
         await loadVerification(identityAddress);
@@ -144,7 +138,7 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
       }
 
       // Start a new verification process
-      final verification = await repository.startVerification(identityAddress);
+      final verification = await _repository.startVerification(identityAddress);
 
       state = state.copyWith(
         verificationProcess: verification,
@@ -171,16 +165,15 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final repository = ref.read(verificationRepositoryProvider);
-
       // Check if there's already an active verification process
-      final hasActive = await repository.hasActiveVerification(identityAddress);
+      final hasActive =
+          await _repository.hasActiveVerification(identityAddress);
       if (hasActive) {
         // Consider if the existing process matches the requested level
         // If not, cancellation/restart logic might be needed (depends on policy)
         // Also check if the existing process level matches eidasLevel
         final existingProcess =
-            await repository.getVerificationProcess(identityAddress);
+            await _repository.getVerificationProcess(identityAddress);
         if (existingProcess?.certificate?.eidasLevel == eidasLevel) {
           await loadVerification(identityAddress);
           return;
@@ -194,7 +187,7 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
 
       // Start a new verification process with the specified level
       // TODO: Update repository interface if `startVerification` needs the level
-      final verification = await repository.startVerification(
+      final verification = await _repository.startVerification(
         identityAddress, // Pass level if required by repo method
         // level: eidasLevel, // Pass the domain level if required
       );
@@ -223,10 +216,9 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final repository = ref.read(verificationRepositoryProvider);
-
       // Check if there's already an active verification process
-      final hasActive = await repository.hasActiveVerification(identityAddress);
+      final hasActive =
+          await _repository.hasActiveVerification(identityAddress);
       if (hasActive) {
         await loadVerification(identityAddress);
         return;
@@ -234,7 +226,7 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
 
       // Start a new verification process, potentially marking it as renewal
       // TODO: Update repository interface if `startVerification` needs renewal info
-      final verification = await repository.startVerification(
+      final verification = await _repository.startVerification(
         identityAddress,
         // isRenewal: true,
         // previousCertificateId: previousCertificateId,
@@ -272,12 +264,11 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final repository = ref.read(verificationRepositoryProvider);
       final verificationId = state.verificationProcess!.id;
       final stepId = state.currentStep!.id;
 
       // Submit the step data to the repository
-      final updatedVerification = await repository.submitVerificationStep(
+      final updatedVerification = await _repository.submitVerificationStep(
         verificationId: verificationId,
         stepId: stepId,
         documentPaths: documentPaths,
@@ -286,7 +277,7 @@ class VerificationNotifier extends StateNotifier<VerificationState> {
       );
 
       // Determine the next step index after submission
-      int nextStepIndex = state.currentStepIndex;
+      var nextStepIndex = state.currentStepIndex;
       if (updatedVerification.steps.length > state.currentStepIndex) {
         // Find the first incomplete step starting from the current index
         final nextIncomplete = updatedVerification.steps.indexWhere(

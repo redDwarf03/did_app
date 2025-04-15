@@ -7,9 +7,11 @@ import 'package:did_app/infrastructure/credential/qualified_credential_service.d
     as infra;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 part 'credential_presentation_provider.freezed.dart';
+part 'credential_presentation_provider.g.dart';
 
 /// Represents the state for credential presentation management.
 @freezed
@@ -49,25 +51,29 @@ final qualifiedCredentialServiceProvider =
   (ref) => infra.QualifiedCredentialService(),
 );
 
-/// Provider for the [CredentialPresentationNotifier] which manages the [CredentialPresentationState].
-final credentialPresentationProvider = StateNotifierProvider<
-    CredentialPresentationNotifier, CredentialPresentationState>(
-  CredentialPresentationNotifier.new,
-);
-
 /// Manages the state and orchestrates operations related to creating and verifying
 /// Verifiable Presentations ([CredentialPresentation]).
 ///
 /// Interacts with identity, credential, and qualification services.
-class CredentialPresentationNotifier
-    extends StateNotifier<CredentialPresentationState> {
+@riverpod
+class CredentialPresentationNotifier extends _$CredentialPresentationNotifier {
   /// Creates an instance of [CredentialPresentationNotifier].
   /// Requires a [Ref] to access other providers.
-  CredentialPresentationNotifier(this._ref)
-      : super(const CredentialPresentationState()); // Use const constructor
+  @override
+  CredentialPresentationState build() {
+    // Initial state
+    return const CredentialPresentationState();
+  }
 
-  final Ref _ref;
   final _uuid = const Uuid();
+
+  // Helper getters for dependencies
+  IdentityNotifier get _identityNotifier =>
+      ref.read(identityNotifierProvider.notifier);
+  CredentialNotifier get _credentialNotifier =>
+      ref.read(credentialNotifierProvider.notifier);
+  infra.QualifiedCredentialService get _qualifiedCredentialService =>
+      ref.read(qualifiedCredentialServiceProvider);
 
   /// Creates a new Verifiable Presentation ([CredentialPresentation]) based on selected credentials.
   ///
@@ -90,7 +96,7 @@ class CredentialPresentationNotifier
 
     try {
       // Ensure user has an identity
-      final identity = _ref.read(identityNotifierProvider).identity;
+      final identity = _identityNotifier.state.identity;
       if (identity == null) {
         state = state.copyWith(
           loading: false,
@@ -100,7 +106,7 @@ class CredentialPresentationNotifier
       }
 
       // Retrieve and validate the selected credentials
-      final credentialState = _ref.read(credentialNotifierProvider);
+      final credentialState = _credentialNotifier.state;
       final credentials = <Credential>[];
 
       for (final id in credentialIds) {
@@ -123,9 +129,8 @@ class CredentialPresentationNotifier
       }
 
       // Check qualification status (e.g., eIDAS) if relevant
-      final qualifiedService = _ref.read(qualifiedCredentialServiceProvider);
       final qualifiedStatuses = await Future.wait(
-        credentials.map(qualifiedService.isQualified),
+        credentials.map(_qualifiedCredentialService.isQualified),
       );
 
       // Define JSON-LD contexts
@@ -255,13 +260,16 @@ class CredentialPresentationNotifier
     CredentialPresentation presentation,
   ) async {
     state = state.copyWith(
-        isValidating: true, verificationResult: null, error: null);
+      isValidating: true,
+      verificationResult: null,
+      error: null,
+    );
 
     try {
       // 1. Basic structural checks
       if (presentation.verifiableCredentials?.isEmpty ?? true) {
         // Check for null or empty
-        final result = VerificationResult(
+        const result = VerificationResult(
           isValid: false,
           message: 'Presentation contains no credentials',
         );
@@ -291,16 +299,14 @@ class CredentialPresentationNotifier
       final isEidasPresentation =
           presentation.type.contains('EidasPresentation');
       if (isEidasPresentation) {
-        final qualifiedService = _ref.read(qualifiedCredentialServiceProvider);
-
         // Ensure all credentials in an EidasPresentation are qualified
         final qualifiedStatuses = await Future.wait(
           presentation.verifiableCredentials! // Safe access
-              .map(qualifiedService.isQualified),
+              .map(_qualifiedCredentialService.isQualified),
         );
 
         if (!qualifiedStatuses.every((q) => q)) {
-          final result = VerificationResult(
+          const result = VerificationResult(
             isValid: false,
             message: 'EidasPresentation contains non-qualified credentials',
           );
@@ -315,7 +321,7 @@ class CredentialPresentationNotifier
       final isSignatureValid = await _verifySignature(presentation);
 
       if (!isSignatureValid) {
-        final result = VerificationResult(
+        const result = VerificationResult(
           isValid: false,
           message: 'Presentation signature is invalid',
         );
@@ -324,7 +330,7 @@ class CredentialPresentationNotifier
       }
 
       // All checks passed
-      final result = VerificationResult(
+      const result = VerificationResult(
         isValid: true,
         message: 'Presentation verified successfully',
       );
@@ -337,9 +343,10 @@ class CredentialPresentationNotifier
         message: 'Error during presentation verification: $e',
       );
       state = state.copyWith(
-          isValidating: false,
-          verificationResult: result,
-          error: result.message);
+        isValidating: false,
+        verificationResult: result,
+        error: result.message,
+      );
       return result;
     }
   }
@@ -354,7 +361,8 @@ class CredentialPresentationNotifier
   Future<bool> _verifySignature(CredentialPresentation presentation) async {
     // Simulate signature verification
     await Future.delayed(
-        const Duration(milliseconds: 150)); // Simulate async work
+      const Duration(milliseconds: 150),
+    ); // Simulate async work
 
     // TODO: Implement actual cryptographic verification based on presentation.proof
     // Steps:

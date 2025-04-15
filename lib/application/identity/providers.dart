@@ -1,14 +1,17 @@
 import 'package:did_app/application/credential/providers.dart';
 import 'package:did_app/application/secure_storage.dart';
 import 'package:did_app/domain/credential/credential.dart';
+import 'package:did_app/domain/credential/credential_repository.dart';
 import 'package:did_app/domain/identity/digital_identity.dart';
 import 'package:did_app/domain/identity/identity_repository.dart';
 import 'package:did_app/infrastructure/identity/secure_storage_identity_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 part 'providers.freezed.dart';
+part 'providers.g.dart';
 
 /// Provides an instance of [IdentityRepository].
 ///
@@ -52,11 +55,6 @@ class IdentityState with _$IdentityState {
 ///
 /// This StateNotifierProvider allows widgets to listen to changes in the [IdentityState]
 /// and access the [IdentityNotifier] to trigger identity-related actions.
-final identityNotifierProvider =
-    StateNotifierProvider<IdentityNotifier, IdentityState>((ref) {
-  // Creates the IdentityNotifier, passing the Riverpod Ref for dependency injection.
-  return IdentityNotifier(ref);
-});
 
 /// Manages the state ([IdentityState]) and orchestrates operations related to
 /// the user's core digital identity profile ([DigitalIdentity]).
@@ -65,20 +63,29 @@ final identityNotifierProvider =
 /// with identity management features. It uses the [IdentityRepository] provided
 /// by [identityRepositoryProvider] to perform actions like checking for an existing
 /// identity, creating a new one, updating it, and refreshing the data.
-class IdentityNotifier extends StateNotifier<IdentityState> {
+@Riverpod(keepAlive: true)
+class IdentityNotifier extends _$IdentityNotifier {
   /// Creates an instance of [IdentityNotifier].
   ///
   /// Requires a [Ref] to access the [identityRepositoryProvider].
   /// Upon initialization, it automatically calls [_checkForExistingIdentity]
   /// to load any pre-existing identity associated with the user/wallet.
-  IdentityNotifier(this.ref) : super(const IdentityState()) {
-    // Immediately check if an identity exists when the notifier is created.
-    _checkForExistingIdentity();
+
+  @override
+  IdentityState build() {
+    // Perform initial check asynchronously
+    Future.microtask(_checkForExistingIdentity);
+    // Initial state
+    return const IdentityState();
   }
 
-  /// Riverpod ref for accessing other providers, primarily [identityRepositoryProvider].
-  final Ref ref;
   final _uuid = const Uuid();
+
+  // Helper getters for dependencies
+  IdentityRepository get _identityRepository =>
+      ref.read(identityRepositoryProvider);
+  CredentialRepository get _credentialRepository =>
+      ref.read(credentialRepositoryProvider);
 
   /// Checks if a digital identity already exists for the current user/wallet.
   ///
@@ -89,12 +96,11 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final repository = ref.read(identityRepositoryProvider);
-      final hasIdentity = await repository.hasIdentity();
+      final hasIdentity = await _identityRepository.hasIdentity();
 
       if (hasIdentity) {
         // If identity exists, fetch and update the state.
-        final identity = await repository.getIdentity();
+        final identity = await _identityRepository.getIdentity();
         state = state.copyWith(
           identity: identity,
           isLoading: false,
@@ -144,9 +150,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final identityRepository = ref.read(identityRepositoryProvider);
-
-      final hasIdentity = await identityRepository.hasIdentity();
+      final hasIdentity = await _identityRepository.hasIdentity();
       if (hasIdentity) {
         state = state.copyWith(
           isLoading: false,
@@ -156,12 +160,11 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
       }
 
       // 1. Create the core identity (only with display name, no PII)
-      final identity = await identityRepository.createIdentity(
+      final identity = await _identityRepository.createIdentity(
         displayName: displayName,
       );
 
       // --- 2. Create and Save Verifiable Credentials for each piece of info ---
-      final credentialRepository = ref.read(credentialRepositoryProvider);
       final createdVCs = <Credential>[];
       final subjectId = identity.identityAddress;
       const issuerId = 'did:app:self';
@@ -189,7 +192,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
             name: 'Full Name',
             description: 'Verified full name',
           );
-          await credentialRepository.saveCredential(fullNameVC);
+          await _credentialRepository.saveCredential(fullNameVC);
           createdVCs.add(fullNameVC);
         }
 
@@ -208,7 +211,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
             name: 'Email Address',
             description: 'Verified email address',
           );
-          await credentialRepository.saveCredential(emailVC);
+          await _credentialRepository.saveCredential(emailVC);
           createdVCs.add(emailVC);
         }
 
@@ -227,7 +230,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
             name: 'Phone Number',
             description: 'Verified phone number',
           );
-          await credentialRepository.saveCredential(phoneVC);
+          await _credentialRepository.saveCredential(phoneVC);
           createdVCs.add(phoneVC);
         }
 
@@ -246,7 +249,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
             name: 'Date of Birth',
             description: 'Verified date of birth',
           );
-          await credentialRepository.saveCredential(dobVC);
+          await _credentialRepository.saveCredential(dobVC);
           createdVCs.add(dobVC);
         }
 
@@ -265,7 +268,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
             name: 'Nationality',
             description: 'Declared nationality',
           );
-          await credentialRepository.saveCredential(nationalityVC);
+          await _credentialRepository.saveCredential(nationalityVC);
           createdVCs.add(nationalityVC);
         }
 
@@ -284,7 +287,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
             name: 'Address',
             description: 'Verified address',
           );
-          await credentialRepository.saveCredential(addressVC);
+          await _credentialRepository.saveCredential(addressVC);
           createdVCs.add(addressVC);
         }
 
@@ -360,8 +363,6 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
     }
 
     try {
-      final IdentityRepository identityRepository =
-          ref.read(identityRepositoryProvider);
       final currentIdentity = state.identity!;
 
       // 1. Create updated identity with new display name if provided
@@ -371,7 +372,7 @@ class IdentityNotifier extends StateNotifier<IdentityState> {
 
       // 2. Save the updated core identity
       final savedIdentity =
-          await identityRepository.updateIdentity(identity: updatedIdentity);
+          await _identityRepository.updateIdentity(identity: updatedIdentity);
 
       // 3. Update the user's state with the saved identity
       state = state.copyWith(

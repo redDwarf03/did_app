@@ -19,10 +19,6 @@ final biometricAuthServiceProvider = Provider<BiometricAuthService>((ref) {
 /// This is the main provider to interact with for biometric authentication features
 /// in the UI layer. It manages the overall state, including availability,
 /// enabled status, and authentication results.
-// final biometricAuthStateProvider =
-//     StateNotifierProvider<BiometricAuthNotifier, BiometricAuthState>((ref) {
-//   return BiometricAuthNotifier(ref);
-// });
 
 /// Manages the state and logic for biometric authentication within the application.
 ///
@@ -35,11 +31,6 @@ class BiometricAuthNotifier extends _$BiometricAuthNotifier {
   /// Requires a [Ref] to read other providers, primarily [biometricAuthServiceProvider].
   /// It immediately calls [checkBiometricAvailability] upon initialization to
   /// determine the initial state.
-  // BiometricAuthNotifier(this._ref) : super(const BiometricAuthState()) {
-  //   // Check biometric availability upon initialization
-  //   checkBiometricAvailability();
-  // }
-  // final Ref _ref;
 
   @override
   BiometricAuthState build() {

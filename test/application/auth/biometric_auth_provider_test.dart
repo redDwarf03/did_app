@@ -24,7 +24,7 @@ void main() {
       ],
     );
     // Read the notifier to trigger initialization (calls checkBiometricAvailability)
-    notifier = container.read(biometricAuthStateProvider.notifier);
+    notifier = container.read(biometricAuthNotifierProvider.notifier);
     return container;
   }
 
