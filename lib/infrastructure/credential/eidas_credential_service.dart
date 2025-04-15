@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as dev;
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/credential/eidas_credential.dart';
 import 'package:did_app/domain/credential/qualified_credential.dart'; // Import for AssuranceLevel
@@ -31,7 +32,12 @@ class EidasCredentialService {
       }
     } catch (e) {
       // TODO: Log error
-      print("Error during import: $e");
+      dev.log(
+        'Error during credential import from JSON',
+        name: 'EidasCredentialService.importFromJson',
+        error: e,
+        level: 1000,
+      );
       return null;
     }
   }
@@ -126,11 +132,20 @@ class EidasCredentialService {
 
       // In a real implementation, use system APIs (e.g., platform channels)
       // to invoke the EUDI Wallet application via its sharing interface.
-      print('Simulating sharing with EUDI Wallet: $jsonString');
+      dev.log(
+        'Simulating sharing with EUDI Wallet', // Don't log the full credential
+        name: 'EidasCredentialService.shareWithEudiWallet',
+        level: 800, // Info level for simulation
+      );
       return true;
     } catch (e) {
       // TODO: Log error
-      print('Error sharing with EUDI Wallet: $e');
+      dev.log(
+        'Error sharing with EUDI Wallet',
+        name: 'EidasCredentialService.shareWithEudiWallet',
+        error: e,
+        level: 1000,
+      );
       return false;
     }
   }
@@ -145,12 +160,21 @@ class EidasCredentialService {
 
       // Simulation: load a sample eIDAS credential
       final jsonString = await _loadSampleEidasCredential();
-      print('Simulating receiving from EUDI Wallet: $jsonString');
+      dev.log(
+        'Simulating receiving from EUDI Wallet', // Don't log the full credential
+        name: 'EidasCredentialService.importFromEudiWallet',
+        level: 800, // Info level for simulation
+      );
 
       return importFromJson(jsonString);
     } catch (e) {
       // TODO: Log error
-      print("Error importing from EUDI Wallet: $e");
+      dev.log(
+        "Error importing from EUDI Wallet",
+        name: 'EidasCredentialService.importFromEudiWallet',
+        error: e,
+        level: 1000,
+      );
       return null;
     }
   }
@@ -243,6 +267,12 @@ class EidasCredentialService {
       );
     } catch (e) {
       // TODO: Log error
+      dev.log(
+        'Error during eIDAS credential verification for ${credential.id}',
+        name: 'EidasCredentialService.verifyEidasCredential',
+        error: e,
+        level: 1000,
+      );
       return domain.VerificationResult(
         isValid: false,
         message: 'Error during eIDAS credential verification: $e',

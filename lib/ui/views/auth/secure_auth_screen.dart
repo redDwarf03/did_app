@@ -29,7 +29,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(biometricAuthStateProvider);
+    final authState = ref.watch(biometricAuthNotifierProvider);
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -345,17 +345,19 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
 
   Future<void> _toggleBiometricAuth(bool enable) async {
     await ref
-        .read(biometricAuthStateProvider.notifier)
+        .read(biometricAuthNotifierProvider.notifier)
         .toggleBiometricAuth(enable);
   }
 
   void _toggleTwoFactorAuth(bool enable) {
-    ref.read(biometricAuthStateProvider.notifier).toggleTwoFactorAuth(enable);
+    ref
+        .read(biometricAuthNotifierProvider.notifier)
+        .toggleTwoFactorAuth(enable);
   }
 
   void _togglePasswordlessAuth(bool enable) {
     ref
-        .read(biometricAuthStateProvider.notifier)
+        .read(biometricAuthNotifierProvider.notifier)
         .togglePasswordlessAuth(enable);
   }
 
@@ -404,7 +406,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
       _errorMessage = null;
     });
 
-    final authState = ref.read(biometricAuthStateProvider);
+    final authState = ref.read(biometricAuthNotifierProvider);
 
     // Check if at least one authentication method is enabled
     if (!authState.isBiometricEnabled &&
@@ -426,7 +428,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
   Future<void> _authenticateWithBiometrics(AppLocalizations l10n) async {
     try {
       final success = await ref
-          .read(biometricAuthStateProvider.notifier)
+          .read(biometricAuthNotifierProvider.notifier)
           .authenticateWithBiometrics(
             reason: 'Authenticate to access the application',
           );
@@ -445,7 +447,7 @@ class _SecureAuthScreenState extends ConsumerState<SecureAuthScreen> {
           });
         }
       } else {
-        final authState = ref.read(biometricAuthStateProvider);
+        final authState = ref.read(biometricAuthNotifierProvider);
         setState(() {
           _errorMessage = authState.errorMessage ?? 'Authentication failed';
           _isTesting = false;

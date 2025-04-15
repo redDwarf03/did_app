@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
 import 'package:local_auth/local_auth.dart' as local_auth;
+import 'dart:developer' as dev;
 
 /// Service pour gérer l'authentification biométrique
 class BiometricAuthService {
@@ -19,7 +20,12 @@ class BiometricAuthService {
 
       return canAuthenticate;
     } catch (e) {
-      debugPrint('Erreur lors de la vérification de la biométrie: $e');
+      dev.log(
+        'Erreur lors de la vérification de la biométrie',
+        name: 'BiometricAuthService.isBiometricAvailable',
+        error: e,
+        level: 1000,
+      );
       return false;
     }
   }
@@ -41,7 +47,12 @@ class BiometricAuthService {
         }
       }).toList();
     } catch (e) {
-      debugPrint('Erreur lors de la récupération des biométries: $e');
+      dev.log(
+        'Erreur lors de la récupération des biométries',
+        name: 'BiometricAuthService.getAvailableBiometrics',
+        error: e,
+        level: 1000,
+      );
       return [];
     }
   }
@@ -87,8 +98,12 @@ class BiometricAuthService {
 
   /// Traite les exceptions spécifiques à la plateforme
   AuthResult _handlePlatformException(PlatformException exception) {
-    debugPrint(
-        "Erreur d'authentification: ${exception.code} - ${exception.message}",);
+    dev.log(
+      "Erreur d'authentification: ${exception.code} - ${exception.message}",
+      name: 'BiometricAuthService._handlePlatformException',
+      error: exception,
+      level: 900, // Error level for platform exceptions
+    );
 
     switch (exception.code) {
       case auth_error.notAvailable:
@@ -128,7 +143,6 @@ class BiometricAuthService {
 
 /// Résultat d'une authentification biométrique
 class AuthResult {
-
   AuthResult({
     required this.success,
     required this.status,

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -31,12 +32,20 @@ class TwoFactorAuthService {
       // Dans une implémentation réelle, cette fonction enverrait le code par email
       // en utilisant un service d'envoi d'emails (SendGrid, Mailgun, etc.)
       if (kDebugMode) {
-        print('Code OTP envoyé à $email: $code');
+        dev.log(
+          'Code OTP envoyé à $email: $code',
+          name: 'TwoFactorAuthService.sendOtp',
+        );
       }
 
       return true;
     } catch (e) {
-      debugPrint("Erreur lors de l'envoi du code OTP: $e");
+      dev.log(
+        'Erreur l\'envoi du code OTP',
+        name: 'TwoFactorAuthService.sendOtp',
+        error: e,
+        level: 1000,
+      );
       return false;
     }
   }
@@ -80,7 +89,12 @@ class TwoFactorAuthService {
         );
       }
     } catch (e) {
-      debugPrint('Erreur lors de la vérification du code OTP: $e');
+      dev.log(
+        'Erreur lors de la vérification du code OTP',
+        name: 'TwoFactorAuthService.verifyOtp',
+        error: e,
+        level: 1000,
+      );
       return OtpVerificationResult(
         isValid: false,
         message: 'Erreur lors de la vérification: $e',
@@ -108,7 +122,6 @@ class TwoFactorAuthService {
 
 /// Résultat de la vérification d'un code OTP
 class OtpVerificationResult {
-
   OtpVerificationResult({
     required this.isValid,
     required this.message,

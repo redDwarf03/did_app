@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as dev;
 
 import 'package:did_app/infrastructure/credential/eidas_trust_list.dart';
 import 'package:http/http.dart' as http;
@@ -6,7 +7,6 @@ import 'package:http/http.dart' as http;
 /// Service pour l'intégration avec le registre de confiance européen (EU Trust Registry)
 /// Implémente les fonctionnalités d'interopérabilité avec l'infrastructure officielle eIDAS 2.0
 class EuTrustRegistryService {
-
   // Constructeur privé pour le singleton
   EuTrustRegistryService._();
   // URLs des APIs du registre de confiance (à remplacer par les URLs officielles)
@@ -30,7 +30,8 @@ class EuTrustRegistryService {
       // Gestion des erreurs HTTP
       if (response.statusCode != 200) {
         throw Exception(
-            'Erreur lors de la récupération des émetteurs de confiance: ${response.statusCode}',);
+          'Erreur lors de la récupération des émetteurs de confiance: ${response.statusCode}',
+        );
       }
 
       // Pour la démo, on simule une réponse
@@ -38,21 +39,28 @@ class EuTrustRegistryService {
       return _simulateTrustedIssuersResponse();
     } catch (e) {
       // En cas d'erreur, on retourne une liste vide et on log l'erreur
-      print('Erreur lors de la récupération des émetteurs de confiance: $e');
+      dev.log(
+        'Erreur lors de la récupération des émetteurs de confiance',
+        name: 'EuTrustRegistryService.fetchTrustedIssuers',
+        error: e,
+        level: 1000,
+      );
       return [];
     }
   }
 
   /// Récupère les émetteurs de confiance d'un pays spécifique
   Future<List<TrustedIssuer>> fetchTrustedIssuersByCountry(
-      String countryCode,) async {
+    String countryCode,
+  ) async {
     try {
       final uri = Uri.parse('$_trustListEndpoint?country=$countryCode');
       final response = await _client.get(uri).timeout(_timeout);
 
       if (response.statusCode != 200) {
         throw Exception(
-            'Erreur lors de la récupération des émetteurs pour $countryCode: ${response.statusCode}',);
+          'Erreur lors de la récupération des émetteurs pour $countryCode: ${response.statusCode}',
+        );
       }
 
       // Pour la démo, on filtre manuellement
@@ -61,7 +69,12 @@ class EuTrustRegistryService {
           .where((issuer) => issuer.country == countryCode)
           .toList();
     } catch (e) {
-      print('Erreur lors de la récupération des émetteurs par pays: $e');
+      dev.log(
+        'Erreur lors de la récupération des émetteurs par pays',
+        name: 'EuTrustRegistryService.fetchTrustedIssuersByCountry',
+        error: e,
+        level: 1000,
+      );
       return [];
     }
   }
@@ -74,7 +87,8 @@ class EuTrustRegistryService {
 
       if (response.statusCode != 200) {
         throw Exception(
-            'Erreur lors de la récupération des schémas de confiance: ${response.statusCode}',);
+          'Erreur lors de la récupération des schémas de confiance: ${response.statusCode}',
+        );
       }
 
       // Pour la démo, on simule une réponse
@@ -111,7 +125,12 @@ class EuTrustRegistryService {
         ],
       };
     } catch (e) {
-      print('Erreur lors de la récupération des schémas de confiance: $e');
+      dev.log(
+        'Erreur lors de la récupération des schémas de confiance',
+        name: 'EuTrustRegistryService.fetchTrustSchemes',
+        error: e,
+        level: 1000,
+      );
       return {'schemes': []};
     }
   }
@@ -130,7 +149,8 @@ class EuTrustRegistryService {
 
       if (response.statusCode != 200) {
         throw Exception(
-            "Erreur lors de la vérification de l'émetteur: ${response.statusCode}",);
+          "Erreur lors de la vérification de l'émetteur: ${response.statusCode}",
+        );
       }
 
       // Pour la démo, on simule une réponse de vérification
@@ -148,7 +168,12 @@ class EuTrustRegistryService {
         },
       };
     } catch (e) {
-      print("Erreur lors de la vérification de l'émetteur: $e");
+      dev.log(
+        "Erreur lors de la vérification de l'émetteur",
+        name: 'EuTrustRegistryService.verifyTrustedIssuer',
+        error: e,
+        level: 1000,
+      );
       return {
         'isValid': false,
         'verification': {
@@ -186,7 +211,12 @@ class EuTrustRegistryService {
 
       return response.statusCode == 201 || response.statusCode == 202;
     } catch (e) {
-      print("Erreur lors de la soumission de l'émetteur: $e");
+      dev.log(
+        "Erreur lors de la soumission de l'émetteur",
+        name: 'EuTrustRegistryService.submitTrustedIssuer',
+        error: e,
+        level: 1000,
+      );
       return false;
     }
   }
@@ -205,7 +235,12 @@ class EuTrustRegistryService {
 
       return true;
     } catch (e) {
-      print('Erreur lors de la synchronisation de la liste de confiance: $e');
+      dev.log(
+        'Erreur lors de la synchronisation de la liste de confiance',
+        name: 'EuTrustRegistryService.synchronizeTrustList',
+        error: e,
+        level: 1000,
+      );
       return false;
     }
   }
@@ -227,7 +262,12 @@ class EuTrustRegistryService {
         'status': 'UP_TO_DATE',
       };
     } catch (e) {
-      print("Erreur lors de la génération du rapport d'interopérabilité: $e");
+      dev.log(
+        "Erreur lors de la génération du rapport d'interopérabilité",
+        name: 'EuTrustRegistryService.generateInteroperabilityReport',
+        error: e,
+        level: 1000,
+      );
       return {
         'timestamp': DateTime.now().toIso8601String(),
         'error': e.toString(),
@@ -331,7 +371,9 @@ class EuTrustRegistryService {
 
   /// Récupère le niveau de confiance d'un émetteur
   String? _getTrustLevelForIssuer(
-      String issuerId, List<TrustedIssuer> issuers,) {
+    String issuerId,
+    List<TrustedIssuer> issuers,
+  ) {
     final issuer = issuers.firstWhere(
       (i) => i.did == issuerId,
       orElse: () => issuers.first,

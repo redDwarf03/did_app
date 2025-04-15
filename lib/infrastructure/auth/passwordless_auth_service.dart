@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:developer' as dev;
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
@@ -39,12 +40,20 @@ class PasswordlessAuthService {
 
       // Dans une implémentation réelle, ce lien serait envoyé par email
       if (kDebugMode) {
-        print('Lien magique généré pour $email: $magicLink');
+        dev.log(
+          'Lien magique généré pour $email: $magicLink',
+          name: 'PasswordlessAuthService.generateMagicLink',
+        );
       }
 
       return magicLink;
     } catch (e) {
-      debugPrint('Erreur lors de la génération du lien magique: $e');
+      dev.log(
+        'Erreur lors de la génération du lien magique',
+        name: 'PasswordlessAuthService.generateMagicLink',
+        error: e,
+        level: 1000, // Severe level
+      );
       rethrow;
     }
   }
@@ -101,7 +110,12 @@ class PasswordlessAuthService {
         );
       }
     } catch (e) {
-      debugPrint('Erreur lors de la vérification du jeton: $e');
+      dev.log(
+        'Erreur lors de la vérification du jeton',
+        name: 'PasswordlessAuthService.verifyToken',
+        error: e,
+        level: 1000, // Severe level
+      );
       return AuthVerificationResult(
         isValid: false,
         message: 'Erreur lors de la vérification: $e',

@@ -4,6 +4,7 @@ import 'package:did_app/ui/views/auth/secure_auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// Login screen with support for different authentication methods
 class LoginScreen extends ConsumerStatefulWidget {
@@ -30,7 +31,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(biometricAuthStateProvider);
+    final authState = ref.watch(biometricAuthNotifierProvider);
     final isBiometricAvailable = authState.status != AuthStatus.unavailable &&
         authState.status != AuthStatus.notSetUp;
     final l10n = AppLocalizations.of(context)!;
@@ -345,7 +346,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       final success = await ref
-          .read(biometricAuthStateProvider.notifier)
+          .read(biometricAuthNotifierProvider.notifier)
           .authenticateWithBiometrics(
             reason: 'Authenticate to access your account',
           );
@@ -353,7 +354,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (success) {
         _navigateToHome(l10n);
       } else {
-        final authState = ref.read(biometricAuthStateProvider);
+        final authState = ref.read(biometricAuthNotifierProvider);
         setState(() {
           _isLoading = false;
           _errorMessage =

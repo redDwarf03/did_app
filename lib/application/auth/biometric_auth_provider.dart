@@ -1,6 +1,9 @@
 import 'package:did_app/domain/auth/biometric_auth_model.dart';
 import 'package:did_app/infrastructure/auth/biometric_auth_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'biometric_auth_provider.g.dart';
 
 /// Provides an instance of [BiometricAuthService].
 ///
@@ -16,27 +19,37 @@ final biometricAuthServiceProvider = Provider<BiometricAuthService>((ref) {
 /// This is the main provider to interact with for biometric authentication features
 /// in the UI layer. It manages the overall state, including availability,
 /// enabled status, and authentication results.
-final biometricAuthStateProvider =
-    StateNotifierProvider<BiometricAuthNotifier, BiometricAuthState>((ref) {
-  return BiometricAuthNotifier(ref);
-});
+// final biometricAuthStateProvider =
+//     StateNotifierProvider<BiometricAuthNotifier, BiometricAuthState>((ref) {
+//   return BiometricAuthNotifier(ref);
+// });
 
 /// Manages the state and logic for biometric authentication within the application.
 ///
 /// It interacts with the [BiometricAuthService] to check availability and perform
 /// authentication, and updates the [BiometricAuthState] accordingly.
-class BiometricAuthNotifier extends StateNotifier<BiometricAuthState> {
+@Riverpod(keepAlive: true)
+class BiometricAuthNotifier extends _$BiometricAuthNotifier {
   /// Creates an instance of [BiometricAuthNotifier].
   ///
   /// Requires a [Ref] to read other providers, primarily [biometricAuthServiceProvider].
   /// It immediately calls [checkBiometricAvailability] upon initialization to
   /// determine the initial state.
-  BiometricAuthNotifier(this._ref) : super(const BiometricAuthState()) {
-    // Check biometric availability upon initialization
-    checkBiometricAvailability();
-  }
+  // BiometricAuthNotifier(this._ref) : super(const BiometricAuthState()) {
+  //   // Check biometric availability upon initialization
+  //   checkBiometricAvailability();
+  // }
+  // final Ref _ref;
 
-  final Ref _ref;
+  @override
+  BiometricAuthState build() {
+    // Return the initial state
+    const initialState = BiometricAuthState();
+    // Perform async initialization *after* the initial build
+    // Using Future.microtask to ensure it runs after the build completes
+    Future.microtask(checkBiometricAvailability);
+    return initialState;
+  }
 
   /// Checks the availability and configuration of biometric authentication on the device.
   ///
@@ -46,7 +59,7 @@ class BiometricAuthNotifier extends StateNotifier<BiometricAuthState> {
   /// are unavailable/not set up.
   Future<void> checkBiometricAvailability() async {
     try {
-      final service = _ref.read(biometricAuthServiceProvider);
+      final service = ref.read(biometricAuthServiceProvider);
 
       // Check if biometrics are available on the device hardware/OS level.
       final isAvailable = await service.isBiometricAvailable();
@@ -162,7 +175,7 @@ class BiometricAuthNotifier extends StateNotifier<BiometricAuthState> {
         errorMessage: null,
       );
 
-      final service = _ref.read(biometricAuthServiceProvider);
+      final service = ref.read(biometricAuthServiceProvider);
       // Calls the infrastructure service to display the OS biometric prompt.
       final result = await service.authenticate(
         localizedReason: reason,

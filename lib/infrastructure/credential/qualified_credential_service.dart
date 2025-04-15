@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as dev;
 
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/credential/qualified_credential.dart';
@@ -89,6 +90,12 @@ class QualifiedCredentialService {
     } catch (e) {
       // In case of exception, the credential is not considered qualified
       // TODO: Log the error
+      dev.log(
+        'Error checking qualification status for credential ${credential.id}',
+        name: 'QualifiedCredentialService.isQualified',
+        error: e,
+        level: 900, // Error level
+      );
       return false;
     }
   }
@@ -237,6 +244,12 @@ class QualifiedCredentialService {
       );
     } catch (e) {
       // TODO: Log the error
+      dev.log(
+        'Error during qualified credential verification for ${qualifiedCredential.credential.id}',
+        name: 'QualifiedCredentialService.verifyQualifiedCredential',
+        error: e,
+        level: 1000, // Severe error level
+      );
       return domain.VerificationResult(
         isValid: false,
         message: 'Error during qualified credential verification: $e',
@@ -251,7 +264,11 @@ class QualifiedCredentialService {
     await Future.delayed(const Duration(seconds: 2));
     // In a real implementation, this would fetch the latest trust list
     // from _trustRegistryUrl and update the local _trustList cache/database.
-    print('Trust registry synchronization simulated.');
+    dev.log(
+      'Trust registry synchronization simulated.',
+      name: 'QualifiedCredentialService.syncTrustRegistry',
+      level: 800, // Info level for simulation message
+    );
   }
 
   // --- Private Helper Methods --- //

@@ -1,6 +1,7 @@
 import 'package:did_app/domain/credential/status_list_2021.dart';
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'dart:developer' as dev;
 
 part 'credential.freezed.dart';
 part 'credential.g.dart';
@@ -231,8 +232,9 @@ class Credential with _$Credential {
     final statusType = statusMap['type'] as String?;
     if (statusType != 'StatusList2021Entry' && statusType != 'StatusList2021') {
       if (kDebugMode) {
-        print(
+        dev.log(
           'Status check failed: status type "$statusType" is not StatusList2021Entry or StatusList2021.',
+          name: 'Credential.getStatusList2021Entry',
         );
       }
       return null;
@@ -263,8 +265,9 @@ class Credential with _$Credential {
         statusListIndex = int.tryParse(statusListIndexDynamic) ?? 0;
       } else {
         if (kDebugMode) {
-          print(
+          dev.log(
             'StatusList2021Entry parsing failed: statusListIndex is not a valid integer.',
+            name: 'Credential.getStatusList2021Entry',
           );
         }
         return null;
@@ -275,8 +278,10 @@ class Credential with _$Credential {
         (p) => p.name.toLowerCase() == statusPurposeStr.toLowerCase(),
         orElse: () {
           if (kDebugMode) {
-            print(
+            dev.log(
               'StatusList2021Entry parsing warning: Unknown statusPurpose "$statusPurposeStr", defaulting to revocation.',
+              name: 'Credential.getStatusList2021Entry',
+              level: 800, // Warning level
             );
           }
           return StatusPurpose
@@ -295,7 +300,13 @@ class Credential with _$Credential {
     } catch (e, stacktrace) {
       // Catch potential type errors or other exceptions during field access/parsing
       if (kDebugMode) {
-        print('Error parsing StatusList2021Entry: $e\n$stacktrace');
+        dev.log(
+          'Error parsing StatusList2021Entry',
+          name: 'Credential.getStatusList2021Entry',
+          error: e,
+          stackTrace: stacktrace,
+          level: 1000, // Severe level
+        );
       }
       return null; // Return null if any parsing step fails
     }
