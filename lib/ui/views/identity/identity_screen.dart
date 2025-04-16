@@ -27,7 +27,10 @@ class IdentityScreen extends ConsumerWidget {
   }
 
   Widget _buildContent(
-      BuildContext context, IdentityState state, AppLocalizations l10n,) {
+    BuildContext context,
+    IdentityState state,
+    AppLocalizations l10n,
+  ) {
     if (state.identity != null) {
       return _buildIdentityView(context, state.identity!, l10n);
     } else {
@@ -36,7 +39,10 @@ class IdentityScreen extends ConsumerWidget {
   }
 
   Widget _buildIdentityView(
-      BuildContext context, DigitalIdentity identity, AppLocalizations l10n,) {
+    BuildContext context,
+    DigitalIdentity identity,
+    AppLocalizations l10n,
+  ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -90,7 +96,9 @@ class IdentityScreen extends ConsumerWidget {
                         const SizedBox(width: 8),
                         Text(
                           _getVerificationLabel(
-                              identity.verificationStatus, l10n,),
+                            identity.verificationStatus,
+                            l10n,
+                          ),
                           style: TextStyle(
                             color: _getVerificationColor(
                               identity.verificationStatus,
@@ -298,7 +306,9 @@ class IdentityScreen extends ConsumerWidget {
   }
 
   String _getVerificationLabel(
-      IdentityVerificationStatus status, AppLocalizations l10n,) {
+    IdentityVerificationStatus status,
+    AppLocalizations l10n,
+  ) {
     switch (status) {
       case IdentityVerificationStatus.unverified:
         return l10n.identityVerificationStatusNotVerified;

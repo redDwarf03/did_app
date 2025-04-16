@@ -286,9 +286,9 @@ class MockVerificationRepository implements VerificationRepository {
         id: _generateMockId(),
         issuedAt: now,
         expiresAt: now.add(const Duration(days: 365)), // Valid for 1 year
-        issuer: 'Archethic Identity Authority',
-        signature: 'mock_digital_signature_${_generateMockId()}',
+        issuer: 'Mock Verification Authority',
         eidasLevel: EidasLevel.substantial,
+        signature: _generateMockSignature(),
       );
     } else if (updatedStatus == VerificationStatus.pendingReview) {
       // If we're still in review but not all steps are complete
@@ -306,6 +306,11 @@ class MockVerificationRepository implements VerificationRepository {
 
     // Update in our mock database
     _verifications[verificationId] = updatedVerification;
+  }
+
+  /// Generate a mock signature
+  String _generateMockSignature() {
+    return _generateMockId() + _generateMockId();
   }
 
   @override

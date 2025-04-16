@@ -248,10 +248,11 @@ class AWCDigitalIdentityRepository implements DigitalIdentityRepository {
       generateEncryptedSeedSC: generateEncryptedSeedSC, // Pass optional param
     );
 
-    final response = await _awcClient.sendTransaction(request);
+    // Send the request to AWC
+    final result = await _awcClient.sendTransaction(request);
 
-    // sendTransaction returns Result<SendTransactionResult, Failure>
-    response.when(
+    // Process the result
+    result.when(
       failure: (f) =>
           _logger.warning('Transaction signature failed: ${f.message}'),
       success: (r) => // r is SendTransactionResult
@@ -259,7 +260,7 @@ class AWCDigitalIdentityRepository implements DigitalIdentityRepository {
     );
     // Return the whole response object (Result<SendTransactionResult, Failure>)
     // or handle/transform it as needed. Returning dynamic allows flexibility.
-    return response;
+    return result;
   }
 
   @override

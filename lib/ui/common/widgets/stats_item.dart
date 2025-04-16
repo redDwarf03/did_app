@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Widget affichant une statistique simple avec icône, compteur et étiquette.
+/// Widget displaying a simple statistic with icon, count, and label.
 class StatsItem extends StatelessWidget {
   const StatsItem({
     required this.icon,

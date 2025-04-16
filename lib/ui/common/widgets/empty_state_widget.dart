@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Widget générique pour afficher un état vide (pas de données, etc.).
+/// Generic widget to display an empty state (no data, etc.).
 class EmptyStateWidget extends StatelessWidget {
   const EmptyStateWidget({
     required this.icon,

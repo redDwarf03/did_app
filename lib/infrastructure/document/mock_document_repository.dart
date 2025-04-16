@@ -273,14 +273,12 @@ class MockDocumentRepository implements DocumentRepository {
 
   @override
   Future<Uint8List> getDocumentContent(String documentId) async {
-    // Simulate network delay and decryption
-    await Future.delayed(const Duration(milliseconds: 500));
-
+    // Simulate network delay
+    await Future.delayed(const Duration(milliseconds: 300));
     final content = _documentContents[documentId];
     if (content == null) {
-      throw Exception('Document content not found');
+      throw Exception('Document content not found for ID: $documentId');
     }
-
     return content;
   }
 
@@ -297,14 +295,12 @@ class MockDocumentRepository implements DocumentRepository {
     String documentId,
     String versionId,
   ) async {
-    // Simulate network delay and decryption
-    await Future.delayed(const Duration(milliseconds: 500));
-
+    // Simulate network delay
+    await Future.delayed(const Duration(milliseconds: 300));
     final content = _versionContents[versionId];
     if (content == null) {
-      throw Exception('Version content not found');
+      throw Exception('Version content not found for ID: $versionId');
     }
-
     return content;
   }
 
@@ -493,57 +489,37 @@ class MockDocumentRepository implements DocumentRepository {
     String? accessCode,
   ) async {
     // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 700));
+    await Future.delayed(const Duration(milliseconds: 800));
 
-    // Find the share corresponding to the URL
-    final share = _documentShares.values.firstWhere(
-      (share) => share.shareUrl == shareUrl,
-      orElse: () => throw Exception('Share not found'),
-    );
+    // Extract share ID from URL
+    final shareId = shareUrl.split('/').last;
+    final share = _documentShares[shareId];
 
-    // Check if the share is active
-    if (!share.isActive) {
-      throw Exception('This share has been revoked');
+    if (share == null) {
+      throw Exception('Share link not found');
     }
 
-    // Check if the share has not expired
-    if (share.expiresAt.isBefore(DateTime.now())) {
-      throw Exception('This share has expired');
+    // Check expiration
+    if (share.expiresAt != null && share.expiresAt!.isBefore(DateTime.now())) {
+      throw Exception('Share link has expired');
     }
 
-    // Check the maximum number of accesses
+    // Check access code
+    if (share.accessCode != null && share.accessCode != accessCode) {
+      throw Exception('Invalid access code');
+    }
+
+    // Check access count
     if (share.maxAccessCount != null &&
         share.accessCount >= share.maxAccessCount!) {
-      throw Exception('Maximum number of accesses has been reached');
+      throw Exception('Share access limit reached');
     }
 
-    // Check access code if needed
-    if (share.accessCode != null && share.accessCode != accessCode) {
-      throw Exception('Incorrect access code');
-    }
+    // Increment access count by creating a new instance
+    final updatedShare = share.copyWith(accessCount: share.accessCount + 1);
+    _documentShares[shareId] = updatedShare;
 
-    // Create a new instance of the share with incremented counter and last access date
-    final updatedShare = DocumentShare(
-      id: share.id,
-      documentId: share.documentId,
-      documentTitle: share.documentTitle,
-      recipientId: share.recipientId,
-      recipientDescription: share.recipientDescription,
-      createdAt: share.createdAt,
-      expiresAt: share.expiresAt,
-      shareUrl: share.shareUrl,
-      accessCode: share.accessCode,
-      isActive: share.isActive,
-      maxAccessCount: share.maxAccessCount,
-      accessCount: share.accessCount + 1,
-      accessType: share.accessType,
-      lastAccessedAt: DateTime.now(),
-    );
-
-    // Update the share in the map
-    _documentShares[share.id] = updatedShare;
-
-    // Return the document
+    // Return the associated document
     return _documents[share.documentId];
   }
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Écran d'information sur le standard Status List 2021
+/// Information screen about the Status List 2021 standard
 class StatusList2021InfoScreen extends ConsumerWidget {
   const StatusList2021InfoScreen({super.key});
 

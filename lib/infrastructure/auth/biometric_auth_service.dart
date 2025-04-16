@@ -5,15 +5,15 @@ import 'package:local_auth/error_codes.dart' as auth_error;
 import 'package:local_auth/local_auth.dart' as local_auth;
 import 'dart:developer' as dev;
 
-/// Service pour gérer l'authentification biométrique
+/// Service for handling biometric authentication
 class BiometricAuthService {
   final local_auth.LocalAuthentication _localAuth =
       local_auth.LocalAuthentication();
 
-  /// Vérifie si l'authentification biométrique est disponible sur l'appareil
+  /// Checks if biometric authentication is available on the device
   Future<bool> isBiometricAvailable() async {
     try {
-      // Vérifie si le matériel prend en charge la biométrie
+      // Check if the hardware supports biometrics
       final canAuthenticateWithBiometrics = await _localAuth.canCheckBiometrics;
       final canAuthenticate =
           canAuthenticateWithBiometrics || await _localAuth.isDeviceSupported();
@@ -21,7 +21,7 @@ class BiometricAuthService {
       return canAuthenticate;
     } catch (e) {
       dev.log(
-        'Erreur lors de la vérification de la biométrie',
+        'Error retrieving biometrics',
         name: 'BiometricAuthService.isBiometricAvailable',
         error: e,
         level: 1000,
@@ -30,7 +30,7 @@ class BiometricAuthService {
     }
   }
 
-  /// Récupère les types de biométrie disponibles sur l'appareil
+  /// Retrieves the available biometric types on the device
   Future<List<BiometricType>> getAvailableBiometrics() async {
     try {
       final availableBiometrics = await _localAuth.getAvailableBiometrics();
@@ -48,7 +48,7 @@ class BiometricAuthService {
       }).toList();
     } catch (e) {
       dev.log(
-        'Erreur lors de la récupération des biométries',
+        'Error retrieving biometrics',
         name: 'BiometricAuthService.getAvailableBiometrics',
         error: e,
         level: 1000,
@@ -57,10 +57,9 @@ class BiometricAuthService {
     }
   }
 
-  /// Authentifie l'utilisateur avec la biométrie
+  /// Authenticates the user with biometrics
   Future<AuthResult> authenticate({
-    String localizedReason =
-        "Veuillez vous authentifier pour accéder à l'application",
+    String localizedReason = "Please authenticate to access the application",
     bool useErrorDialogs = true,
     bool stickyAuth = true,
   }) async {
@@ -82,7 +81,7 @@ class BiometricAuthService {
         return AuthResult(
           success: false,
           status: AuthStatus.failed,
-          message: 'Authentification annulée ou échouée',
+          message: 'Authentication cancelled or failed',
         );
       }
     } on PlatformException catch (e) {
@@ -91,15 +90,15 @@ class BiometricAuthService {
       return AuthResult(
         success: false,
         status: AuthStatus.failed,
-        message: 'Erreur inattendue: $e',
+        message: 'Unexpected error: $e',
       );
     }
   }
 
-  /// Traite les exceptions spécifiques à la plateforme
+  /// Handles platform-specific exceptions
   AuthResult _handlePlatformException(PlatformException exception) {
     dev.log(
-      "Erreur d'authentification: ${exception.code} - ${exception.message}",
+      "Authentication error: ${exception.code} - ${exception.message}",
       name: 'BiometricAuthService._handlePlatformException',
       error: exception,
       level: 900, // Error level for platform exceptions
@@ -110,38 +109,38 @@ class BiometricAuthService {
         return AuthResult(
           success: false,
           status: AuthStatus.unavailable,
-          message: "La biométrie n'est pas disponible sur cet appareil",
+          message: "Biometrics are not available on this device",
         );
       case auth_error.notEnrolled:
         return AuthResult(
           success: false,
           status: AuthStatus.notSetUp,
-          message: "Aucune biométrie n'est enregistrée sur cet appareil",
+          message: "No biometrics enrolled on this device",
         );
       case auth_error.lockedOut:
         return AuthResult(
           success: false,
           status: AuthStatus.failed,
-          message: 'Trop de tentatives échouées, veuillez réessayer plus tard',
+          message: 'Too many failed attempts, please try again later',
         );
       case auth_error.permanentlyLockedOut:
         return AuthResult(
           success: false,
           status: AuthStatus.failed,
           message:
-              "L'appareil est verrouillé de façon permanente. Veuillez le déverrouiller avec votre code PIN/Pattern/Mot de passe",
+              "The device is permanently locked. Please unlock it using your PIN/Pattern/Password",
         );
       default:
         return AuthResult(
           success: false,
           status: AuthStatus.failed,
-          message: 'Erreur: ${exception.message}',
+          message: 'Error: ${exception.message}',
         );
     }
   }
 }
 
-/// Résultat d'une authentification biométrique
+/// Result of a biometric authentication
 class AuthResult {
   AuthResult({
     required this.success,

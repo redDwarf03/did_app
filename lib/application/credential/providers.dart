@@ -278,7 +278,7 @@ class CredentialNotifier extends _$CredentialNotifier {
     }
   }
 
-  /// Partager une présentation
+  /// Share a presentation
   Future<String?> sharePresentation(String presentationId) async {
     state = state.copyWith(isLoading: true);
 
@@ -286,7 +286,7 @@ class CredentialNotifier extends _$CredentialNotifier {
       final repository = ref.read(credentialRepositoryProvider);
       final presentation = state.presentations.firstWhere(
         (p) => p.id == presentationId,
-        orElse: () => throw Exception('Présentation non trouvée'),
+        orElse: () => throw Exception('Presentation not found'),
       );
 
       final link = await repository.sharePresentation(presentation);
@@ -296,13 +296,13 @@ class CredentialNotifier extends _$CredentialNotifier {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Erreur lors de la génération du lien: $e',
+        errorMessage: 'Error generating link: $e',
       );
       return null;
     }
   }
 
-  /// Recevoir une attestation depuis un URI
+  /// Receive a credential from a URI
   Future<Credential?> receiveCredential(String uri) async {
     state = state.copyWith(isLoading: true);
 
@@ -310,7 +310,7 @@ class CredentialNotifier extends _$CredentialNotifier {
       final repository = ref.read(credentialRepositoryProvider);
       final credential = await repository.receiveCredential(uri);
 
-      // Ajouter l'attestation à la liste
+      // Add the credential to the list
       final updatedCredentials = [...state.credentials, credential];
 
       state = state.copyWith(
@@ -323,21 +323,21 @@ class CredentialNotifier extends _$CredentialNotifier {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: "Erreur lors de la réception de l'attestation: $e",
+        errorMessage: "Error receiving credential: $e",
       );
       return null;
     }
   }
 }
 
-/// Provider pour récupérer la liste des attestations
+/// Provider to retrieve the list of credentials
 final credentialsProvider = FutureProvider<List<Credential>>((ref) async {
   final repository = ref.watch(credentialRepositoryProvider);
 
   try {
     return await repository.getCredentials();
   } catch (e) {
-    throw Exception('Erreur lors de la récupération des attestations: $e');
+    throw Exception('Error retrieving credentials: $e');
   }
 });
 

@@ -7,7 +7,7 @@ import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-/// Écran pour interagir avec le registre de confiance européen
+/// Screen to interact with the European trust registry
 class EidasTrustRegistryScreen extends ConsumerStatefulWidget {
   const EidasTrustRegistryScreen({super.key});
 
@@ -86,45 +86,45 @@ class _EidasTrustRegistryScreenState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Bandeau d'information sur le registre
+                    // Information banner about the registry
                     _EidasTrustInfoBanner(l10n: l10n),
 
                     if (eidasState.errorMessage != null)
                       _buildErrorMessage(eidasState.errorMessage!),
 
-                    // Section synchro
+                    // Sync section
                     _buildSyncStatusCard(lastSyncDate, dateFormat, l10n),
 
                     const SizedBox(height: 16),
 
-                    // Section pour vérifier un émetteur
+                    // Section to verify an issuer
                     _buildIssuerVerificationCard(l10n),
 
                     const SizedBox(height: 16),
 
-                    // Section rapport de liste de confiance
+                    // Trust list report section
                     if (trustListReport != null)
                       _buildTrustListReportCard(trustListReport, l10n),
 
                     const SizedBox(height: 16),
 
-                    // Section schémas de confiance
+                    // Trust schemes section
                     _buildTrustSchemesCard(l10n),
 
                     const SizedBox(height: 16),
 
-                    // Section interopérabilité
+                    // Interoperability section
                     if (interopReport != null)
                       _buildInteropReportCard(interopReport, l10n),
 
                     const SizedBox(height: 16),
 
-                    // Section filtres
+                    // Filters section
                     _buildFilterCard(eidasState, l10n),
 
                     const SizedBox(height: 16),
 
-                    // Liste des émetteurs
+                    // List of issuers
                     _buildTrustedIssuersList(trustedIssuers, l10n),
                   ],
                 ),
@@ -810,7 +810,7 @@ class _EidasTrustRegistryScreenState
   }
 
   Future<void> _synchronizeWithEuRegistry() async {
-    await ref.read(eidasNotifierProvider.notifier).syncTrustRegistry();
+    await ref.read(eidasNotifierProvider.notifier).synchronizeTrustRegistry();
   }
 
   Future<void> _verifyIssuer(String issuerId) async {

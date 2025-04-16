@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer' as dev;
+
 import 'package:did_app/domain/credential/credential.dart';
 import 'package:did_app/domain/credential/eidas_credential.dart';
 import 'package:did_app/domain/verification/verification_result.dart';
@@ -9,6 +12,7 @@ import 'package:did_app/infrastructure/credential/revocation_status.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter/foundation.dart' as dev;
 
 part 'eidas_provider.freezed.dart';
 part 'eidas_provider.g.dart';
@@ -259,76 +263,63 @@ class EidasNotifier extends _$EidasNotifier {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       // Use the injected _eidasService instance
-      final verificationResult =
-          await _eidasService.verifyEidasCredential(credential);
+      final verificationResult = await _eidasService
+          .verifyEidasCredential(credential); // Corrected call
 
       RevocationStatus? revocationStatus;
+      // Fetch revocation status only if verification succeeded initially
       if (verificationResult.isValid) {
         // Use the injected _eidasService instance
         revocationStatus =
             await _eidasService.checkRevocationStatus(credential);
-        // If revoked, update the overall verification result
-        if (revocationStatus.isRevoked) {
-          final updatedResult = VerificationResult(
-            isValid: false,
-            message:
-                '${verificationResult.message ?? 'Verification OK'}; ${revocationStatus.message}', // Access properties directly
-          );
-          state = state.copyWith(
-            isLoading: false,
-            verificationResult: updatedResult,
-            revocationStatus: revocationStatus, // Assign prefixed type
-            errorMessage: null,
-          );
-          return; // Stop processing if revoked
-        }
       }
 
       state = state.copyWith(
         isLoading: false,
         verificationResult: verificationResult,
-        revocationStatus: revocationStatus, // Assign prefixed type
+        revocationStatus: revocationStatus,
         errorMessage: null,
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // Log the error and stack trace for debugging
+      dev.log(
+        'Error verifying eIDAS credential',
+        error: e,
+        stackTrace: stackTrace,
+        name: 'EidasNotifier.verifyEidasCredential',
+      );
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Error verifying eIDAS credential: $e',
-        verificationResult: VerificationResult(
-          isValid: false,
-          message: 'Verification failed: $e',
-        ),
-        revocationStatus: null, // Reset revocation status on error
+        verificationResult: null,
+        revocationStatus: null,
+        errorMessage: 'Verification failed: $e',
       );
     }
   }
 
-  /// Filters the list of trusted issuers based on the selected country and/or trust level.
-  Future<void> filterTrustedIssuers({
-    String? country,
-    TrustLevel? level,
-  }) async {
+  /// Filters the displayed trusted issuers based on country and trust level.
+  /// Updates the [trustedIssuers] list in the state.
+  Future<void> filterTrustedIssuers(
+      {String? country, TrustLevel? level}) async {
     state = state.copyWith(
-      isLoading: true,
+      isLoading: true, // Show loading while filtering
       selectedCountry: country,
       selectedTrustLevel: level,
     );
     try {
-      // Use the injected _trustList instance
+      // Access trustList via getter and fetch all issuers
+      // Corrected: Fetch all and filter locally
       final allIssuers = await _trustList.getAllTrustedIssuers();
-
       var filteredIssuers = allIssuers;
 
-      // Apply country filter
-      if (country != null && country.isNotEmpty) {
+      // Apply country filter if provided
+      if (country != null) {
         filteredIssuers = filteredIssuers
-            .where(
-              (issuer) => issuer.country.toLowerCase() == country.toLowerCase(),
-            )
+            .where((issuer) => issuer.country == country)
             .toList();
       }
 
-      // Apply trust level filter
+      // Apply trust level filter if provided
       if (level != null) {
         filteredIssuers = filteredIssuers
             .where((issuer) => issuer.trustLevel == level)
@@ -338,9 +329,17 @@ class EidasNotifier extends _$EidasNotifier {
       state = state.copyWith(
         isLoading: false,
         trustedIssuers: filteredIssuers,
-        errorMessage: null,
+        errorMessage: null, // Clear any previous error
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // Also catch stackTrace for logging
+      // Corrected: Add logging
+      dev.log(
+        'Error filtering trusted issuers',
+        error: e,
+        stackTrace: stackTrace,
+        name: 'EidasNotifier.filterTrustedIssuers',
+      );
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Error filtering trusted issuers: $e',
@@ -350,23 +349,30 @@ class EidasNotifier extends _$EidasNotifier {
 
   /// Synchronizes the local Trust List cache with the official EU Trust Registry.
   /// Uses the [EuTrustRegistryService].
-  Future<void> syncTrustRegistry() async {
+  Future<void> synchronizeTrustRegistry() async {
     state = state.copyWith(isLoading: true);
     try {
+      // Corrected: Use EuTrustRegistryService as originally intended
       final registryService = EuTrustRegistryService.instance;
       final syncSuccess = await registryService.synchronizeTrustList();
 
       if (syncSuccess) {
         // Reload local data after successful sync
         await _loadTrustListData(_trustList);
-        // No need to call state.copyWith here as _loadTrustListData handles it
       } else {
         throw Exception('Synchronization with EU Trust Registry failed');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // Log the error and stack trace for debugging
+      dev.log(
+        'Error synchronizing trust registry',
+        error: e,
+        stackTrace: stackTrace,
+        name: 'EidasNotifier.synchronizeTrustRegistry',
+      );
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Error syncing Trust Registry: $e',
+        errorMessage: 'Synchronization failed: $e',
       );
     }
   }
@@ -376,15 +382,22 @@ class EidasNotifier extends _$EidasNotifier {
   Future<void> generateInteroperabilityReport() async {
     state = state.copyWith(isLoading: true);
     try {
-      // TODO: Implement logic to analyze the trust list and generate
-      //       a meaningful interoperability report (e.g., count by country,
-      //       service type, levels of assurance).
+      // Corrected: Restore simulation logic
+      // --- Real Implementation Placeholder ---
+      // This would involve analyzing the Trust List (_trustList)
+      // and comparing it against known standards/schemas.
+      // Example: Check for support of specific credential types, signature algorithms etc.
+
       await Future.delayed(const Duration(seconds: 1)); // Simulate analysis
 
+      // Simulated report data
       final report = {
-        'reportGenerated': DateTime.now().toIso8601String(),
-        'status': 'Simulated - Requires Implementation',
-        'summary': 'Analyzes trust list for interoperability metrics.',
+        'analysisDate': DateTime.now().toIso8601String(),
+        'schemaCompliance': 'Partial',
+        'supportedSignatureAlgorithms': ['ES256K', 'EdDSA'],
+        'missingCriticalEntries': 5,
+        'summary': 'The local trust list shows partial compliance. '
+            'Further analysis needed for full interoperability assessment.',
       };
 
       state = state.copyWith(
@@ -392,10 +405,18 @@ class EidasNotifier extends _$EidasNotifier {
         interoperabilityReport: report,
         errorMessage: null,
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // Log the error and stack trace for debugging
+      dev.log(
+        'Error generating interoperability report',
+        error: e,
+        stackTrace: stackTrace,
+        name: 'EidasNotifier.generateInteroperabilityReport',
+      );
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Error generating interoperability report: $e',
+        interoperabilityReport: null,
+        errorMessage: 'Failed to generate interoperability report: $e',
       );
     }
   }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Widget de carte stylisée pour l'application
+/// Styled card widget for the application
 class AppCard extends StatelessWidget {
-
   const AppCard({
     super.key,
     this.title,
@@ -15,31 +14,32 @@ class AppCard extends StatelessWidget {
     this.expanded,
     this.onExpansionChanged,
   });
-  /// Titre de la carte
+
+  /// Card title
   final String? title;
 
-  /// Contenu de la carte
+  /// Card content
   final Widget child;
 
-  /// Couleur d'accent de la carte
+  /// Card accent color
   final Color? accentColor;
 
-  /// Action supplémentaire (icône en haut à droite)
+  /// Additional action (icon on the top right)
   final Widget? actionIcon;
 
-  /// Callback pour l'action supplémentaire
+  /// Callback for the additional action
   final VoidCallback? onActionPressed;
 
-  /// Élévation de la carte
+  /// Card elevation
   final double elevation;
 
-  /// Si la carte est expansible
+  /// If the card is expandable
   final bool isExpanded;
 
-  /// Si la carte est actuellement étendue (si expansible)
+  /// If the card is currently expanded (if expandable)
   final bool? expanded;
 
-  /// Callback lors de l'expansion
+  /// Callback during expansion
   final Function(bool)? onExpansionChanged;
 
   @override
@@ -47,7 +47,7 @@ class AppCard extends StatelessWidget {
     final theme = Theme.of(context);
     final color = accentColor ?? theme.primaryColor;
 
-    // Si la carte est expansible
+    // If the card is expandable
     if (isExpanded) {
       return Card(
         elevation: elevation,
@@ -78,7 +78,7 @@ class AppCard extends StatelessWidget {
       );
     }
 
-    // Carte standard
+    // Standard card
     return Card(
       elevation: elevation,
       clipBehavior: Clip.antiAlias,
@@ -108,7 +108,7 @@ class AppCard extends StatelessWidget {
             ),
             const Divider(),
           ],
-          // Contenu principal
+          // Main content
           child,
         ],
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 
-/// Bannière d'information pour les débutants
+/// Information banner for beginners
 class BeginnerInfoBanner extends StatelessWidget {
   const BeginnerInfoBanner({required this.onDismiss, super.key});
   final VoidCallback onDismiss;
@@ -58,7 +58,7 @@ class BeginnerInfoBanner extends StatelessWidget {
     );
   }
 
-  /// Affiche un tutoriel rapide sur les attestations
+  /// Shows a quick tutorial on credentials
   void _showTutorial(BuildContext context) {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     showDialog(

@@ -6,7 +6,7 @@ import 'package:did_app/ui/views/verification/verification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 
-/// Écran principal avec une navigation par onglets
+/// Main screen with tabbed navigation
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -130,7 +130,7 @@ class _MainScreenState extends State<MainScreen> {
               leading: const Icon(Icons.settings),
               title: Text(l10n.settingsDrawerLabel),
               onTap: () {
-                // TODO: Naviguer vers les paramètres
+                // TODO: Navigate to settings
                 Navigator.pop(context);
               },
             ),
@@ -138,7 +138,7 @@ class _MainScreenState extends State<MainScreen> {
               leading: const Icon(Icons.help),
               title: Text(l10n.helpDrawerLabel),
               onTap: () {
-                // TODO: Naviguer vers la page d'aide
+                // TODO: Navigate to help page
                 Navigator.pop(context);
               },
             ),

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:go_router/go_router.dart';
 
-/// Écran d'accueil de l'application
+/// Application home screen
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -133,7 +133,7 @@ class HomeScreen extends StatelessWidget {
           subtitle: l10n.credentialsMenuDesc,
           icon: Icons.credit_card,
           color: Colors.orange,
-          onTap: () {}, // À implémenter
+          onTap: () {}, // To implement
         ),
         const SizedBox(height: 12),
         MenuCard(
@@ -149,7 +149,7 @@ class HomeScreen extends StatelessWidget {
           subtitle: l10n.secureShareMenuDesc,
           icon: Icons.share,
           color: Colors.purple,
-          onTap: () {}, // À implémenter
+          onTap: () {}, // To implement
         ),
       ],
     );

@@ -228,7 +228,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
                   'EUDI Wallet Interaction',
                 ), // TODO: Localize (l10n.eudiWalletInteractionTitle)
                 subtitle: Text(
-                  'Import from or share credentials with the EUDI Wallet.',
+                  'Import from or export credentials to the EUDI Wallet.',
                 ), // TODO: Localize (l10n.eudiWalletInteractionDesc)
               ),
               const Divider(),
@@ -468,8 +468,8 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
           padding: const EdgeInsets.only(bottom: 8, left: 4, right: 4),
           child: Text(
             // TODO: Localize
-            'Manually import or export credentials in eIDAS-compatible JSON format.',
-            // l10n.importExportSectionDescription,
+            'Import credentials from external sources or export them for backup or transfer.',
+            // l10n.importExportSectionDesc,
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ),
@@ -709,7 +709,7 @@ class _EidasInteropScreenState extends ConsumerState<EidasInteropScreen> {
 
   Future<void> _syncTrustRegistry() async {
     try {
-      await ref.read(eidasNotifierProvider.notifier).syncTrustRegistry();
+      await ref.read(eidasNotifierProvider.notifier).synchronizeTrustRegistry();
 
       if (mounted) {
         final l10n =

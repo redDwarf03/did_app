@@ -4,43 +4,43 @@ import 'dart:developer' as dev;
 import 'package:did_app/infrastructure/credential/eidas_trust_list.dart';
 import 'package:http/http.dart' as http;
 
-/// Service pour l'intégration avec le registre de confiance européen (EU Trust Registry)
-/// Implémente les fonctionnalités d'interopérabilité avec l'infrastructure officielle eIDAS 2.0
+/// Service for integrating with the European Trust Registry.
+/// Implements interoperability features with the official eIDAS 2.0 infrastructure.
 class EuTrustRegistryService {
-  // Constructeur privé pour le singleton
+  // Private constructor for singleton
   EuTrustRegistryService._();
-  // URLs des APIs du registre de confiance (à remplacer par les URLs officielles)
+  // Base URLs for the trust registry APIs (replace with official URLs)
   static const String _baseUrl = 'https://eu-trust-registry.europa.eu/api/v1';
   static const String _trustListEndpoint = '$_baseUrl/trusted-issuers';
   static const String _trustSchemeEndpoint = '$_baseUrl/trust-schemes';
   static const String _verificationEndpoint = '$_baseUrl/verify';
   static final EuTrustRegistryService instance = EuTrustRegistryService._();
 
-  // Client HTTP avec timeout
+  // HTTP client with timeout
   final http.Client _client = http.Client();
   static const _timeout = Duration(seconds: 10);
 
-  /// Récupère la liste complète des émetteurs de confiance du registre européen
+  /// Fetches the complete list of trusted issuers from the European registry.
   Future<List<TrustedIssuer>> fetchTrustedIssuers() async {
     try {
-      // Dans une implémentation réelle, cette méthode ferait un appel API à l'endpoint officiel
+      // In a real implementation, this method would make an API call to the official endpoint.
       final response =
           await _client.get(Uri.parse(_trustListEndpoint)).timeout(_timeout);
 
-      // Gestion des erreurs HTTP
+      // Handle HTTP errors
       if (response.statusCode != 200) {
         throw Exception(
-          'Erreur lors de la récupération des émetteurs de confiance: ${response.statusCode}',
+          'Error fetching trusted issuers: ${response.statusCode}',
         );
       }
 
-      // Pour la démo, on simule une réponse
-      // Dans une implémentation réelle, on traiterait la réponse JSON du serveur
+      // For the demo, simulate a response.
+      // In a real implementation, process the JSON response from the server.
       return _simulateTrustedIssuersResponse();
     } catch (e) {
-      // En cas d'erreur, on retourne une liste vide et on log l'erreur
+      // In case of error, return an empty list and log the error.
       dev.log(
-        'Erreur lors de la récupération des émetteurs de confiance',
+        'Error fetching trusted issuers',
         name: 'EuTrustRegistryService.fetchTrustedIssuers',
         error: e,
         level: 1000,
@@ -49,7 +49,7 @@ class EuTrustRegistryService {
     }
   }
 
-  /// Récupère les émetteurs de confiance d'un pays spécifique
+  /// Fetches trusted issuers for a specific country.
   Future<List<TrustedIssuer>> fetchTrustedIssuersByCountry(
     String countryCode,
   ) async {
@@ -59,18 +59,18 @@ class EuTrustRegistryService {
 
       if (response.statusCode != 200) {
         throw Exception(
-          'Erreur lors de la récupération des émetteurs pour $countryCode: ${response.statusCode}',
+          'Error fetching issuers for $countryCode: ${response.statusCode}',
         );
       }
 
-      // Pour la démo, on filtre manuellement
+      // For the demo, filter manually.
       final allIssuers = _simulateTrustedIssuersResponse();
       return allIssuers
           .where((issuer) => issuer.country == countryCode)
           .toList();
     } catch (e) {
       dev.log(
-        'Erreur lors de la récupération des émetteurs par pays',
+        'Error fetching issuers by country',
         name: 'EuTrustRegistryService.fetchTrustedIssuersByCountry',
         error: e,
         level: 1000,
@@ -79,7 +79,7 @@ class EuTrustRegistryService {
     }
   }
 
-  /// Récupère les schémas de confiance disponibles (Low, Substantial, High)
+  /// Fetches available trust schemes (Low, Substantial, High).
   Future<Map<String, dynamic>> fetchTrustSchemes() async {
     try {
       final response =
@@ -87,11 +87,11 @@ class EuTrustRegistryService {
 
       if (response.statusCode != 200) {
         throw Exception(
-          'Erreur lors de la récupération des schémas de confiance: ${response.statusCode}',
+          'Error fetching trust schemes: ${response.statusCode}',
         );
       }
 
-      // Pour la démo, on simule une réponse
+      // For the demo, simulate a response.
       return {
         'schemes': [
           {
@@ -126,7 +126,7 @@ class EuTrustRegistryService {
       };
     } catch (e) {
       dev.log(
-        'Erreur lors de la récupération des schémas de confiance',
+        'Error fetching trust schemes',
         name: 'EuTrustRegistryService.fetchTrustSchemes',
         error: e,
         level: 1000,
@@ -135,7 +135,7 @@ class EuTrustRegistryService {
     }
   }
 
-  /// Vérifie si un émetteur est dans le registre de confiance européen
+  /// Checks if an issuer is listed in the European trust registry.
   Future<Map<String, dynamic>> verifyTrustedIssuer(String issuerId) async {
     try {
       final uri = Uri.parse(_verificationEndpoint);
@@ -149,11 +149,11 @@ class EuTrustRegistryService {
 
       if (response.statusCode != 200) {
         throw Exception(
-          "Erreur lors de la vérification de l'émetteur: ${response.statusCode}",
+          "Error verifying issuer: ${response.statusCode}",
         );
       }
 
-      // Pour la démo, on simule une réponse de vérification
+      // For the demo, simulate a verification response.
       final allIssuers = _simulateTrustedIssuersResponse();
       final isTrusted = allIssuers.any((issuer) => issuer.did == issuerId);
 
@@ -169,7 +169,7 @@ class EuTrustRegistryService {
       };
     } catch (e) {
       dev.log(
-        "Erreur lors de la vérification de l'émetteur",
+        "Error verifying issuer",
         name: 'EuTrustRegistryService.verifyTrustedIssuer',
         error: e,
         level: 1000,
@@ -185,11 +185,11 @@ class EuTrustRegistryService {
     }
   }
 
-  /// Soumet un émetteur pour inclusion dans le registre de confiance (pour les autorités autorisées)
+  /// Submits an issuer for inclusion in the trust registry (for authorized authorities).
   Future<bool> submitTrustedIssuer(TrustedIssuer issuer, String apiKey) async {
     try {
-      // Dans une implémentation réelle, cette méthode nécessiterait une autorisation
-      // et un processus d'approbation
+      // In a real implementation, this method would require authorization
+      // and an approval process.
       final uri = Uri.parse('$_trustListEndpoint/submit');
       final response = await _client
           .post(
@@ -212,7 +212,7 @@ class EuTrustRegistryService {
       return response.statusCode == 201 || response.statusCode == 202;
     } catch (e) {
       dev.log(
-        "Erreur lors de la soumission de l'émetteur",
+        "Error submitting issuer",
         name: 'EuTrustRegistryService.submitTrustedIssuer',
         error: e,
         level: 1000,
@@ -221,22 +221,22 @@ class EuTrustRegistryService {
     }
   }
 
-  /// Synchronise la liste locale avec le registre de confiance européen
+  /// Synchronizes the local list with the European trust registry.
   Future<bool> synchronizeTrustList() async {
     try {
       final trustedIssuers = await fetchTrustedIssuers();
 
-      // Mise à jour de la liste locale avec les données récupérées
+      // Update the local list with the fetched data.
       for (final issuer in trustedIssuers) {
-        // Dans une implémentation réelle, cela mettrait à jour la liste locale
-        // Pour la démo, on peut utiliser EidasTrustList pour stocker les émetteurs
+        // In a real implementation, this would update the local list.
+        // For the demo, EidasTrustList can be used to store issuers.
         await EidasTrustList.instance.updateTrustedIssuer(issuer);
       }
 
       return true;
     } catch (e) {
       dev.log(
-        'Erreur lors de la synchronisation de la liste de confiance',
+        'Error synchronizing trust list',
         name: 'EuTrustRegistryService.synchronizeTrustList',
         error: e,
         level: 1000,
@@ -245,11 +245,11 @@ class EuTrustRegistryService {
     }
   }
 
-  /// Génère un rapport d'interopérabilité
+  /// Generates an interoperability report.
   Future<Map<String, dynamic>> generateInteroperabilityReport() async {
     try {
-      // Dans une implémentation réelle, cette méthode interrogerait l'API
-      // pour produire un rapport d'interopérabilité
+      // In a real implementation, this method would query the API
+      // to produce an interoperability report.
       final trustedIssuers = await fetchTrustedIssuers();
       final trustSchemes = await fetchTrustSchemes();
 
@@ -263,7 +263,7 @@ class EuTrustRegistryService {
       };
     } catch (e) {
       dev.log(
-        "Erreur lors de la génération du rapport d'interopérabilité",
+        "Error generating interoperability report",
         name: 'EuTrustRegistryService.generateInteroperabilityReport',
         error: e,
         level: 1000,
@@ -276,11 +276,11 @@ class EuTrustRegistryService {
     }
   }
 
-  // Méthodes utilitaires
+  // Utility methods
 
-  /// Simule une réponse du serveur pour la démo
+  /// Simulates a server response for the demo.
   List<TrustedIssuer> _simulateTrustedIssuersResponse() {
-    // Création d'une liste d'émetteurs de confiance fictifs pour la démo
+    // Create a list of fictitious trusted issuers for the demo.
     return [
       TrustedIssuer(
         did: 'did:eidas:eu:gov:ec',
@@ -349,7 +349,7 @@ class EuTrustRegistryService {
     ];
   }
 
-  /// Compte les émetteurs par pays
+  /// Counts issuers by country.
   Map<String, int> _countIssuersByCountry(List<TrustedIssuer> issuers) {
     final countByCountry = <String, int>{};
     for (final issuer in issuers) {
@@ -359,7 +359,7 @@ class EuTrustRegistryService {
     return countByCountry;
   }
 
-  /// Compte les émetteurs par niveau de confiance
+  /// Counts issuers by trust level.
   Map<String, int> _countIssuersByLevel(List<TrustedIssuer> issuers) {
     final countByLevel = <String, int>{};
     for (final issuer in issuers) {
@@ -369,19 +369,19 @@ class EuTrustRegistryService {
     return countByLevel;
   }
 
-  /// Récupère le niveau de confiance d'un émetteur
+  /// Gets the trust level of an issuer.
   String? _getTrustLevelForIssuer(
     String issuerId,
     List<TrustedIssuer> issuers,
   ) {
     final issuer = issuers.firstWhere(
       (i) => i.did == issuerId,
-      orElse: () => issuers.first,
+      orElse: () => issuers.first, // TODO: Handle case where issuer not found
     );
     return _trustLevelToString(issuer.trustLevel);
   }
 
-  /// Convertit le niveau de confiance en chaîne de caractères
+  /// Converts trust level enum to string.
   String _trustLevelToString(TrustLevel level) {
     switch (level) {
       case TrustLevel.low:

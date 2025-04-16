@@ -7,26 +7,26 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
 
-/// Service pour gérer l'authentification sans mot de passe
+/// Service for managing passwordless authentication.
 class PasswordlessAuthService {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   final String _tokenKey = 'auth_token';
   final String _tokenExpiryKey = 'auth_token_expiry';
   final String _emailKey = 'auth_email';
 
-  // URL de base pour les liens magiques (à remplacer par votre URL réelle)
-  final String _baseUrl = 'https://votreapp.com/auth';
+  // Base URL for magic links (replace with your actual URL)
+  final String _baseUrl = 'https://yourapp.com/auth';
 
-  /// Génère un lien magique pour l'authentification sans mot de passe
+  /// Generates a magic link for passwordless authentication.
   Future<String> generateMagicLink(String email) async {
     try {
-      // Générer un jeton unique
+      // Generate a unique token
       final token = _generateToken();
 
-      // Définir une expiration (15 minutes)
+      // Set an expiration time (15 minutes)
       final expiry = DateTime.now().add(const Duration(minutes: 15));
 
-      // Stocker le jeton et son expiration
+      // Store the token and its expiration
       await _secureStorage.write(key: _tokenKey, value: token);
       await _secureStorage.write(
         key: _tokenExpiryKey,
@@ -34,14 +34,14 @@ class PasswordlessAuthService {
       );
       await _secureStorage.write(key: _emailKey, value: email);
 
-      // Créer le lien magique
+      // Create the magic link
       final magicLink =
           '$_baseUrl?token=$token&email=${Uri.encodeComponent(email)}';
 
-      // Dans une implémentation réelle, ce lien serait envoyé par email
+      // In a real implementation, this link would be sent via email
       if (kDebugMode) {
         dev.log(
-          'Lien magique généré pour $email: $magicLink',
+          'Magic link generated for $email: $magicLink',
           name: 'PasswordlessAuthService.generateMagicLink',
         );
       }
@@ -49,7 +49,7 @@ class PasswordlessAuthService {
       return magicLink;
     } catch (e) {
       dev.log(
-        'Erreur lors de la génération du lien magique',
+        'Error generating magic link',
         name: 'PasswordlessAuthService.generateMagicLink',
         error: e,
         level: 1000, // Severe level
@@ -58,78 +58,78 @@ class PasswordlessAuthService {
     }
   }
 
-  /// Vérifie un jeton d'authentification
+  /// Verifies an authentication token.
   Future<AuthVerificationResult> verifyToken(String token, String email) async {
     try {
-      // Récupérer le jeton stocké et son expiration
+      // Retrieve the stored token and its expiration
       final storedToken = await _secureStorage.read(key: _tokenKey);
       final expiryString = await _secureStorage.read(key: _tokenExpiryKey);
       final storedEmail = await _secureStorage.read(key: _emailKey);
 
-      // Si aucun jeton n'est stocké
+      // If no token is stored
       if (storedToken == null || expiryString == null || storedEmail == null) {
         return AuthVerificationResult(
           isValid: false,
-          message: "Aucun jeton d'authentification en attente",
+          message: "No pending authentication token",
         );
       }
 
-      // Vérifier que l'email correspond
+      // Check if the email matches
       if (email != storedEmail) {
         return AuthVerificationResult(
           isValid: false,
-          message: "L'email ne correspond pas",
+          message: "Email does not match",
         );
       }
 
-      // Vérifier l'expiration
+      // Check expiration
       final expiry =
           DateTime.fromMillisecondsSinceEpoch(int.parse(expiryString));
       if (DateTime.now().isAfter(expiry)) {
         return AuthVerificationResult(
           isValid: false,
-          message: 'Le lien a expiré',
+          message: 'Link has expired',
           isExpired: true,
         );
       }
 
-      // Vérifier le jeton
+      // Verify the token
       if (token == storedToken) {
-        // Générer un JWT pour l'authentification de session
+        // Generate a JWT for session authentication
         final sessionToken = _generateJwt(email);
 
         return AuthVerificationResult(
           isValid: true,
-          message: 'Authentification réussie',
+          message: 'Authentication successful',
           token: sessionToken,
         );
       } else {
         return AuthVerificationResult(
           isValid: false,
-          message: "Jeton d'authentification invalide",
+          message: "Invalid authentication token",
         );
       }
     } catch (e) {
       dev.log(
-        'Erreur lors de la vérification du jeton',
+        'Error verifying token',
         name: 'PasswordlessAuthService.verifyToken',
         error: e,
         level: 1000, // Severe level
       );
       return AuthVerificationResult(
         isValid: false,
-        message: 'Erreur lors de la vérification: $e',
+        message: 'Verification error: $e',
       );
     }
   }
 
-  /// Efface le jeton après une authentification réussie
+  /// Clears the token after successful authentication.
   Future<void> clearToken() async {
     await _secureStorage.delete(key: _tokenKey);
     await _secureStorage.delete(key: _tokenExpiryKey);
   }
 
-  /// Génère un jeton aléatoire sécurisé
+  /// Generates a secure random token.
   String _generateToken() {
     const uuid = Uuid();
     final random = Random.secure();
@@ -143,13 +143,13 @@ class PasswordlessAuthService {
     return digest.toString();
   }
 
-  /// Génère un JWT simplifié pour l'authentification de session
-  /// Note: Dans une implémentation réelle, utilisez une bibliothèque JWT complète
+  /// Generates a simplified JWT for session authentication.
+  /// Note: In a real implementation, use a complete JWT library.
   String _generateJwt(String email) {
-    // Créer l'en-tête
+    // Create the header
     final header = {'alg': 'HS256', 'typ': 'JWT'};
 
-    // Créer le payload
+    // Create the payload
     final payload = {
       'sub': email,
       'iat': DateTime.now().millisecondsSinceEpoch ~/ 1000,
@@ -158,42 +158,42 @@ class PasswordlessAuthService {
               1000,
     };
 
-    // Encoder l'en-tête et le payload en base64
+    // Base64 encode the header and payload
     final encodedHeader = base64Url.encode(utf8.encode(jsonEncode(header)));
     final encodedPayload = base64Url.encode(utf8.encode(jsonEncode(payload)));
 
-    // Dans une implémentation réelle, nous signerions réellement le JWT avec une clé secrète
-    // Pour cette démo, nous utilisons un secret fixe
-    const secret = 'votre_secret_tres_long_et_tres_complexe';
+    // In a real implementation, we would actually sign the JWT with a secret key
+    // For this demo, use a fixed secret
+    const secret = 'your_very_long_and_complex_secret';
     final data = '$encodedHeader.$encodedPayload';
     final bytes = utf8.encode(data + secret);
     final signature = base64Url.encode(sha256.convert(bytes).bytes);
 
-    // Assembler le JWT
+    // Assemble the JWT
     return '$encodedHeader.$encodedPayload.$signature';
   }
 
-  /// Vérifie si l'utilisateur est déjà authentifié
+  /// Checks if the user is already authenticated.
   Future<bool> isAuthenticated() async {
     try {
       final token = await _secureStorage.read(key: 'session_token');
       if (token == null) return false;
 
-      // Dans une implémentation réelle, nous vérifierions si le JWT est valide
-      // Pour cette démo, nous supposons qu'il est valide
+      // In a real implementation, we would verify if the JWT is valid
+      // For this demo, assume it is valid
       return true;
     } catch (e) {
       return false;
     }
   }
 
-  /// Enregistre le jeton de session
+  /// Saves the session token.
   Future<void> saveSessionToken(String token) async {
     await _secureStorage.write(key: 'session_token', value: token);
   }
 }
 
-/// Résultat de la vérification d'authentification
+/// Result of an authentication verification.
 class AuthVerificationResult {
   AuthVerificationResult({
     required this.isValid,

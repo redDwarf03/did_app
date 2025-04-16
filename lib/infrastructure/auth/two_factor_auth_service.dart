@@ -5,23 +5,23 @@ import 'dart:developer' as dev;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-/// Service pour gérer l'authentification à deux facteurs
+/// Service to manage two-factor authentication
 class TwoFactorAuthService {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   final String _otpStorageKey = 'otp_code';
   final String _otpExpiryKey = 'otp_expiry';
   final String _emailKey = 'otp_email';
 
-  /// Génère et envoie un code OTP à l'adresse email spécifiée
+  /// Generates and sends an OTP code to the specified email address
   Future<bool> sendOtp(String email) async {
     try {
-      // Générer un code OTP aléatoire à 6 chiffres
+      // Generate a random 6-digit OTP code
       final code = _generateOtpCode();
 
-      // Définir une expiration (10 minutes à partir de maintenant)
+      // Set an expiration (10 minutes from now)
       final expiry = DateTime.now().add(const Duration(minutes: 10));
 
-      // Stocker le code et son expiration de manière sécurisée
+      // Store the code and its expiration securely
       await _secureStorage.write(key: _otpStorageKey, value: code);
       await _secureStorage.write(
         key: _otpExpiryKey,
@@ -29,11 +29,11 @@ class TwoFactorAuthService {
       );
       await _secureStorage.write(key: _emailKey, value: email);
 
-      // Dans une implémentation réelle, cette fonction enverrait le code par email
-      // en utilisant un service d'envoi d'emails (SendGrid, Mailgun, etc.)
+      // In a real implementation, this function would send the code via email
+      // using an email sending service (SendGrid, Mailgun, etc.)
       if (kDebugMode) {
         dev.log(
-          'Code OTP envoyé à $email: $code',
+          'OTP code sent to $email: $code',
           name: 'TwoFactorAuthService.sendOtp',
         );
       }
@@ -41,7 +41,7 @@ class TwoFactorAuthService {
       return true;
     } catch (e) {
       dev.log(
-        'Erreur l\'envoi du code OTP',
+        'Error sending OTP code',
         name: 'TwoFactorAuthService.sendOtp',
         error: e,
         level: 1000,
@@ -50,77 +50,77 @@ class TwoFactorAuthService {
     }
   }
 
-  /// Vérifie si un code OTP est valide
+  /// Verifies if an OTP code is valid
   Future<OtpVerificationResult> verifyOtp(String code) async {
     try {
-      // Récupérer le code stocké et son expiration
+      // Retrieve the stored code and its expiration
       final storedCode = await _secureStorage.read(key: _otpStorageKey);
       final expiryString = await _secureStorage.read(key: _otpExpiryKey);
 
-      // Si aucun code n'est stocké
+      // If no code is stored
       if (storedCode == null || expiryString == null) {
         return OtpVerificationResult(
           isValid: false,
-          message: 'Aucun code OTP en attente de validation',
+          message: 'No pending OTP code for validation',
         );
       }
 
-      // Vérifier l'expiration
+      // Check expiration
       final expiry =
           DateTime.fromMillisecondsSinceEpoch(int.parse(expiryString));
       if (DateTime.now().isAfter(expiry)) {
         return OtpVerificationResult(
           isValid: false,
-          message: 'Le code OTP a expiré',
+          message: 'OTP code has expired',
           isExpired: true,
         );
       }
 
-      // Vérifier le code
+      // Verify the code
       if (code == storedCode) {
         return OtpVerificationResult(
           isValid: true,
-          message: 'Code OTP validé avec succès',
+          message: 'OTP code validated successfully',
         );
       } else {
         return OtpVerificationResult(
           isValid: false,
-          message: 'Code OTP invalide',
+          message: 'Invalid OTP code',
         );
       }
     } catch (e) {
       dev.log(
-        'Erreur lors de la vérification du code OTP',
+        'Error during OTP code verification',
         name: 'TwoFactorAuthService.verifyOtp',
         error: e,
         level: 1000,
       );
       return OtpVerificationResult(
         isValid: false,
-        message: 'Erreur lors de la vérification: $e',
+        message: 'Verification error: $e',
       );
     }
   }
 
-  /// Efface le code OTP après une validation réussie
+  /// Clears the OTP code after successful validation
   Future<void> clearOtp() async {
     await _secureStorage.delete(key: _otpStorageKey);
     await _secureStorage.delete(key: _otpExpiryKey);
   }
 
-  /// Récupère l'email associé au dernier code OTP envoyé
+  /// Retrieves the email associated with the last sent OTP code
   Future<String?> getOtpEmail() async {
     return _secureStorage.read(key: _emailKey);
   }
 
-  /// Génère un code OTP aléatoire à 6 chiffres
+  /// Generates a random 6-digit OTP code
   String _generateOtpCode() {
     final random = Random.secure();
     return (100000 + random.nextInt(900000)).toString();
   }
 }
 
-/// Résultat de la vérification d'un code OTP
+/// Result of the OTP code verification
 class OtpVerificationResult {
   OtpVerificationResult({
     required this.isValid,

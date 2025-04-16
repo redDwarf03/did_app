@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-/// Widget qui contraint la largeur de l'application sur le web pour correspondre
-/// à celle d'un iPhone Pro Max
+/// Widget that constrains the application's width on the web to match
+/// that of an iPhone Pro Max
 class ResponsiveWidthContainer extends StatelessWidget {
   const ResponsiveWidthContainer({
     required this.child,
@@ -11,12 +11,12 @@ class ResponsiveWidthContainer extends StatelessWidget {
 
   final Widget child;
 
-  // Largeur d'un iPhone Pro Max
+  // Width of an iPhone Pro Max
   static const double _maxMobileWidth = 430;
 
   @override
   Widget build(BuildContext context) {
-    // Si ce n'est pas le web, on retourne directement le child
+    // If it's not web, return the child directly
     if (!kIsWeb) {
       return child;
     }
@@ -39,8 +39,8 @@ class ResponsiveWidthContainer extends StatelessWidget {
           height: double.infinity,
           child: GestureDetector(
             onHorizontalDragUpdate: (details) {
-              // On ignore le défilement horizontal sur le web
-              // pour permettre le swipe comme sur mobile
+              // Ignore horizontal scrolling on the web
+              // to allow swiping like on mobile
             },
             child: child,
           ),

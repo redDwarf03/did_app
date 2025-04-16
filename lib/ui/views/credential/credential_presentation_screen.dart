@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Écran pour la présentation sélective d'attributs avec ZKP
+/// Screen for selective attribute presentation with ZKP
 class CredentialPresentationScreen extends ConsumerStatefulWidget {
   const CredentialPresentationScreen({
     super.key,
     required this.credentialIds,
   });
 
-  /// IDs des attestations à présenter
+  /// IDs of the credentials to present
   final List<String> credentialIds;
 
   @override
@@ -22,7 +22,7 @@ class CredentialPresentationScreen extends ConsumerStatefulWidget {
 
 class _CredentialPresentationScreenState
     extends ConsumerState<CredentialPresentationScreen> {
-  // État local
+  // Local state
   final Map<String, List<String>> _selectedAttributes = {};
   final List<CredentialPredicate> _predicates = [];
   final TextEditingController _messageController = TextEditingController();
@@ -30,7 +30,7 @@ class _CredentialPresentationScreenState
   bool _usePredicate = false;
   String? _errorMessage;
 
-  // Récupérer les attestations correspondantes
+  // Get the corresponding credentials
   List<Credential> get _credentials {
     final allCredentials = ref.read(credentialNotifierProvider).credentials;
     return allCredentials
@@ -41,13 +41,13 @@ class _CredentialPresentationScreenState
   @override
   void initState() {
     super.initState();
-    // Initialiser les attributs sélectionnés
+    // Initialize selected attributes
     _initSelectedAttributes();
   }
 
   void _initSelectedAttributes() {
     for (final credential in _credentials) {
-      // Présélectionner les attributs courants (nom, prénom, etc.)
+      // Pre-select common attributes (first name, last name, etc.)
       final defaultAttrs = <String>[];
       if (credential.claims.containsKey('firstName')) {
         defaultAttrs.add('firstName');
@@ -58,7 +58,7 @@ class _CredentialPresentationScreenState
       if (defaultAttrs.isNotEmpty) {
         _selectedAttributes[credential.id] = defaultAttrs;
       } else {
-        // Si pas d'attributs courants, présélectionner le premier
+        // If no common attributes, pre-select the first one
         final keys = credential.claims.keys.toList();
         if (keys.isNotEmpty) {
           _selectedAttributes[credential.id] = [keys.first];
@@ -88,7 +88,7 @@ class _CredentialPresentationScreenState
 
           return Column(
             children: [
-              // Bannière explicative pour débutants
+              // Explanatory banner for beginners
               const _BeginnerInfoBox(),
 
               Expanded(
@@ -133,16 +133,16 @@ class _CredentialPresentationScreenState
         children: [
           _buildHeader(),
           const SizedBox(height: 24),
-          // Liste des attestations
+          // List of credentials
           ..._credentials.map(_buildCredentialSection),
           const SizedBox(height: 24),
-          // Section prédicat (si affichée)
+          // Predicate section (if displayed)
           if (_usePredicate) _buildPredicatesSection(),
           const SizedBox(height: 24),
-          // Message facultatif
+          // Optional message
           _buildMessageSection(),
           const SizedBox(height: 32),
-          // Actions en bas d'écran
+          // Bottom action buttons
           _buildActionButtons(context, ref),
         ],
       ),

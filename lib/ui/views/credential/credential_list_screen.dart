@@ -249,7 +249,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     );
   }
 
-  // Verify a credential.
+  // Verify a credential's status.
   Future<void> _verifyCredential(
     BuildContext context,
     Credential credential,
@@ -299,10 +299,8 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     }
   }
 
-  // Scan a QR code.
+  // Scan a QR code to receive a credential or verify a presentation.
   Future<void> _scanQRCode(BuildContext context) async {
-    // In a real implementation, we would use a QR code scanner.
-    // For the prototype, we simply simulate receiving a credential.
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
 
     await showDialog(
@@ -385,7 +383,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     }
   }
 
-  // Show the request credential dialog.
+  // Show dialog to request a new credential.
   Future<void> _showRequestCredentialDialog(BuildContext context) async {
     await showDialog(
       context: context,
@@ -397,7 +395,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     );
   }
 
-  // Request a credential.
+  // Handle credential request type selection.
   Future<void> _requestCredential(BuildContext context, String type) async {
     // Here, we would launch the credential request process.
     // By contacting an issuer, or redirecting to their site.
@@ -432,7 +430,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     );
   }
 
-  // Present a credential (selection dialog).
+  // Show dialog to select credentials for presentation.
   Future<void> _showPresentCredentialDialog(BuildContext context) async {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     final credentials = ref.read(credentialNotifierProvider).credentials;
@@ -484,8 +482,11 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     );
   }
 
-  // Confirm credential deletion.
-  void _confirmDeleteCredential(BuildContext context, Credential credential) {
+  // Ask for confirmation before deleting a credential.
+  Future<void> _confirmDeleteCredential(
+    BuildContext context,
+    Credential credential,
+  ) async {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     DialogUtils.showConfirmationDialog(
       context: context,
@@ -501,7 +502,7 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     });
   }
 
-  // Delete a credential.
+  // Delete the credential.
   Future<void> _deleteCredential(
     BuildContext context,
     Credential credential,
@@ -602,21 +603,8 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
     }
   }
 
-  /// Checks if this is the user's first visit to this screen.
-  bool _isFirstVisit(WidgetRef ref) {
-    // In a real implementation, this would be stored in preferences.
-    // For this demo, always return true.
-    return true;
-  }
-
-  /// Marks the screen as visited.
-  void _markAsVisited(WidgetRef ref) {
-    // In a real implementation, this would be stored in preferences.
-    // For this demo, do nothing.
-  }
-
-  /// Displays a dialog explaining credentials.
-  void _showInfoDialog(BuildContext context) {
+  // Show informational dialog about credentials.
+  Future<void> _showInfoDialog(BuildContext context) async {
     final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations)!;
     DialogUtils.showInfoDialog(
       context: context,
@@ -642,7 +630,22 @@ class _CredentialListScreenState extends ConsumerState<CredentialListScreen> {
       ],
     );
   }
+
+  // Logic to check if it's the user's first visit to this screen.
+  bool _isFirstVisit(WidgetRef ref) {
+    // In a real app, this would check a persistent flag.
+    return true;
+  }
+
+  // Logic to mark the screen as visited.
+  void _markAsVisited(WidgetRef ref) {
+    // In a real app, this would set a persistent flag.
+    ref.read(dummyFirstVisitProvider.notifier).state = false;
+  }
 }
+
+// Temporary provider for demo purposes.
+final dummyFirstVisitProvider = StateProvider<bool>((ref) => true);
 
 // This component will be implemented later.
 class CredentialDetailScreen extends StatelessWidget {

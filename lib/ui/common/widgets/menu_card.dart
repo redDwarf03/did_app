@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Widget représentant une carte de menu cliquable.
+/// Widget representing a clickable menu card.
 class MenuCard extends StatelessWidget {
   const MenuCard({
     required this.title,

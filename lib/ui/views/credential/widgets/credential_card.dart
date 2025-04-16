@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/localizations.dart';
 
-/// Widget réutilisable pour afficher une carte d'attestation dans l'application
+/// Reusable widget to display a credential card in the application
 class CredentialCard extends StatelessWidget {
   const CredentialCard({
     super.key,
@@ -15,22 +15,22 @@ class CredentialCard extends StatelessWidget {
     this.compact = false,
   });
 
-  /// L'attestation à afficher
+  /// The credential to display
   final Credential credential;
 
-  /// Callback quand la carte est touchée (généralement pour ouvrir les détails)
+  /// Callback when the card is tapped (usually to open details)
   final VoidCallback onTap;
 
-  /// Callback pour présenter l'attestation
+  /// Callback to present the credential
   final VoidCallback? onPresent;
 
-  /// Callback pour vérifier l'attestation
+  /// Callback to verify the credential
   final VoidCallback? onVerify;
 
-  /// Callback pour supprimer l'attestation
+  /// Callback to delete the credential
   final VoidCallback? onDelete;
 
-  /// Indique s'il faut afficher une version compacte de la carte
+  /// Indicates whether to display a compact version of the card
   final bool compact;
 
   @override
@@ -38,14 +38,14 @@ class CredentialCard extends StatelessWidget {
     final localizations =
         Localizations.of<AppLocalizations>(context, AppLocalizations)!;
 
-    // Formatter les dates
+    // Format dates
     final dateFormat = DateFormat('dd/MM/yyyy');
     final issuedAt = dateFormat.format(credential.issuedAt);
     final expiresAt = credential.expiresAt != null
         ? dateFormat.format(credential.expiresAt!)
         : localizations.unlimited;
 
-    // Couleur basée sur le statut de vérification
+    // Color based on verification status
     final statusColor = _getStatusColor(credential.verificationStatus);
 
     return Card(
@@ -58,7 +58,7 @@ class CredentialCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Titre et type
+              // Title and type
               Row(
                 children: [
                   Icon(
@@ -119,7 +119,7 @@ class CredentialCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
 
-              // Description - afficher seulement si pas en mode compact
+              // Description - show only if not compact
               if (!compact && credential.description != null)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
@@ -131,9 +131,9 @@ class CredentialCard extends StatelessWidget {
                   ),
                 ),
 
-              // Afficher ces champs seulement si pas en mode compact
+              // Show these fields only if not in compact mode
               if (!compact) ...[
-                // Émetteur
+                // Issuer
                 Row(
                   children: [
                     const Icon(Icons.business, size: 16, color: Colors.grey),
@@ -149,7 +149,7 @@ class CredentialCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
 
-                // Dates d'émission et d'expiration
+                // Issued and expiration dates
                 Row(
                   children: [
                     const Icon(
@@ -182,31 +182,31 @@ class CredentialCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
 
-                // Afficher un aperçu des claims
+                // Display a preview of the claims
                 _buildClaimsPreview(context),
               ],
 
               const SizedBox(height: 8),
 
-              // Boutons d'action
+              // Action buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // Bouton de présentation
+                  // Presentation button
                   if (onPresent != null)
                     IconButton(
                       icon: const Icon(Icons.qr_code),
                       tooltip: localizations.presentButton,
                       onPressed: onPresent,
                     ),
-                  // Bouton de vérification
+                  // Verification button
                   if (onVerify != null)
                     IconButton(
                       icon: const Icon(Icons.verified_user),
                       tooltip: localizations.verifyStatusButton,
                       onPressed: onVerify,
                     ),
-                  // Menu pour édition et suppression
+                  // Menu for edit and delete
                   if (onDelete != null)
                     PopupMenuButton<String>(
                       onSelected: (value) {
@@ -230,7 +230,7 @@ class CredentialCard extends StatelessWidget {
     );
   }
 
-  // Construit un aperçu des claims (attributs) de l'attestation
+  // Builds a preview of the credential claims (attributes)
   Widget _buildClaimsPreview(BuildContext context) {
     final localizations =
         Localizations.of<AppLocalizations>(context, AppLocalizations)!;
@@ -239,7 +239,7 @@ class CredentialCard extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    // Limiter le nombre de claims affichés dans l'aperçu
+    // Limit the number of claims displayed in the preview
     final previewClaims = claims.entries.take(3).toList();
 
     return Container(

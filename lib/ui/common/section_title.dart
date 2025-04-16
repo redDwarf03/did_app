@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Widget pour afficher un titre de section
+/// Widget to display a section title
 class SectionTitle extends StatelessWidget {
   const SectionTitle({
     super.key,

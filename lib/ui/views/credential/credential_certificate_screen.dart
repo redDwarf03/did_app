@@ -137,7 +137,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          // En-tête avec motif
+          // Header with pattern
           Container(
             height: 80,
             width: double.infinity,
@@ -150,7 +150,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
             ),
             child: Stack(
               children: [
-                // Motif de fond
+                // Background pattern
                 Positioned.fill(
                   child: CustomPaint(
                     painter: CertificatePatternPainter(
@@ -158,7 +158,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                // Contenu de l'en-tête
+                // Header content
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -183,13 +183,13 @@ class CredentialCertificateScreen extends ConsumerWidget {
             ),
           ),
 
-          // Contenu du certificat
+          // Certificate content
           Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Titre
+                // Title
                 Center(
                   child: Text(
                     l10n.verifiableCredentialsTitle,
@@ -201,7 +201,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // Sous-titre
+                // Subtitle
                 Center(
                   child: Text(
                     _getCredentialName(l10n),
@@ -214,18 +214,18 @@ class CredentialCertificateScreen extends ConsumerWidget {
 
                 const SizedBox(height: 24),
 
-                // Contenu principal
+                // Main content
                 ..._buildCertificateContent(context, l10n),
 
                 const SizedBox(height: 24),
 
-                // Pied avec signature
+                // Footer with signature
                 _buildSignature(context, l10n),
               ],
             ),
           ),
 
-          // Pied avec infos de validation
+          // Footer with validation info
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
             decoration: BoxDecoration(
@@ -265,7 +265,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
   }
 
   String _getCredentialName(AppLocalizations l10n) {
-    // Détermine un nom plus lisible pour l'attestation
+    // Determines a more readable name for the credential
     final subjectData = credential.credentialSubject;
     if (credential.type.contains('IdentityCredential')) {
       final firstName = subjectData['firstName'] as String? ?? '';
@@ -297,7 +297,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
     final widgets = <Widget>[];
 
     if (credential.type.contains('IdentityCredential')) {
-      // Pour une attestation d'identité
+      // For an identity credential
       widgets.addAll([
         _buildContentRow(
           l10n.fullNameLabelDetails,
@@ -318,7 +318,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
           ),
       ]);
     } else if (credential.type.contains('UniversityDegreeCredential')) {
-      // Pour un diplôme
+      // For a degree
       final degree = subjectData['degree'] as Map<String, dynamic>? ?? {};
       widgets.addAll([
         _buildContentRow(
@@ -337,7 +337,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
           _buildContentRow(l10n.documentDescriptionLabel, subjectData['gpa']),
       ]);
     } else if (credential.type.contains('HealthInsuranceCredential')) {
-      // Pour une attestation d'assurance santé
+      // For a health insurance credential
       widgets.addAll([
         _buildContentRow(
           l10n.issuerLabelDetail,
@@ -361,7 +361,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
         ),
       ]);
     } else if (credential.type.contains('EmploymentCredential')) {
-      // Pour une attestation d'emploi
+      // For an employment credential
       final employer = subjectData['employer'] as Map<String, dynamic>? ?? {};
       widgets.addAll([
         _buildContentRow(l10n.documentTypeLabel, subjectData['position'] ?? ''),
@@ -380,7 +380,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
         ),
       ]);
     } else {
-      // Pour tout autre type d'attestation, afficher tous les attributs
+      // For any other type of credential, display all attributes
       subjectData.forEach((key, value) {
         if (key != 'id') {
           if (value is Map) {
@@ -435,7 +435,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            // QR code (simulé)
+            // QR code (simulated)
             Container(
               width: 60,
               height: 60,
@@ -610,7 +610,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
     );
   }
 
-  /// Retourne l'icône correspondant au type d'attestation
+  /// Returns the icon corresponding to the credential type
   IconData _getCredentialTypeIcon(CredentialType type) {
     switch (type) {
       case CredentialType.identity:
@@ -638,7 +638,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
     }
   }
 
-  /// Convertit une liste de types en CredentialType
+  /// Converts a list of types to CredentialType
   CredentialType _getCredentialTypeFromList(List<String> types) {
     if (types.contains('IdentityCredential')) {
       return CredentialType.identity;
@@ -666,7 +666,7 @@ class CredentialCertificateScreen extends ConsumerWidget {
   }
 }
 
-/// Peintre personnalisé pour dessiner un motif sur le certificat
+/// Custom painter to draw a pattern on the certificate
 class CertificatePatternPainter extends CustomPainter {
   CertificatePatternPainter({required this.color});
   final Color color;
@@ -678,7 +678,7 @@ class CertificatePatternPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
-    // Dessiner un motif de lignes en diagonale
+    // Draw a diagonal line pattern
     for (var i = -size.height; i < size.width + size.height; i += 20) {
       canvas.drawLine(
         Offset(i, 0),
@@ -687,7 +687,7 @@ class CertificatePatternPainter extends CustomPainter {
       );
     }
 
-    // Dessiner une bordure
+    // Draw a border
     final borderPaint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke

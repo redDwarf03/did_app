@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 /// Represents a section in the info dialog.
 class InfoSectionData {
-
   InfoSectionData({
     required this.text,
     required this.icon,
@@ -167,15 +166,18 @@ class DialogUtils {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(section.icon,
-                                color: section.iconColor, size: 20,),
+                            Icon(
+                              section.icon,
+                              color: section.iconColor,
+                              size: 20,
+                            ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(section.text),
                             ),
                           ],
                         ),
-                      ),)
+                      ))
                   .toList(),
             ),
           ),
